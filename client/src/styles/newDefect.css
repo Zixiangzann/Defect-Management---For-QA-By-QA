@@ -1,0 +1,53 @@
+.wrapperClassName{
+    width: 100%;
+    display: block;
+    min-height: 150px;
+}
+
+.editorClassName{
+    border: 1px solid black;
+    min-height: 150px;
+}
+
+.create-new-defect{
+    padding: 2px;
+    margin: 2px;
+}
+
+.create-new-defect input{
+
+    min-height: 20px;
+    align-self: stretch;
+    width: 450px;
+
+}
+
+.create-new-defect label{
+    flex-basis: 50%
+}
+
+
+.create-new-defect .assignee{
+    flex-basis: 50%;
+}
+
+.create-new-defect .priority{
+    flex-basis: 50%;
+}
+
+.create-new-defect .issuetype{
+    flex-basis: 50%;
+}
+
+.create-new-defect form{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 15px 10px;
+    width: 500px;
+}
+
+.create-new-defect button{
+align-self: baseline;
+}

@@ -1,0 +1,62 @@
+.drawer_btn {
+    color: #0062cc;
+    cursor: pointer;
+    margin-right: 10px;
+    align-self: center;
+}
+
+.demo-wrapper {
+    border: 1px solid black;
+    max-width: 1200px;
+    min-height: 300px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.demo-wrapper.error .rdw-editor-main {
+    border-color: red;
+}
+
+.rdw-editor-toolbar {
+    margin-bottom: 0;
+}
+
+.rdw-editor-main {
+    border: 1px solid #F1F1F1;
+    padding: 10px;
+    min-height: 300px;
+}
+
+.rdw-editor-toolbar,
+.rdw-editor-main {
+    border-color: rgba(0, 0, 0, 0.23);
+}
+
+
+.modal-box{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 500px;
+    height: 300px;
+    margin-left: -300px;
+    margin-top: -300px;
+    background-color: whitesmoke;
+    border: 2px solid #000;
+    box-shadow: 24;
+    padding: 1rem;
+    box-sizing: content-box;
+    display: flex;
+    flex-direction: column;
+}
+
+@media only screen and (max-width: 1000px) {
+    .modal-box{
+        width: 300px;
+        height: 300px;
+        left: 45%;
+        top: 50%;
+        margin-left: -150px;
+        margin-top: -175px;
+    }
+  }
