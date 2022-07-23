@@ -277,7 +277,10 @@ const EditDefect = () => {
                             {errorHelperSelect(formik, 'components')}
                         </FormControl>
 
-
+<FormikProvider value={formik}>
+<FieldArray
+name="assignee"
+render={arrayHelpers => (
                         <FormControl
                             sx={{ margin: '1rem 1.5rem 0 0' }}>
                             <InputLabel>Assignee</InputLabel>
@@ -287,6 +290,7 @@ const EditDefect = () => {
                                 name='assignee'
                                 label='Assignee'
                                 value={assignee}
+                                
                                 onChange={
                                     (e) => {
                                         handleChange(e)
@@ -294,11 +298,13 @@ const EditDefect = () => {
                                 }
                                 onClose={() => {
                                     setAssigneeSelectTouched(true);
-                                    formik.values.assignee = assignee
+                                    // formik.values.assignee = assignee
+                                    formik.setFieldValue('assignee',[...assignee])
                                 }}
                                 required
                                 renderValue={(selected) => selected.join(', ')}
                             >
+                                
                                 {defects.data.assignee ? defects.data.assignee.map((item) => (
                                     <MenuItem key={item} value={item}>
                                         <Checkbox
@@ -318,6 +324,10 @@ const EditDefect = () => {
                                 null
                             }
                         </FormControl>
+                        )}
+                />
+                 </FormikProvider>
+
                         <br></br>
 
                         <FormControl

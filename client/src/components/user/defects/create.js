@@ -234,47 +234,53 @@ const CreateDefect = () => {
                             {errorHelperSelect(formik, 'components')}
                         </FormControl>
 
+                        <FormikProvider value={formik}>
+                            <FieldArray
+                                name="assignee"
+                                render={arrayHelpers => (
+                                    <FormControl
+                                        sx={{ margin: '1rem 1.5rem 0 0' }}>
+                                        <InputLabel>Assignee</InputLabel>
+                                        <Select
+                                            sx={{ width: '250px' }}
+                                            multiple
+                                            name='assignee'
+                                            label='Assignee'
+                                            value={assignee}
+                                            onChange={
+                                                (e) => {
+                                                    handleChange(e)
+                                                }
+                                            }
+                                            onClose={() => {
+                                                setAssigneeSelectTouched(true);
+                                                formik.setFieldValue('assignee',[...assignee])
+                                            }}
+                                            required
+                                            renderValue={(selected) => selected.join(', ')}
+                                        >
+                                            {defects.data.assignee ? defects.data.assignee.map((item) => (
+                                                <MenuItem key={item} value={item}>
+                                                    <Checkbox
+                                                        checked={assignee.indexOf(item) > -1}
+                                                    />
+                                                    <ListItemText primary={item} />
+                                                </MenuItem>
+                                            )
+                                            ) : null}
 
-                        <FormControl
-                            sx={{ margin: '1rem 1.5rem 0 0' }}>
-                            <InputLabel>Assignee</InputLabel>
-                            <Select
-                                sx={{ width: '250px' }}
-                                multiple
-                                name='assignee'
-                                label='Assignee'
-                                value={assignee}
-                                onChange={
-                                    (e) => {
-                                        handleChange(e)
-                                    }
-                                }
-                                onClose={() => {
-                                    setAssigneeSelectTouched(true);
-                                    formik.values.assignee = assignee
-                                }}
-                                required
-                                renderValue={(selected) => selected.join(', ')}
-                            >
-                                {defects.data.assignee ? defects.data.assignee.map((item) => (
-                                    <MenuItem key={item} value={item}>
-                                        <Checkbox
-                                            checked={assignee.indexOf(item) > -1}
-                                        />
-                                        <ListItemText primary={item} />
-                                    </MenuItem>
-                                )
-                                ) : null}
-
-                            </Select>
-                            {assignee.length === 0 && assigneeSelectTouched === true ?
-                                <FormHelperText error={true}>
-                                    Please select a assignee
-                                </FormHelperText>
-                                :
-                                null
-                            }
-                        </FormControl>
+                                        </Select>
+                                        {assignee.length === 0 && assigneeSelectTouched === true ?
+                                            <FormHelperText error={true}>
+                                                Please select a assignee
+                                            </FormHelperText>
+                                            :
+                                            null
+                                        }
+                                    </FormControl>
+                                )}
+                            />
+                        </FormikProvider>
                         <br></br>
 
                         <FormControl

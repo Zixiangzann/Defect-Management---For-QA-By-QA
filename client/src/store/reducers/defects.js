@@ -22,7 +22,8 @@ let DEFAULT_DEFECT_STATE ={
         components:null,
         severity:null,
         status:null
-    }
+    },
+    current:null
 }
 
 export const defectsSlice = createSlice({
@@ -64,6 +65,12 @@ export const defectsSlice = createSlice({
         state.defectLists = action.payload
         state.filter.filtered = true;
     })
+        .addCase(getDefectById.pending,(state)=>{state.loading=true})
+        .addCase(getDefectById.fulfilled,(state,action)=>{
+            state.loading = false;
+            state.current = action.payload;
+        })
+        .addCase(getDefectById.rejected,(state) => {state.loading=false})
     }
     })
     

@@ -55,6 +55,10 @@ const PaginateComponent = ({
         navigate(`/defect/edit/${id}`)
     }
 
+    const handleView = (id) => {
+        navigate(`/defect/view/${id}`)
+    }
+
     const handleModalConfirm = (toRemove) => {
         dispatch(deleteDefect({defectId:toRemove}))
         setToRemove(null)
@@ -112,6 +116,7 @@ const PaginateComponent = ({
                                                 <Tooltip title="View">
                                                 <Button
                                                 sx={{ minHeight: 0, minWidth: 0, padding: 1}}
+                                                onClick={()=>handleView(item.defectid)}
                                                 >
                                                     <OpenInNewIcon />
                                                     </Button>

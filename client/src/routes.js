@@ -22,6 +22,7 @@ import Projects from './components/Projects';
 import Auth from './components/auth';
 
 import * as AuthGuard from './hoc/authGuard';
+import ViewDefect from './components/user/defects/view';
 
 
 const Router = () => {
@@ -69,6 +70,12 @@ const Router = () => {
                             <Route path="/defect/create" element={
                                 <AuthGuard.LoginGuard>
                                     <CreateDefect />
+                                </AuthGuard.LoginGuard>
+                            } />
+
+                            <Route path="/defect/view/:defectId" element={
+                                <AuthGuard.LoginGuard>
+                                    <ViewDefect />
                                 </AuthGuard.LoginGuard>
                             } />
 
