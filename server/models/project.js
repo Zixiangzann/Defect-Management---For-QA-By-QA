@@ -3,6 +3,7 @@ import 'dotenv/config'
 import validator from 'validator';
 import * as autoIncrement from 'mongoose-auto-increment'
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import mongoosePaginate from 'mongoose-paginate-v2'
 
 export const projectSchema = mongoose.Schema({
     title: {
@@ -27,6 +28,7 @@ export const projectSchema = mongoose.Schema({
         default: Date.now
     }
 })
+mongoose.plugin(mongoosePaginate);
 mongoose.plugin(mongooseAggregatePaginate);
 const Project = mongoose.model('Project', projectSchema)
 

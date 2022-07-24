@@ -31,7 +31,7 @@ export const getDefectById = async (defectId, user) => {
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
 
         //If it is a "user" account, the account need to be assigned to the project in order to view the defect.
-        const defectProject = (await Defect.find({ defectId }).select('project -_id').exec())[0].project;
+        const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
         if (user.role !== 'admin' && !user.project.includes(defectProject)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
@@ -143,44 +143,28 @@ export const paginateDefectList = async (req, user) => {
     const sortby = req.body.sortby || "_id";
     const order = req.body.order || "desc";
     const limit = req.body.limit || 15;
-    const project = req.body.project || 'all';
     const skip = req.body.skip || 0;
 
-    if (req.user.role !== 'admin' && !user.project.includes(project)) {
-        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+    //If it is a user account, user can only see project that the account is been assigned to
+    const userProject = Project.find({"assignee":{$in:[req.user.email]}}).select("title -_id").distinct("title").exec()
+
+    const options = {
+        page: req.body.page,
+        limit,
+        sortby
     }
 
+    let aggQuery = Defect.aggregate()
+
     try {
-        //default
-        let aggQuery = Defect.aggregate();
-
-        //Project only
-        if (project !== 'all')
-            aggQuery = Defect.aggregate([
-                { $match: { project: project } }
-            ]);
-
-        //Project and keyword
-        if (req.body.keywords && req.body.keywords != '' && project !== 'all') {
-            const re = new RegExp(`${req.body.keywords}`, 'gi')
-            aggQuery = Defect.aggregate([
-                { $match: { title: { $regex: re }, project: project } }])
+        if (req.user.role !== 'admin') {
+            aggQuery = Defect.aggregate(
+                [{$match:{project:{$in:await userProject}}}]
+                )
         }
-
-        //no project but have keyword
-        if (req.body.keywords && req.body.keywords != '' && project === 'all') {
-            const re = new RegExp(`${req.body.keywords}`, 'gi')
-            aggQuery = Defect.aggregate([
-                { $match: { title: { $regex: re } } }])
-        }
-
-        const options = {
-            page: req.body.page,
-            limit,
-            sortby
-        }
-
+    
         const defects = Defect.aggregatePaginate(aggQuery, options);
+   
         return defects;
 
     } catch (error) {

@@ -15,6 +15,7 @@ let grantsObject = {
         admin: allRights,
         assignee:allRights,
         projects:allRights,
+        comments:allRights,
     },
     user: {
         profile:{
@@ -31,6 +32,10 @@ let grantsObject = {
         },
         projects:{
             'read:any':['*']
+        },
+        comments:{
+            'create:any':['*'],
+            'read:any':['*'],
         }
     }
 };

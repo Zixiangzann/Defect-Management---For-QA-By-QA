@@ -6,6 +6,7 @@ import userRoute from './user.route.js';
 import defectRoute from './defect.route.js';
 import adminRoute from './admin.route.js';
 import projectRoute from './project.route.js';
+import commentRoute from './comment.route.js';
 
 const routesIndex = [
     {
@@ -27,6 +28,10 @@ const routesIndex = [
     {
         path:'/project',
         route:projectRoute
+    },
+    {
+        path:'/comment',
+        route:commentRoute
     }
 ] 
 
