@@ -4,8 +4,14 @@ import { commentService } from "../services/index.js";
 const commentController ={
 
     //get comment by defectId
-    async commentPaginate(req,res,next){
-
+    async paginateComment(req,res,next){
+        try {
+         const defectid = req.params.defectId
+         const comments = await commentService.paginateComment(defectid,req.body,req.user);
+         res.json(comments)
+        } catch (error) {
+            next(error);
+        }
     },
 
     async addComment(req,res,next){

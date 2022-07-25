@@ -55,9 +55,7 @@ export const defectSchema = mongoose.Schema({
     }
 })
 
-const connection = mongoose.createConnection(process.env.DB_URI);
-autoIncrement.initialize(connection);
-mongoose.plugin(autoIncrement.plugin,{model:'Defect',field:'defectid',startAt: 1})
+
 mongoose.plugin(mongooseAggregatePaginate);
 
 const Defect = mongoose.model('Defect',defectSchema);

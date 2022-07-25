@@ -6,7 +6,7 @@ import {auth} from '../middleware/auth.js'
 
 const router = express.Router()
 
-router.post('/paginate',auth('createAny','comments'),)
+router.post('/paginate/:defectId',auth('readAny','comments'),commentController.paginateComment)
 router.post('/add/:defectId',auth('createAny','comments'),commentController.addComment)
 router.delete('/delete/:defectId',auth('deleteAny','comments'),commentController.deleteComment)
 router.patch('/update/:defectId',auth('updateAny','comments'),commentController.editComment)

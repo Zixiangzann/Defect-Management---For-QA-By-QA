@@ -3,7 +3,7 @@ import 'dotenv/config'
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 export const commentSchema = mongoose.Schema({
-    defectid_comment:{
+    defectidComment:{
         type:Number
     },
     user:{

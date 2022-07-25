@@ -3,10 +3,35 @@ import httpStatus from "http-status";
 import { ApiError } from "../middleware/apiError.js";
 import User from "../models/user.js"
 import Project from "../models/project.js";
+import DefectCount from "../models/count.js";
 
 export const createDefect = async (body) => {
-    try {
-        const defect = new Defect({
+        try {
+
+            const checkIfExist = await DefectCount.findOne({}).exec()
+
+            if(checkIfExist === null){
+                //set it to 1 if it is not exist
+                const count = new DefectCount({
+                    defectCount:1
+                })
+                await count.save()
+            }else{
+                //increase count by 1(defectid)
+                const currentCount = await DefectCount.findOne({}).select('defectCount').exec()
+                await DefectCount.findOneAndUpdate({},{
+                    "$set": {
+                        defectCount: currentCount.defectCount +1
+                    }
+                },
+                { new: true }).exec();
+            }
+
+            //get new count and set it to defectid
+            const newCount = await DefectCount.findOne({}).select('defectCount').exec()
+            console.log(newCount)
+            const defect = new Defect({
+            defectid: parseInt(await newCount.defectCount),
             title: body.title,
             description: body.description,
             project: body.project,
@@ -18,6 +43,8 @@ export const createDefect = async (body) => {
             server: body.server
         })
         await defect.save();
+
+        // const update = DefectCount.update('')
         return defect;
     } catch (error) {
         throw error
@@ -138,7 +165,7 @@ export const getMoreDefects = async (req, user) => {
 
 //For paginate and search by title
 //Do a seperate search for id? 
-export const paginateDefectList = async (req, user) => {
+export const paginateDefectList = async (req) => {
 
     const sortby = req.body.sortby || "_id";
     const order = req.body.order || "desc";

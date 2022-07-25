@@ -1,7 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 import EditDefect from '../../components/user/defects/edit'
-import { createDefect, deleteDefect, filterDefect, getAllAssignee,getAllComponents,getAllDefectPaginate,getAllProjects,getDefectById,updateDefect } from '../actions/defects'
+import { 
+    createDefect, 
+    deleteDefect, 
+    filterDefect, 
+    getAllAssignee,
+    getAllComponents,
+    getAllDefectPaginate,
+    getAllProjects,
+    getDefectById,
+    updateDefect, 
+    } from '../actions/defects'
 
 let DEFAULT_DEFECT_STATE ={
     loading:false,

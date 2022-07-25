@@ -36,6 +36,7 @@ let grantsObject = {
         comments:{
             'create:any':['*'],
             'read:any':['*'],
+            'delete:any':['*'],
         }
     }
 };
