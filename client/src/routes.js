@@ -13,7 +13,7 @@ import CreateDefect from './components/user/defects/create';
 import EditDefect from './components/user/defects/edit';
 import UserManagement from './components/admin';
 
-import AdminProfile from './components/admin/profile';
+import AdminAssignProject from './components/admin/assign';
 import AdminUsers from './components/admin/users';
 import AdminDefects from './components/admin/defects';
 import AdminProjects from './components/admin/projects';
@@ -96,7 +96,7 @@ const Router = () => {
                                     <UserManagement />
                                 </AuthGuard.AdminGuard>
                             }>
-                                <Route path='profile' element={<AdminProfile />} />
+                                <Route path='assign' element={<AdminAssignProject />} />
                                 <Route path='Defects' element={<AdminDefects />} />
                                 <Route path='users' element={<AdminUsers />} />
                                 <Route path='projects' element={<AdminProjects />} />

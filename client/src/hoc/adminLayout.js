@@ -1,5 +1,5 @@
 //comp
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 //lib
 import { Link as RouterLink } from 'react-router-dom';
@@ -26,13 +26,30 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import RestoreIcon from '@mui/icons-material/Restore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import FilterVintageOutlinedIcon from '@mui/icons-material/FilterVintageOutlined';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
 
 
 const AdminLayout = (props) => {
 
     const [value, setValue] = useState(0);
+
+    useEffect(() => {
+        if(window.location.href.includes('users')){
+            setValue(0);
+        }
+
+        if(window.location.href.includes('projects')){
+            setValue(1);
+        }
+
+        if(window.location.href.includes('assign')){
+            setValue(2);
+        }
+        
+    }, [window.location.href]);
 
     return (
 
@@ -42,32 +59,31 @@ const AdminLayout = (props) => {
 
                 <BottomNavigation
                     id='adminBottomNavigation'
-                    sx={{position:'absolute',top:'auto',bottom:'0',right:'0',left:'0',bgcolor:'lavender',display:'flex',justifyContent:'space-around'}}
+                    sx={{ position: 'absolute', top: 'auto', bottom: '0', right: '0', left: '0', bgcolor: 'lavender', display: 'flex', justifyContent: 'space-around' }}
                     showLabels
                     value={value}
-                    onChange={(event, newValue) => {
-                        setValue(newValue);
-                    }}
                 >
-                    <BottomNavigationAction 
-                    label="Profile" 
-                    icon={<RestoreIcon />} 
-                    component={RouterLink}
-                    to="/usermanagement/profile"
+                    <BottomNavigationAction
+                        label="User"
+                        icon={<PersonAddAltIcon />}
+                        component={RouterLink}
+                        to="/usermanagement/users"
                     />
-                    <BottomNavigationAction 
-                    label="User" 
-                    icon={<FavoriteIcon />}
-                    component={RouterLink}
-                    to="/usermanagement/users" 
+                    <BottomNavigationAction
+                        label="Project/Component"
+                        icon={<FilterVintageOutlinedIcon />}
+                        component={RouterLink}
+                        to="/usermanagement/projects"
                     />
-                    <BottomNavigationAction 
-                    label="Project" 
-                    icon={<LocationOnIcon />}
-                    component={RouterLink}
-                    to="/usermanagement/projects" 
+
+                    <BottomNavigationAction
+                        label="Assign project"
+                        icon={<AssignmentIndIcon />}
+                        component={RouterLink}
+                        to="/usermanagement/assign"
                     />
                 </BottomNavigation>
+
 
             </Box>
             {props.children}
