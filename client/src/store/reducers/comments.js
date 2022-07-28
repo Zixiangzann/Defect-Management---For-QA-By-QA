@@ -6,7 +6,7 @@ import { showToast } from '../../utils/tools';
 export const commentsSlice = createSlice({
     name:'comments',
     initialState: {
-        comments:{}
+        comments:{},
     },reducers:{
 
     },

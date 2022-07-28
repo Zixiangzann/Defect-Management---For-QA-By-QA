@@ -59,4 +59,38 @@
         margin-left: -150px;
         margin-top: -175px;
     }
+    #addUserFirstNameForm{
+        flex-basis: 100%;
+    }
+    #addUserLastNameForm{
+        flex-basis: 100%;
+    }
+    #addUserUserNameForm{
+        flex-basis: 100%;
+    }
+    #addUserEmailForm{
+        flex-basis: 100%;
+    }
+    #addUserPasswordForm{
+        flex-basis: 100%;
+    }
+
+    #addUserGeneratePasswordBtn{
+        flex-basis: 100%;
+    }
+
+    #addUserRoleForm{
+        flex-basis: 100%;
+    }
+
+    #addUserBtn{
+        flex-basis: 100%;
+    }
   }
+
+
+@media only screen and (max-height:500px){
+    #adminBottomNavigation{
+        top:200%;
+    }
+}  

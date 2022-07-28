@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 //comp
 import { getAllDefectPaginate,deleteDefect, filterDefect } from '../../../store/actions/defects';
-import ModalComponent from './modal';
+import ModalComponent from '../../../utils/modal/modal';
 
 //MUI
 import Table from '@mui/material/Table'
@@ -171,6 +171,9 @@ const PaginateComponent = ({
                             description={`You are about to permanently delete Defect ID: ${toRemove}`}
                             warn={"Are you sure you want to continue?"}
                             handleModalConfirm={()=>handleModalConfirm(toRemove)}
+                            button1="Confirm"
+                            button2="Cancel"
+                            titleColor="darkred"
                         >
                         </ModalComponent>
 

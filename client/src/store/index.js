@@ -4,14 +4,16 @@ import defectsSlice  from './reducers/defects'
 import notificationsSlice from './reducers/notifications'
 import siteSlice from './reducers/site'
 import commentsSlice from './reducers/comments'
+import adminSlice from './reducers/admin'
 
 export const store = configureStore({
   reducer: {
     users: usersSlice,
+    admin:adminSlice,
     defects: defectsSlice,
     notifications: notificationsSlice,
     site:siteSlice,
-    comments:commentsSlice
+    comments:commentsSlice,
   },middleware:(getDefaultMiddleware)=>
     getDefaultMiddleware({
       serializableCheck:{

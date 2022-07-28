@@ -18,6 +18,10 @@ const userSchema = mongoose.Schema({
             }
         }
     },
+    username: {
+      type:String,
+      required:true  
+    },
     password: {
         type: String,
         required: true,
@@ -39,9 +43,6 @@ const userSchema = mongoose.Schema({
     lastname:{
         type:String,
         maxLength: 100
-    },
-    age:{
-        type: Number
     },
     verified:{
         type: Boolean
@@ -71,7 +72,11 @@ userSchema.pre('save',async function(next){
 userSchema.statics.emailTaken = async function(email){
     const user = await this.findOne({email});
     return !!user;
+}
 
+userSchema.statics.usernameTaken = async function(username){
+    const user = await this.findOne({"username":username.toLowerCase()})
+    return !!user;
 }
 
 userSchema.methods.generateAuthToken = function(){

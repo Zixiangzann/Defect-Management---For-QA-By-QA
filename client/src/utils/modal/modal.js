@@ -14,7 +14,10 @@ const ModalComponent = ({
     title,
     description,
     warn,
-    handleModalConfirm
+    handleModalConfirm,
+    button1,
+    button2,
+    titleColor,
 }) => {
 
 
@@ -26,7 +29,7 @@ const ModalComponent = ({
             aria-describedby="modal-modal-description"
         >
             <Box className="modal-box">
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{fontWeight:600,color:'darkred'}}>
+                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{fontWeight:600,color:titleColor}}>
                     {title}
                 </Typography>
                 <Typography id="modal-modal-description" sx={{ mt: 2, mb: 2, whiteSpace: 'pre-line' }}>
@@ -44,7 +47,7 @@ const ModalComponent = ({
                         handleModalConfirm()
                         setOpenModal(false)
                     }}
-                >Confirm</Button>
+                >{button1}</Button>
 
 
                 <Button
@@ -54,7 +57,7 @@ const ModalComponent = ({
                     onClick={()=>{
                         setOpenModal(false)
                     }}
-                >Cancel</Button>
+                >{button2}</Button>
 
 
 

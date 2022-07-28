@@ -4,18 +4,26 @@ import httpStatus from "http-status";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
-export const addUser = async(email,password,role) => {
+export const addUser = async(body) => {
     try{
 
         //if email already exist
-        if(await User.emailTaken(email)){
+        if(await User.emailTaken(body.email.toLowerCase())){
             throw new ApiError(httpStatus.BAD_REQUEST,'Sorry email taken');
         }
 
+        //if username already exist
+        if(await User.usernameTaken(body.username.toLowerCase())){
+            throw new ApiError(httpStatus.BAD_REQUEST,'Sorry username taken');
+        }
+
         const user = new User({
-            email,
-            password,
-            role
+            firstname:body.firstname,
+            lastname:body.lastname,
+            username:body.username,
+            email:body.email,
+            password:body.password,
+            role:body.role
         });
 
         await user.save();
@@ -25,6 +33,31 @@ export const addUser = async(email,password,role) => {
         throw error;
 
     }
+}
+
+export const checkEmailExist = async(body)=>{
+
+    try {
+        if (await User.emailTaken(body.email)) {
+            return {message:'Sorry email taken'}
+        }
+    } catch (error) {
+        throw error
+    }
+        
+}
+
+export const checkUsernameExist = async(body)=>{
+
+    try {
+        if (await User.usernameTaken(body.username.toLowerCase())) {
+            return {message:'Sorry username taken'}
+        }
+    
+    } catch (error) {
+        throw error
+    }
+
 }
 
 export const getAllUsers = async()=>{

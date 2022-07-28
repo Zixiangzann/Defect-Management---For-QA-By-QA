@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom'
 //comp
 import { errorHelper, errorHelperSelect, Loader } from '../../../utils/tools'
 import { validation, formValues } from './validationSchema'
-import ModalComponent from './modal';
+import ModalComponent from '../../../utils/modal/modal';
+import WYSIWYG from '../../../utils/form/wysiwyg';
 
 //MUI
 import { Checkbox, FormControlLabel, Tooltip, Typography } from "@mui/material";
@@ -33,7 +34,7 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAssignee, getAllComponents, getAllProjects, createDefect } from '../../../store/actions/defects';
 import { resetDataState } from '../../../store/reducers/defects';
-import WYSIWYG from '../../../utils/form/wysiwyg';
+
 
 const CreateDefect = () => {
 
@@ -169,6 +170,9 @@ const CreateDefect = () => {
                             description={"Changing of Project will reset all field"}
                             warn={"Are you sure you want to continue?"}
                             handleModalConfirm={handleModalConfirm}
+                            button1="Confirm"
+                            button2="Cancel"
+                            titleColor="darkred"
                         >
                         </ModalComponent>
 

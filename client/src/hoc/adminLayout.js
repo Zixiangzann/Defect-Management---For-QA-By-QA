@@ -1,6 +1,10 @@
+//comp
+import { useState } from 'react';
+
+//lib
 import { Link as RouterLink } from 'react-router-dom';
-import Link from '@mui/material/Link';
 import { ToastContainer } from 'react-toastify';
+
 
 //css
 import "../styles/main.css";
@@ -16,64 +20,54 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import RestoreIcon from '@mui/icons-material/Restore';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+
+
+
 
 const AdminLayout = (props) => {
+
+    const [value, setValue] = useState(0);
+
     return (
+
         <Container className={`adminContainer`}>
-            <Box sx={{ display: 'flex' }}>
+            <Box>
                 <CssBaseline />
-                
-                <Drawer
-                    sx={{
-                        width: '150px',
-                        flexShrink: 0,
-                        '& .MuiDrawer-paper': {
-                            width: '150px',
-                            boxSizing: 'border-box',
-                            top: '65px'
-                        },
+
+                <BottomNavigation
+                    id='adminBottomNavigation'
+                    sx={{position:'absolute',top:'auto',bottom:'0',right:'0',left:'0',bgcolor:'lavender',display:'flex',justifyContent:'space-around'}}
+                    showLabels
+                    value={value}
+                    onChange={(event, newValue) => {
+                        setValue(newValue);
                     }}
-                    variant="permanent"
-                    anchor="left"
                 >
-
-                    <List>
-                        <ListItem
-                            button
-                            component={RouterLink}
-                            to="/usermanagement/profile">
-                            <ListItemText primary="Profile" />
-                        </ListItem>
-
-                        <ListItem
-                            button
-                            component={RouterLink}
-                            to="/usermanagement/users">
-                            <ListItemText primary="Users" />
-                        </ListItem>
-
-                        <ListItem
-                            button
-                            component={RouterLink}
-                            to="/usermanagement/Defects">
-                            <ListItemText primary="Defects" />
-                        </ListItem>
-
-                        <ListItem
-                            button
-                            component={RouterLink}
-                            to="/usermanagement/Projects">
-                            <ListItemText primary="Projects" />
-                        </ListItem>
-                    </List>
-                </Drawer>
-                <Typography>User Management</Typography>
-
+                    <BottomNavigationAction 
+                    label="Profile" 
+                    icon={<RestoreIcon />} 
+                    component={RouterLink}
+                    to="/usermanagement/profile"
+                    />
+                    <BottomNavigationAction 
+                    label="User" 
+                    icon={<FavoriteIcon />}
+                    component={RouterLink}
+                    to="/usermanagement/users" 
+                    />
+                    <BottomNavigationAction 
+                    label="Project" 
+                    icon={<LocationOnIcon />}
+                    component={RouterLink}
+                    to="/usermanagement/projects" 
+                    />
+                </BottomNavigation>
 
             </Box>
             {props.children}
