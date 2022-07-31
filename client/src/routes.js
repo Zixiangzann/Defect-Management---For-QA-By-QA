@@ -12,17 +12,17 @@ import Defect from './components/user/defects';
 import CreateDefect from './components/user/defects/create';
 import EditDefect from './components/user/defects/edit';
 import UserManagement from './components/admin';
-
 import AdminAssignProject from './components/admin/assign';
 import AdminUsers from './components/admin/users';
 import AdminDefects from './components/admin/defects';
 import AdminProjects from './components/admin/projects';
-
 import Projects from './components/Projects';
 import Auth from './components/auth';
+import ViewDefect from './components/user/defects/view';
+import Report from './components/user/defects/report';
 
 import * as AuthGuard from './hoc/authGuard';
-import ViewDefect from './components/user/defects/view';
+
 
 
 const Router = () => {
@@ -67,6 +67,12 @@ const Router = () => {
                                 </AuthGuard.LoginGuard>
                             } />
 
+                            <Route path="/defect/report" element={
+                                <AuthGuard.LoginGuard>
+                                    <Report />
+                                </AuthGuard.LoginGuard>
+                            } />
+
                             <Route path="/defect/create" element={
                                 <AuthGuard.LoginGuard>
                                     <CreateDefect />
@@ -96,10 +102,9 @@ const Router = () => {
                                     <UserManagement />
                                 </AuthGuard.AdminGuard>
                             }>
-                                <Route path='assign' element={<AdminAssignProject />} />
-                                <Route path='Defects' element={<AdminDefects />} />
                                 <Route path='users' element={<AdminUsers />} />
                                 <Route path='projects' element={<AdminProjects />} />
+                                <Route path='assign' element={<AdminAssignProject />} />
                             </Route>
                         </Routes>
                     </MainLayout>

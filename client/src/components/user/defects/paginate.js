@@ -94,8 +94,10 @@ const PaginateComponent = ({
                                         <TableCell>Project</TableCell>
                                         <TableCell>Components</TableCell>
                                         <TableCell>Severity</TableCell>
-                                        <TableCell>Created Date</TableCell>
                                         <TableCell>Status</TableCell>
+                                        <TableCell>Server</TableCell>
+                                        <TableCell>Reporter</TableCell>
+                                        <TableCell>Created Date</TableCell>
                                     </TableRow>
                                 </TableHead>
 
@@ -110,8 +112,10 @@ const PaginateComponent = ({
                                             <TableCell sx={{ maxWidth: '50px' }}>{item.project}</TableCell>
                                             <TableCell sx={{ maxWidth: '50px' }}>{item.components}</TableCell>
                                             <TableCell sx={{ maxWidth: '20px' }}>{item.severity}</TableCell>
-                                            <TableCell sx={{ maxWidth: '20px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
                                             <TableCell sx={{ maxWidth: '20px' }}>{item.status}</TableCell>
+                                            <TableCell sx={{ maxWidth: '20px' }}>{item.server}</TableCell>
+                                            <TableCell sx={{ maxWidth: '200px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                            <TableCell sx={{ maxWidth: '20px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
                                             <TableCell sx={{ maxWidth: '150px' }}>
                                                 <Tooltip title="View">
                                                 <Button

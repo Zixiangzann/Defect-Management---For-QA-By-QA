@@ -1,6 +1,13 @@
+//lib
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+
+//comp
+import { signOut } from '../../store/actions/users';
+import { successGlobal } from '../../store/reducers/notifications'
+
+
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -8,7 +15,6 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-
 import DehazeIcon from '@mui/icons-material/Dehaze';
 import MailIcon from '@mui/icons-material/Mail';
 import HomeIcon from '@mui/icons-material/Home';
@@ -17,9 +23,9 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import FilterVintageOutlinedIcon from '@mui/icons-material/FilterVintageOutlined';
+import PieChartIcon from '@mui/icons-material/PieChart';
 
-import { signOut } from '../../store/actions/users';
-import { successGlobal } from '../../store/reducers/notifications'
+
 
 
 const SideDrawer = ({ users }) => {
@@ -110,11 +116,23 @@ const SideDrawer = ({ users }) => {
                                 <ListItemText primary="Dashboards" />
                             </ListItem>
 
+                            <ListItem
+                                button
+                                component={RouterLink}
+                                to="/defect/report"
+                                onClick={() => setState(false)}
+                            >
+                                <ListItemIcon>
+                                    <PieChartIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Generate reports" />
+                            </ListItem>
+
                             {users.data.role === 'admin' ?
                                 <ListItem
                                     button
                                     component={RouterLink}
-                                    to="/usermanagement"
+                                    to="/usermanagement/users"
                                     onClick={() => setState(false)}
                                 >
                                     <ListItemIcon>

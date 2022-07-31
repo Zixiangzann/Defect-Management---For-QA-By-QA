@@ -5,7 +5,7 @@ import User from "../models/user.js"
 import Project from "../models/project.js";
 import DefectCount from "../models/count.js";
 
-export const createDefect = async (body) => {
+export const createDefect = async (body,user) => {
         try {
 
             const checkIfExist = await DefectCount.findOne({}).exec()
@@ -32,6 +32,7 @@ export const createDefect = async (body) => {
             console.log(newCount)
             const defect = new Defect({
             defectid: parseInt(await newCount.defectCount),
+            reporter: user.email,
             title: body.title,
             description: body.description,
             project: body.project,
@@ -83,7 +84,8 @@ export const updateDefectById = async (defectId, body) => {
                     issuetype: body.issuetype,
                     severity: body.severity,
                     status: body.status,
-                    assignee: body.assignee
+                    assignee: body.assignee,
+                    server:body.server
                 }
             },
             { new: true }).exec();
@@ -105,33 +107,6 @@ export const deleteDefectById = async (defectId) => {
     }
 }
 
-export const getAllDefects = async (req, user) => {
-    const sortby = req.query.sortby || "_id";
-    const order = req.query.order || "desc";
-    const limit = req.query.limit || 15;
-    const project = req.query.project || 'all'
-
-    if (req.user.role !== 'admin' && !user.project.includes(project)) {
-        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
-    }
-
-    let defects = ''
-    if (project === 'all') {
-        defects = Defect.find({})
-    } else {
-        defects = Defect.find({ project })
-    }
-
-    try {
-        defects
-            .sort([[sortby, order]])
-            .limit(parseInt(limit));
-
-        return defects;
-    } catch (error) {
-        throw error
-    }
-}
 
 //For more
 export const getMoreDefects = async (req, user) => {
@@ -253,6 +228,7 @@ export const filterDefectList = async (req, user) => {
         const components = req.body.components || '';
         const status = req.body.status || '';
         const severity = req.body.severity || '';
+        const server = req.body.server || '';
 
         if (req.user.role !== 'admin' && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
@@ -263,6 +239,7 @@ export const filterDefectList = async (req, user) => {
      const filterComponents = (components==='') ? { $regex: matchAll } : components   
      const filterStatus = (status==='') ? { $regex: matchAll } : status
      const filterSeverity = (severity==='') ? { $regex: matchAll } : severity
+     const filterServer = (server==='') ? { $regex: matchAll } : server
 
         let aggQuery = Defect.aggregate([
             [
@@ -270,7 +247,8 @@ export const filterDefectList = async (req, user) => {
                     project:filterProject,
                     components:filterComponents,
                     status:filterStatus,
-                    severity:filterSeverity
+                    severity:filterSeverity,
+                    server:filterServer
                    }
                 }
             ]
@@ -290,4 +268,124 @@ export const filterDefectList = async (req, user) => {
         throw error
     }
 }
+
+//For generate report
+
+export const countSeverity = async (req, user) => {
+    const project = req.body.project || ''
+
+    try {
+        if (req.user.role !== 'admin' && !user.project.includes(project)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+        }
+
+        const matchAll = new RegExp('(.*?)', 'gi')  
+        const filterProject = (project==='') ? { $regex: matchAll } : project    
+
+        let aggQuery = ([
+            {$match:{project:filterProject}},
+            {$group:{_id:'$severity',count:{$sum:1}}}])
+
+        const defects = Defect.aggregate(aggQuery).sort('_id').exec()
+        return defects;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const countStatus = async (req, user) => {
+    const project = req.body.project || ''
+
+    try {
+        if (req.user.role !== 'admin' && !user.project.includes(project)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+        }
+
+        const matchAll = new RegExp('(.*?)', 'gi')  
+        const filterProject = (project==='') ? { $regex: matchAll } : project    
+
+        let aggQuery = ([
+            {$match:{project:filterProject}},
+            {$group:{_id:'$status',count:{$sum:1}}}])
+
+        const defects = Defect.aggregate(aggQuery).sort('_id').exec()
+        return defects;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const countServer = async (req, user) => {
+    const project = req.body.project || ''
+
+    try {
+        if (req.user.role !== 'admin' && !user.project.includes(project)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+        }
+
+        const matchAll = new RegExp('(.*?)', 'gi')  
+        const filterProject = (project==='') ? { $regex: matchAll } : project    
+
+        let aggQuery = ([
+            {$match:{project:filterProject}},
+            {$group:{_id:'$server',count:{$sum:1}}}])
+
+        const defects = Defect.aggregate(aggQuery).sort('_id').exec()
+        return defects;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const countIssueType = async (req, user) => {
+    const project = req.body.project || ''
+
+    try {
+        if (req.user.role !== 'admin' && !user.project.includes(project)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+        }
+
+        const matchAll = new RegExp('(.*?)', 'gi')  
+        const filterProject = (project==='') ? { $regex: matchAll } : project    
+
+        let aggQuery = ([
+            {$match:{project:filterProject}},
+            {$group:{_id:'$issuetype',count:{$sum:1}}}])
+
+        const defects = Defect.aggregate(aggQuery).sort('_id').exec()
+        return defects;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const countComponents = async (req, user) => {
+    const project = req.body.project || ''
+
+    try {
+        if (req.user.role !== 'admin' && !user.project.includes(project)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+        }
+
+        const matchAll = new RegExp('(.*?)', 'gi')  
+        const filterProject = (project==='') ? { $regex: matchAll } : project    
+
+        let aggQuery = ([
+            {$match:{project:filterProject}},
+            {$group:{_id:'$components',count:{$sum:1}}}])
+
+        const defects = Defect.aggregate(aggQuery).sort('_id').exec()
+        return defects;
+
+    } catch (error) {
+        throw error
+    }
+}
+
 

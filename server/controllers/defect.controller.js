@@ -1,11 +1,12 @@
 import httpStatus from 'http-status';
+import { countIssueType } from '../services/defect.service.js';
 import { defectService } from '../services/index.js';
 
 const defectController ={
 
     async createDefect(req,res,next){
         try {
-            const defect = await defectService.createDefect(req.body);
+            const defect = await defectService.createDefect(req.body,req.user);
             res.json(defect)
         } catch (error) {
             next(error)
@@ -38,14 +39,7 @@ const defectController ={
             next(error);
         }
     },
-    async getAllDefects(req,res,next){
-        try {
-            const defects = await defectService.getAllDefects(req,req.user);
-            res.json(defects);
-        } catch (error) {
-            next(error);
-        }
-    },
+
     //For more
     async getMoreDefects(req,res,next){
         try {
@@ -91,6 +85,50 @@ const defectController ={
     async filterDefectList(req,res,next){
         try {
             const defects = await defectService.filterDefectList(req,req.user);
+            res.json(defects);
+        } catch (error) {
+            next(error);
+        }
+    },
+    //for generate report
+    async countSeverity(req,res,next){
+        try {
+            const defects = await defectService.countSeverity(req,req.user);
+            res.json(defects);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async countStatus(req,res,next){
+        try {
+            const defects = await defectService.countStatus(req,req.user);
+            res.json(defects);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async countIssueType(req,res,next){
+        try {
+            const defects = await defectService.countIssueType(req,req.user);
+            res.json(defects);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async countServer(req,res,next){
+        try {
+            const defects = await defectService.countServer(req,req.user);
+            res.json(defects);
+        } catch (error) {
+            next(error);
+        }
+    },
+    async countComponents(req,res,next){
+        try {
+            const defects = await defectService.countComponents(req,req.user);
             res.json(defects);
         } catch (error) {
             next(error);

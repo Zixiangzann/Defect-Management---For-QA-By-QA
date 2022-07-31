@@ -65,9 +65,10 @@ const Defect = () => {
 
 {defects.filter.filtered ?
                 <Tooltip title="Reset Filter">
-                    <Button>
-                        <RestartAltIcon 
-                        onClick={()=>{dispatch(getAllDefectPaginate({}))}}/>
+                    <Button
+                    onClick={()=>{dispatch(getAllDefectPaginate({}))}}
+                    >
+                        <RestartAltIcon />
                     </Button>
                 </Tooltip>
 :

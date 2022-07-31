@@ -5,12 +5,14 @@ import notificationsSlice from './reducers/notifications'
 import siteSlice from './reducers/site'
 import commentsSlice from './reducers/comments'
 import adminSlice from './reducers/admin'
+import reportSlice from './reducers/report'
 
 export const store = configureStore({
   reducer: {
     users: usersSlice,
     admin:adminSlice,
     defects: defectsSlice,
+    report: reportSlice,
     notifications: notificationsSlice,
     site:siteSlice,
     comments:commentsSlice,

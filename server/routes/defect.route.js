@@ -12,8 +12,6 @@ router.patch('/update/:defectId',auth('updateAny','defects'),defectController.up
 router.delete('/delete/:defectId',auth('deleteAny','defects'),defectController.deleteDefectById);
 
 //get all
-
-router.get('/all',auth('readAny','defects'),defectController.getAllDefects);
 router.post('/more',auth('readAny','defects'),defectController.getMoreDefects);
 router.post('/paginate',auth('readAny','defects'),defectController.defectListPaginate)
 
@@ -25,5 +23,11 @@ router.post('/projects',auth('readAny','defects'),defectController.getAllProject
 //filter
 router.post('/filter',auth('readAny','defects'),defectController.filterDefectList);
 
+//For Report
+router.post('/countseverity',auth('readAny','defects'),defectController.countSeverity);
+router.post('/countstatus',auth('readAny','defects'),defectController.countStatus);
+router.post('/countserver',auth('readAny','defects'),defectController.countServer);
+router.post('/countissuetype',auth('readAny','defects'),defectController.countIssueType);
+router.post('/countcomponents',auth('readAny','defects'),defectController.countComponents);
 
 export default router;

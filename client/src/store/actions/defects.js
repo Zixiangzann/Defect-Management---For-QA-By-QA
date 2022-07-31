@@ -130,7 +130,8 @@ export const filterDefect = createAsyncThunk(
         project,
         components,
         status,
-        severity
+        severity,
+        server
     }) => {
         try {
             const request = await axios.post('/api/defect/filter',{
@@ -140,6 +141,7 @@ export const filterDefect = createAsyncThunk(
                 components,
                 status,
                 severity
+                ,server
             },getAuthHeader());
             return request.data;
 

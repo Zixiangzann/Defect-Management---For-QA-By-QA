@@ -9,6 +9,9 @@ export const defectSchema = mongoose.Schema({
         type:Number,
         unique:true
     },
+    reporter:{
+        type:String
+    },
     title:{
         type:String,
         required: true

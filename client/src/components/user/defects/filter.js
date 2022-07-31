@@ -49,7 +49,8 @@ const DefectFilter = ({
         project:"",
         components:"",
         severity:"",
-        status:""
+        status:"",
+        server:""
     })
 
     useEffect(() => {
@@ -178,6 +179,27 @@ const DefectFilter = ({
                         </FormControl>
                         <br></br>
 
+                        <FormControl
+                            fullWidth
+                            sx={{ marginTop: '1rem'}}>
+
+                            <InputLabel>Server</InputLabel>
+                            <Select
+                                name='server'
+                                label='Server'
+                                value={state.server ?? ""}
+                                onChange={handleChange}
+                                sx={{ width: '85%' }}
+                            >
+
+                                <MenuItem key="Local" value="Local">Local</MenuItem>
+                                <MenuItem key="Development" value="Development">Development</MenuItem>
+                                <MenuItem key="QA" value="QA">QA</MenuItem>
+                                <MenuItem key="Production" value="Production">Production</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <br></br>
+
 
                         <FormControl
                             fullWidth
@@ -212,13 +234,15 @@ const DefectFilter = ({
                                 project:state.project,
                                 components:state.components,
                                 status:state.status,
-                                severity:state.severity
+                                severity:state.severity,
+                                server:state.server
                             }))
                             dispatch(filterDefect(
                                 {project:state.project,
                                 components:state.components,
                                 status:state.status,
-                                severity:state.severity
+                                severity:state.severity,
+                                server:state.server,
                         }))
                         setDrawerState(false)
                         dispatch(resetDataState());

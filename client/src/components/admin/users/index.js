@@ -2,7 +2,6 @@
 import { useState } from 'react';
 
 //lib
-import CopyToClipboard from 'react-copy-to-clipboard'
 import ModalComponent from '../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser, checkEmailExist, checkUsernameExist } from '../../../store/actions/admin';

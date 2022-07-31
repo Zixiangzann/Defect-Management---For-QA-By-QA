@@ -17,6 +17,7 @@ let DEFAULT_DEFECT_STATE ={
     loading:false,
     data:{
         defectid:null,
+        reporter:null,
         title:null,
         description:null,
         project:null,

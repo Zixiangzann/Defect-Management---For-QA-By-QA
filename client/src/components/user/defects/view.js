@@ -149,8 +149,7 @@ const ViewDefect = () => {
 
 
                     <Typography className='view-title' sx={viewTitleStyle}>Created by:</Typography>
-                    {/* to add created by field to db when defect created */}
-                    <Typography className='view-value' sx={viewValueStyle}>zixiang</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.reporter}</Typography>
 
 
                     <List className='card' sx={{ ml: 3, mt: 2 }}>
