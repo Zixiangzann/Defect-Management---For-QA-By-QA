@@ -72,3 +72,23 @@ export const getCountComponents = createAsyncThunk(
         }
     }
 )
+
+export const getDefectId = createAsyncThunk(
+    'report/getDefectId',
+    async(
+        {
+            page=1,
+            project
+    })=>{
+        try {
+            const request = await axios.post('/api/defect/filter',{
+                page,
+                project
+            },getAuthHeader());
+
+            return request.data.docs;
+        } catch (error) {
+            throw error
+        }
+    }
+)

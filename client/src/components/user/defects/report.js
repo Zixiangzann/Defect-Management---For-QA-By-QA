@@ -1,13 +1,17 @@
-import { Doughnut, Bar } from 'react-chartjs-2';
+import { Doughnut, Bar, Chart } from 'react-chartjs-2';
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, LinearScale, Title, CategoryScale, BarController, BarElement } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 
 //comp
-import { getCountComponents, getCountIssueType, getCountServer, getCountSeverity, getCountStatus } from '../../../store/actions/report'
+import { getCountComponents, getCountIssueType, getCountServer, getCountSeverity, getCountStatus, getDefectId } from '../../../store/actions/report'
 import { setXSelect, setYSelect, resetReportState } from '../../../store/reducers/report';
 import { getAllProjects } from '../../../store/actions/defects';
+import Moment from 'react-moment';
+import JsPDF from 'jspdf';
+import html2canvas from 'html2canvas'
 
 //MUI
 import Box from '@mui/material/Box'
@@ -20,7 +24,7 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import { IconButton, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Icon, IconButton, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -30,8 +34,18 @@ import { visuallyHidden } from '@mui/utils';
 import Table from '@mui/material/Table';
 import { DataGrid } from '@material-ui/data-grid'
 import Drawer from '@mui/material/Drawer';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import PictureAsPdf from '@mui/icons-material/PictureAsPdf';
 
-ChartJS.register(ArcElement, Tooltip, Legend, Title, LinearScale, CategoryScale, BarController, BarElement, LinearScale);
+ChartJS.register(ArcElement, Tooltip, Legend, Title, LinearScale, CategoryScale, BarController, BarElement, LinearScale, ChartDataLabels);
+ChartJS.register({
+    id: "custom_canvas_background_color",
+    beforeDraw: (chart)=>{
+        const {ctx} = chart;
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, chart.width, chart.height);
+    }
+})
 
 const Report = () => {
 
@@ -55,7 +69,7 @@ const Report = () => {
     const handleYAxis = (event) => {
         const value = event.target.value;
         dispatch(setYSelect(value))
-    
+
     }
 
     const generateChart = (event) => {
@@ -82,10 +96,44 @@ const Report = () => {
         dispatch(setYSelect('status'))
     }
 
+    //export report to pdf
+        const generatePDF = async() => {
+            const reportArea = document.getElementById('report')
+            const reportTitle = document.getElementById('report-title')
+            const reportDate = document.getElementById('report-date')
+            const reportChart = document.getElementById('report-chart')
+            const reportTable = document.getElementById('report-table')
+    
+            const report = new JsPDF('landscape','mm','a4');
+            var width = report.internal.pageSize.getWidth();
+            var height = report.internal.pageSize.getHeight();
+
+
+            report.setFontSize(24)
+            report.text(project, width*0.5,height*0.1, 'center');
+            report.setFontSize(15)
+            report.text(`Total Bug: ${totalDefect.toString()}`, width*0.5,height*0.2, 'center');
+
+            const chartImgData = (await html2canvas(reportChart)).toDataURL('image/jpeg');
+            report.addImage(chartImgData,'JPEG',width*0.1,height*0.3,width*0.4,height*0.6)
+
+
+            const tableImgData = (await html2canvas(reportTable)).toDataURL('image/jpeg');
+            report.addImage(tableImgData,'JPEG',width*0.5,height*0.3,width*0.4,height*0.6)
+
+            report.setFontSize(8)
+            report.text(`Report Generated on: ${Date().toString()}`,width*0.6,height*0.9)
+
+
+            report.save(`${project}_${Date().toString().replace(/\s/g,'_').replace(/:/g,'_')}`)
+        }
+
     useEffect(() => {
         dispatch(getAllProjects());
         //reset report state to default
         dispatch(resetReportState());
+
+
     }, []);
 
     useEffect(() => {
@@ -100,6 +148,7 @@ const Report = () => {
                 setTotalDefect(total)
             }
             )
+        dispatch(getDefectId({ project }));
     }, [project]);
 
     const tableBodyCell = () => {
@@ -154,14 +203,14 @@ const Report = () => {
 
 
             {!selectedProject ? null :
-                <Grid container spacing={{ xs: 5, md: 2 }} columns={{ xs: 1, sm: 3, md: 8 }}>
-
+                <Box>
                     {/* Filter container */}
                     <Button
-                        variant='contained'
+                        variant='outlined'
                         onClick={() => setShowFilter(true)}
-                        sx={{mt:5}}
-                    >Show Filter</Button>
+                        sx={{ m: 10 }}
+                    >Open Menu</Button>
+                    
 
                     <Drawer
                         anchor='left'
@@ -266,7 +315,7 @@ const Report = () => {
                                     name="yaxis"
                                     label="Y-Axis"
                                     value={report.yselect ?? ""}
-                                    onChange={(e)=>{
+                                    onChange={(e) => {
                                         handleYAxis(e)
                                         generateChart(e)
                                     }}
@@ -304,22 +353,37 @@ const Report = () => {
                                 </Select>
                             </FormControl>
 
-
                         </Box>
 
-                    </Drawer>
+                        <Button
+                                variant="outlined"
+                                color="secondary"
+                                aria-label="download report as pdf"
+                                sx={{m:1}}
+                                onClick={generatePDF}
+                                startIcon={<PictureAsPdf />}>
+                                Download report as pdf
+                            </Button>
 
-                    <Grid item xs={1} sm={1} md={8}>
+                    </Drawer>
+                           <Grid container spacing={{ xs: 5, md: 5 }} columns={{ xs: 1, sm: 1, md: 8 }}
+                    id='report'
+                   >
+             
+    
+
+                    <Grid item xs={1} sm={1} md={8} id='report-title'>                    
                         <Typography variant='h3' textAlign={'center'}>{project}</Typography>
+                        <Typography variant='h5' mt={4} mb={4} textAlign={'center'}>Total Bug: {totalDefect}</Typography>
                     </Grid>
+                   
 
                     <Grid item xs={1} sm={1} md={4}>
                         <Box
-                            sx={{ width: 'fit-content', height: '400px', mt: 5, mb: 5 }}>
+                            id='report-chart'
+                            sx={{ width: '400px', height: '400px', mt: 5, mb: 5 }}>
 
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-
-                            </Box>
+          
 
                             {chartType === 'pie' && report.xselect ?
                                 <Doughnut
@@ -350,6 +414,19 @@ const Report = () => {
                                             legend: {
                                                 position: 'bottom',
                                             },
+                                            datalabels: {
+                                                color: 'blue',
+                                                labels: {
+                                                    title: {
+                                                        font: {
+                                                            weight: 'bold'
+                                                        }
+                                                    },
+                                                    value: {
+                                                        color: 'green'
+                                                    }
+                                                }
+                                            }
                                         }
                                     }}
 
@@ -394,6 +471,24 @@ const Report = () => {
                                                     stepSize: 1
                                                 }
                                             }
+                                        },
+                                        plugins: {
+                                            legend: {
+                                                display: false
+                                            },
+                                            datalabels: {
+                                                color: 'blue',
+                                                labels: {
+                                                    title: {
+                                                        font: {
+                                                            weight: 'bold'
+                                                        }
+                                                    },
+                                                    value: {
+                                                        color: 'green'
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                     }
@@ -404,14 +499,16 @@ const Report = () => {
                                 null
                             }
                         </Box>
+                        
 
                     </Grid>
+                    
 
                     {/* TABLE */}
-                    <Grid item xs={1} sm={1} md={4}>
+                    <Grid item xs={1} sm={1} md={4} id='report-table'>
                         <Box height={500} mt={5}>
 
-                            <Typography variant='h6' mt={4}>Total Bug: {totalDefect}</Typography>
+
 
                             {report.xlabel ?
                                 <Box>
@@ -422,7 +519,7 @@ const Report = () => {
                                                     {report.yselect.toUpperCase()}
                                                 </TableCell>
                                                 <TableCell variant='head'>
-                                                   COUNT
+                                                    COUNT
                                                 </TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -439,23 +536,28 @@ const Report = () => {
                             }
                         </Box>
                     </Grid>
-
-
-
-
-
-
-
-
+                    
+                    {/* <Typography id='report-date'variant='h7' sx={{
+                        position: 'relative'
+                        , left: '75%'
+                    }}>Report Generated on: <Moment format="DD/MMM/YYYY , HH:MM:SS">{Date.now()}</Moment></Typography>
+         */}
                 </Grid>
-
+                </Box>
+                
+                
+                
             }
-
+            
+            
         </Box >
 
-
     )
-
+    
+    
+    
 }
+
+
 
 export default Report

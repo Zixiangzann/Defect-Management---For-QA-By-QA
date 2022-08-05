@@ -1,6 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import { getCountComponents, getCountServer, getCountStatus, getCountSeverity, getCountIssueType } from '../actions/report'
+import { 
+    getCountComponents, 
+    getCountServer, 
+    getCountStatus, 
+    getCountSeverity, 
+    getCountIssueType,
+    getDefectId
+} from '../actions/report'
 
 
 let DEFAULT_REPORT_STATE = {
@@ -12,6 +19,7 @@ let DEFAULT_REPORT_STATE = {
         ylabel: [],
         yvalue: [],
         totalDefect: '',
+        defectid:[]
     }
 }
 
@@ -127,6 +135,11 @@ export const reportSlice = createSlice({
                     state.report.ylabel = [...yLabel]
                     state.report.yvalue = [...yValue]
                 }
+            })
+            .addCase(getDefectId.fulfilled,(state,action)=>{
+                const defectIdList = []
+                action.payload.map((item)=> defectIdList.push(item.defectid))
+                state.report.defectid = [...defectIdList]
             })
 
 
