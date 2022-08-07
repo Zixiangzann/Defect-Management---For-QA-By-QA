@@ -84,7 +84,7 @@ export const getAllDefectPaginate = createAsyncThunk(
         limit=10,
         project="",
         sortby='defectid',
-        order='1'
+        order=1
     },{dispatch})=>{
         try {
             const request = await axios.post('/api/defect/paginate',{
@@ -142,7 +142,7 @@ export const filterDefect = createAsyncThunk(
         severity,
         server,
         sortby='defectid',
-        order='1'
+        order=1
     }) => {
         try {
             const request = await axios.post('/api/defect/filter',{
