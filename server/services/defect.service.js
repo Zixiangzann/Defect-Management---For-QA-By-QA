@@ -142,8 +142,8 @@ export const getMoreDefects = async (req, user) => {
 //Do a seperate search for id? 
 export const paginateDefectList = async (req) => {
 
-    const sortby = req.body.sortby || "_id";
-    const order = req.body.order || "desc";
+    const sortby = req.body.sortby || "defectid";
+    const order = req.body.order || 1
     const limit = req.body.limit || 15;
     const skip = req.body.skip || 0;
 
@@ -153,16 +153,26 @@ export const paginateDefectList = async (req) => {
     const options = {
         page: req.body.page,
         limit,
-        sortby
+        sortby,
+        order
     }
 
-    let aggQuery = Defect.aggregate()
+    let aggQuery;
 
     try {
         if (req.user.role !== 'admin') {
             aggQuery = Defect.aggregate(
-                [{$match:{project:{$in:await userProject}}}]
+                [{$match:{project:{$in:await userProject}}},
+                    {$sort:{[sortby]:order}}
+                    ],{collation: { locale: "en", caseLevel: true }}
                 )
+        }
+
+        if(req.user.role === 'admin'){
+            aggQuery = Defect.aggregate(
+                [{$sort:{[sortby]:order}}]
+                ,{ collation: { locale: "en", caseLevel: true }}
+            )
         }
     
         const defects = Defect.aggregatePaginate(aggQuery, options);
@@ -220,8 +230,8 @@ export const getAllComponents = async (title) => {
 export const filterDefectList = async (req, user) => {
     try {
 
-        const sortby = req.body.sortby || "_id";
-        const order = req.body.order || "desc";
+        const sortby = req.body.sortby || "defectid";
+        const order = req.body.order || 1;
         const limit = req.body.limit || 15;
         const skip = req.body.skip || 0;
         const project = req.body.project || '';
@@ -250,10 +260,10 @@ export const filterDefectList = async (req, user) => {
                     severity:filterSeverity,
                     server:filterServer
                    }
-                }
-            ]
-        ]);
-
+                },
+                {$sort:{[sortby]:order}}
+            ],
+        ],{ collation: { locale: "en", caseLevel: true } });
         
         const options = {
             page: req.body.page,

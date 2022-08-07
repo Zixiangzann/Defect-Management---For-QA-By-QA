@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 //comp
-import { getAllDefectPaginate,deleteDefect, filterDefect } from '../../../store/actions/defects';
+import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../../store/actions/defects';
 import ModalComponent from '../../../utils/modal/modal';
 
 //MUI
@@ -25,6 +25,8 @@ import TablePagination from '@mui/material/TablePagination';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper'
 import Tooltip from '@mui/material/Tooltip'
+import TableSortLabel from '@mui/material/TableSortLabel';
+import { visuallyHidden } from '@mui/utils';
 
 const PaginateComponent = ({
     defects,
@@ -32,9 +34,42 @@ const PaginateComponent = ({
 }) => {
 
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [toRemove,setToRemove] = useState(null);
+    const [toRemove, setToRemove] = useState(null);
 
     const [page, setPage] = useState(0);
+
+    //Table
+    const tableHeader = [
+        'Defect ID',
+        'Title',
+        'Project',
+        'Components',
+        'Severity',
+        'Status',
+        'Server',
+        'Reporter',
+        'Created Date'
+    ]
+
+    //Table sorting
+
+    //For table header sorting state
+    const [orderActive, setOrderActive] = useState('asc');
+    const [sortActive, setSortActive] = useState('defectid');
+
+    //toggle order
+    const handleOrder = () => {
+        if (orderActive === 'desc') {
+            setOrderActive('asc')
+        } else if (orderActive === 'asc') {
+            setOrderActive('desc')
+        }
+    }
+
+    const handleSort = (header) => {
+        setSortActive(header)
+
+    }
 
     //Modal
     const [openModal, setOpenModal] = useState(false);
@@ -60,44 +95,78 @@ const PaginateComponent = ({
     }
 
     const handleModalConfirm = (toRemove) => {
-        dispatch(deleteDefect({defectId:toRemove}))
+        dispatch(deleteDefect({ defectId: toRemove }))
         setToRemove(null)
     }
 
 
     useEffect(() => {
-        if(filter.filtered === false){
-        dispatch(getAllDefectPaginate({ page: page + 1, limit: rowsPerPage }))
-    }else{
-        dispatch(filterDefect({
-            page: page + 1,
-            limit: rowsPerPage,
-            project: filter.project,
-            components: filter.components,
-            severity: filter.severity,
-            status: filter.status
-        }))
-    }
-    }, [page, rowsPerPage,toRemove]);
+        let sortby = ''
+        const order = orderActive === 'asc' ? 1 : -1
+
+        switch (sortActive) {
+            case "Defect ID":
+                sortby = 'defectid';
+                break;
+            case "Created Date":
+                sortby = 'date';
+                break;
+            default:
+                sortby = sortActive.toLocaleLowerCase();
+                break;
+        }
+
+        if (filter.filtered === false) {
+            dispatch(getAllDefectPaginate({
+                page: page + 1,
+                limit: rowsPerPage,
+                sortby,
+                order
+            }))
+        } else {
+            dispatch(filterDefect({
+                page: page + 1,
+                limit: rowsPerPage,
+                project: filter.project,
+                components: filter.components,
+                severity: filter.severity,
+                status: filter.status,
+                sortby,
+                order
+            }))
+        }
+    }, [page, rowsPerPage, toRemove, orderActive, sortActive]);
+
+
 
     return (
         <>
             {defects && defects.docs ?
                 <Box sx={{ width: '100%' }}>
                     <Paper sx={{ width: '100%', mb: 2 }}>
-                        <TableContainer>
+                        <TableContainer sx={{ mt: 2 }}>
                             <Table className='defect-table' size='small' sx={{ minWidth: 650 }}>
-                                <TableHead>
+
+                                <TableHead sx={{ whiteSpace: 'nowrap' }}>
                                     <TableRow>
-                                        <TableCell sx={{ textAlign: 'center' }}>Defect ID</TableCell>
-                                        <TableCell>Title</TableCell>
-                                        <TableCell>Project</TableCell>
-                                        <TableCell>Components</TableCell>
-                                        <TableCell>Severity</TableCell>
-                                        <TableCell>Status</TableCell>
-                                        <TableCell>Server</TableCell>
-                                        <TableCell>Reporter</TableCell>
-                                        <TableCell>Created Date</TableCell>
+                                        {tableHeader.map((header) => (
+                                            <TableCell>
+                                                <TableSortLabel
+                                                    active={sortActive === header}
+                                                    direction={sortActive === header ? orderActive : 'desc'}
+                                                    onClick={() => {
+                                                        handleOrder()
+                                                        handleSort(header)
+                                                    }}
+                                                >{header}
+                                                    {sortActive === header ? (
+                                                        <Box component="span" sx={visuallyHidden}>
+                                                            {orderActive === -1 ? 'sorted descending' : 'sorted ascending'}
+                                                        </Box>
+                                                    ) : null}
+                                                </TableSortLabel>
+                                            </TableCell>
+                                        ))}
                                     </TableRow>
                                 </TableHead>
 
@@ -108,43 +177,45 @@ const PaginateComponent = ({
                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                         >
                                             <TableCell sx={{ maxWidth: '50px', textAlign: 'center' }}>{item.defectid}</TableCell>
-                                            <TableCell sx={{ maxWidth: '200px', overflowWrap: 'break-word' }}>{item.title}</TableCell>
-                                            <TableCell sx={{ maxWidth: '50px' }}>{item.project}</TableCell>
-                                            <TableCell sx={{ maxWidth: '50px' }}>{item.components}</TableCell>
-                                            <TableCell sx={{ maxWidth: '20px' }}>{item.severity}</TableCell>
-                                            <TableCell sx={{ maxWidth: '20px' }}>{item.status}</TableCell>
-                                            <TableCell sx={{ maxWidth: '20px' }}>{item.server}</TableCell>
-                                            <TableCell sx={{ maxWidth: '200px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
-                                            <TableCell sx={{ maxWidth: '20px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
+
+                                            <TableCell sx={{ maxWidth: '150px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
+
+                                            <TableCell sx={{ maxWidth: '150px' }}>{item.project}</TableCell>
+                                            <TableCell sx={{ maxWidth: '150px', textAlign: 'center' }}>{item.components}</TableCell>
+                                            <TableCell sx={{ maxWidth: '150px' }}>{item.severity}</TableCell>
+                                            <TableCell sx={{ maxWidth: '50px' }}>{item.status}</TableCell>
+                                            <TableCell sx={{ maxWidth: '50px' }}>{item.server}</TableCell>
+                                            <TableCell sx={{ maxWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                            <TableCell sx={{ maxWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
                                             <TableCell sx={{ maxWidth: '150px' }}>
                                                 <Tooltip title="View">
-                                                <Button
-                                                sx={{ minHeight: 0, minWidth: 0, padding: 1}}
-                                                onClick={()=>handleView(item.defectid)}
-                                                >
-                                                    <OpenInNewIcon />
+                                                    <Button
+                                                        sx={{ minHeight: 0, minWidth: 0, padding: 2 }}
+                                                        onClick={() => handleView(item.defectid)}
+                                                    >
+                                                        <OpenInNewIcon />
                                                     </Button>
                                                 </Tooltip>
                                                 <Tooltip title="Edit">
-                                                <Button
-                                                sx={{ minHeight: 0, minWidth: 0, padding: 1 ,color:'darkorange' }}
-                                                onClick={()=>handleEdit(item.defectid)}
-                                                >
-                                                    <ModeEditIcon />
-                                                </Button>
+                                                    <Button
+                                                        sx={{ minHeight: 0, minWidth: 0, padding: 2, color: 'darkorange' }}
+                                                        onClick={() => handleEdit(item.defectid)}
+                                                    >
+                                                        <ModeEditIcon />
+                                                    </Button>
                                                 </Tooltip>
                                                 <Tooltip title="Delete">
-                                                <Button
-                                                onClick={()=>{
-                                                    setOpenModal(true)
-                                                    setToRemove(item.defectid)
-                                                }}
-                                                sx={{ minHeight: 0, minWidth: 0, padding: 1 }}
-                                                
-                                                >
-                                                    <DeleteForeverIcon color='error'/>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setOpenModal(true)
+                                                            setToRemove(item.defectid)
+                                                        }}
+                                                        sx={{ minHeight: 0, minWidth: 0, padding: 2 }}
+
+                                                    >
+                                                        <DeleteForeverIcon color='error' />
                                                     </Button>
-                                                    </Tooltip>
+                                                </Tooltip>
                                             </TableCell>
                                         </TableRow>
 
@@ -174,7 +245,7 @@ const PaginateComponent = ({
                             title="Warning"
                             description={`You are about to permanently delete Defect ID: ${toRemove}`}
                             warn={"Are you sure you want to continue?"}
-                            handleModalConfirm={()=>handleModalConfirm(toRemove)}
+                            handleModalConfirm={() => handleModalConfirm(toRemove)}
                             button1="Confirm"
                             button2="Cancel"
                             titleColor="darkred"

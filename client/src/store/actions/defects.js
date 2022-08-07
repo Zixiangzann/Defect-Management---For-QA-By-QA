@@ -79,12 +79,21 @@ export const getDefectById = createAsyncThunk(
 
 export const getAllDefectPaginate = createAsyncThunk(
     'defects/getAllDefectPaginate',
-    async({page=1,limit=10,project=""},{dispatch})=>{
+    async({
+        page=1,
+        limit=10,
+        project="",
+        sortby='defectid',
+        order='1'
+    },{dispatch})=>{
         try {
             const request = await axios.post('/api/defect/paginate',{
                 page,
                 limit,
-                project}
+                project,
+                sortby,
+                order
+            }
                 ,getAuthHeader())
                 return request.data;
         } catch (error) {
@@ -131,7 +140,9 @@ export const filterDefect = createAsyncThunk(
         components,
         status,
         severity,
-        server
+        server,
+        sortby='defectid',
+        order='1'
     }) => {
         try {
             const request = await axios.post('/api/defect/filter',{
@@ -140,8 +151,10 @@ export const filterDefect = createAsyncThunk(
                 project,
                 components,
                 status,
-                severity
-                ,server
+                severity,
+                server,
+                sortby,
+                order
             },getAuthHeader());
             return request.data;
 

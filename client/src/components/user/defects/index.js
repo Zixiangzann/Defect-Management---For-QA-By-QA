@@ -29,9 +29,6 @@ const Defect = () => {
 
     const [drawerState, setDrawerState] = useState(false)
 
-    // useEffect(() => {
-    //     // dispatch(getAllDefectPaginate({}))
-    // }, []);
 
     return (
 
