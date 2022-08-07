@@ -42,6 +42,7 @@ const Defect = () => {
 
             <Box display={'flex'} justifyContent={'flex-end'} flexDirection={'row'} flexWrap={'wrap'}>
 
+
                 <Button
                     variant="contained"
                     onClick={() => navigate('/defect/create')}

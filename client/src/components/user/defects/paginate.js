@@ -27,6 +27,7 @@ import Paper from '@mui/material/Paper'
 import Tooltip from '@mui/material/Tooltip'
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
+import TextField from '@mui/material/TextField';
 
 const PaginateComponent = ({
     defects,
@@ -56,6 +57,8 @@ const PaginateComponent = ({
     //For table header sorting state
     const [orderActive, setOrderActive] = useState('asc');
     const [sortActive, setSortActive] = useState('defectid');
+    //search
+    const [searchField,setSearchField] = useState('');
 
     //toggle order
     const handleOrder = () => {
@@ -69,6 +72,10 @@ const PaginateComponent = ({
     const handleSort = (header) => {
         setSortActive(header)
 
+    }
+
+    const handleSearch = (event) => {
+        setSearchField(event.target.value);
     }
 
     //Modal
@@ -103,6 +110,7 @@ const PaginateComponent = ({
     useEffect(() => {
         let sortby = ''
         const order = orderActive === 'asc' ? 1 : -1
+        const search = searchField === '' ? '(.*?)' : searchField 
 
         switch (sortActive) {
             case "Defect ID":
@@ -121,7 +129,8 @@ const PaginateComponent = ({
                 page: page + 1,
                 limit: rowsPerPage,
                 sortby,
-                order
+                order,
+                search
             }))
         } else {
             dispatch(filterDefect({
@@ -132,10 +141,11 @@ const PaginateComponent = ({
                 severity: filter.severity,
                 status: filter.status,
                 sortby,
-                order
+                order,
+                search
             }))
         }
-    }, [page, rowsPerPage, toRemove, orderActive, sortActive]);
+    }, [page, rowsPerPage, toRemove, orderActive, sortActive,searchField]);
 
 
 
@@ -143,7 +153,15 @@ const PaginateComponent = ({
         <>
             {defects && defects.docs ?
                 <Box sx={{ width: '100%' }}>
-                    <Paper sx={{ width: '100%', mb: 2 }}>
+                    <Paper sx={{ width: '100%', mb: 2,mt:2 }}>
+                        <TextField
+                            id="search-by-title"
+                            label="Search by title"
+                            type="search"
+                            variant="standard"
+                            onChange={(e)=>handleSearch(e)}
+                            sx={{float:'right',mb:3,mt:1,mr:1}}
+                        />
                         <TableContainer sx={{ mt: 2 }}>
                             <Table className='defect-table' size='small' sx={{ minWidth: 650 }}>
 

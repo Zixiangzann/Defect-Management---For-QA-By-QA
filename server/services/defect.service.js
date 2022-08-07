@@ -146,6 +146,7 @@ export const paginateDefectList = async (req) => {
     const order = req.body.order || 1
     const limit = req.body.limit || 15;
     const skip = req.body.skip || 0;
+    const search = req.body.search || '(.*?)';
 
     //If it is a user account, user can only see project that the account is been assigned to
     const userProject = Project.find({"assignee":{$in:[req.user.email]}}).select("title -_id").distinct("title").exec()
@@ -154,7 +155,8 @@ export const paginateDefectList = async (req) => {
         page: req.body.page,
         limit,
         sortby,
-        order
+        order,
+        search
     }
 
     let aggQuery;
@@ -162,7 +164,7 @@ export const paginateDefectList = async (req) => {
     try {
         if (req.user.role !== 'admin') {
             aggQuery = Defect.aggregate(
-                [{$match:{project:{$in:await userProject}}},
+                [{$match:{project:{$in:await userProject},title:{$regex: search, $options: 'i'}}},
                     {$sort:{[sortby]:order}}
                     ],{collation: { locale: "en", caseLevel: true }}
                 )
@@ -170,7 +172,9 @@ export const paginateDefectList = async (req) => {
 
         if(req.user.role === 'admin'){
             aggQuery = Defect.aggregate(
-                [{$sort:{[sortby]:order}}]
+                [{$match:{title:{$regex: search,$options:'i'}}},
+                    {$sort:{[sortby]:order}}
+                ]
                 ,{ collation: { locale: "en", caseLevel: true }}
             )
         }
@@ -239,6 +243,7 @@ export const filterDefectList = async (req, user) => {
         const status = req.body.status || '';
         const severity = req.body.severity || '';
         const server = req.body.server || '';
+        const search = req.body.search || '(.*?)';
 
         if (req.user.role !== 'admin' && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
@@ -258,7 +263,8 @@ export const filterDefectList = async (req, user) => {
                     components:filterComponents,
                     status:filterStatus,
                     severity:filterSeverity,
-                    server:filterServer
+                    server:filterServer,
+                    title:{$regex: search,$options:'i'}
                    }
                 },
                 {$sort:{[sortby]:order}}
@@ -268,7 +274,8 @@ export const filterDefectList = async (req, user) => {
         const options = {
             page: req.body.page,
             limit,
-            sortby
+            sortby,
+            search
         }
 
         const defects = Defect.aggregatePaginate(aggQuery, options);
