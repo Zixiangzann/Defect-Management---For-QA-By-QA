@@ -30,7 +30,6 @@ const Defect = () => {
 
     const [drawerState, setDrawerState] = useState(false)
 
-
     return (
 
 
@@ -62,25 +61,25 @@ const Defect = () => {
                     Filter
                 </Button>
 
-{defects.filter.filtered ?
-                <Tooltip title="Reset Filter">
-                    <Button
-                    onClick={()=>{
-                        dispatch(getAllDefectPaginate({
-                            order:defects.sort.order,
-                            sortby: defects.sort.sortby
-                        
-                        }))
-                        //clear search input field
-                        document.getElementById('search-by-title').value = ''
-                        dispatch(resetFilterState());
-                        }}
-                    >
-                        <RestartAltIcon />
-                    </Button>
-                </Tooltip>
-:
-null}
+                {defects.filter.filtered ?
+                    <Tooltip title="Reset Filter">
+                        <Button
+                            onClick={() => {
+                                //clear search input field
+                                document.getElementById('search-by-title').value = ''
+                                dispatch(resetFilterState());
+                                dispatch(getAllDefectPaginate({
+                                    order: defects.sort.order,
+                                    sortby: defects.sort.sortby
+
+                                }))
+                            }}
+                        >
+                            <RestartAltIcon />
+                        </Button>
+                    </Tooltip>
+                    :
+                    null}
             </Box>
 
 

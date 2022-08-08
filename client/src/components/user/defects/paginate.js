@@ -139,6 +139,7 @@ const PaginateComponent = ({
                 limit: rowsPerPage,
                 project: filter.project,
                 components: filter.components,
+                server: filter.server,
                 severity: filter.severity,
                 status: filter.status,
                 sortby: sort.sortby,
