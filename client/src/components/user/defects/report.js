@@ -1,6 +1,6 @@
-import { Doughnut, Bar, Chart } from 'react-chartjs-2';
+import { Doughnut, Bar, Chart} from 'react-chartjs-2';
 
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, LinearScale, Title, CategoryScale, BarController, BarElement } from 'chart.js';
+import { Chart as ChartJS, ArcElement, plugins, LinearScale, CategoryScale, BarController, BarElement} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
@@ -37,7 +37,7 @@ import Drawer from '@mui/material/Drawer';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PictureAsPdf from '@mui/icons-material/PictureAsPdf';
 
-ChartJS.register(ArcElement, Tooltip, Legend, Title, LinearScale, CategoryScale, BarController, BarElement, LinearScale, ChartDataLabels);
+ChartJS.register(ArcElement, plugins, LinearScale, CategoryScale, BarController, BarElement, LinearScale, ChartDataLabels);
 ChartJS.register({
     id: "custom_canvas_background_color",
     beforeDraw: (chart)=>{
@@ -46,6 +46,7 @@ ChartJS.register({
         ctx.fillRect(0, 0, chart.width, chart.height);
     }
 })
+
 
 const Report = () => {
 
@@ -414,6 +415,9 @@ const Report = () => {
                                             legend: {
                                                 position: 'bottom',
                                             },
+                                            animation: {
+                                                duration: 0,
+                                            },
                                             datalabels: {
                                                 color: 'blue',
                                                 labels: {
@@ -475,6 +479,9 @@ const Report = () => {
                                         plugins: {
                                             legend: {
                                                 display: false
+                                            },
+                                            animation: {
+                                                duration: 0,
                                             },
                                             datalabels: {
                                                 color: 'blue',
