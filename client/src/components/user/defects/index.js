@@ -20,6 +20,7 @@ import ListItem from '@mui/material/ListItem';
 import List from '@mui/material/List';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { resetDataState, resetFilterState } from '../../../store/reducers/defects';
 
 
 const Defect = () => {
@@ -64,7 +65,16 @@ const Defect = () => {
 {defects.filter.filtered ?
                 <Tooltip title="Reset Filter">
                     <Button
-                    onClick={()=>{dispatch(getAllDefectPaginate({}))}}
+                    onClick={()=>{
+                        dispatch(getAllDefectPaginate({
+                            order:defects.sort.order,
+                            sortby: defects.sort.sortby
+                        
+                        }))
+                        //clear search input field
+                        document.getElementById('search-by-title').value = ''
+                        dispatch(resetFilterState());
+                        }}
                     >
                         <RestartAltIcon />
                     </Button>
@@ -84,6 +94,7 @@ null}
             <PaginateComponent
                 defects={defects.defectLists}
                 filter={defects.filter}
+                sort={defects.sort}
             ></PaginateComponent>
 
         </Box>

@@ -235,7 +235,10 @@ const DefectFilter = ({
                                 components:state.components,
                                 status:state.status,
                                 severity:state.severity,
-                                server:state.server
+                                server:state.server,
+                                order:defects.sort.order,
+                                sortby:defects.sort.sortby,
+                                search:defects.filter.search
                             }))
                             dispatch(filterDefect(
                                 {project:state.project,
@@ -243,6 +246,9 @@ const DefectFilter = ({
                                 status:state.status,
                                 severity:state.severity,
                                 server:state.server,
+                                order:defects.sort.order,
+                                sortby:defects.sort.sortby,
+                                search: defects.filter.search
                         }))
                         setDrawerState(false)
                         dispatch(resetDataState());

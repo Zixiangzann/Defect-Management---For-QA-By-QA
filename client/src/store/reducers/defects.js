@@ -32,7 +32,12 @@ let DEFAULT_DEFECT_STATE ={
         project:null,
         components:null,
         severity:null,
-        status:null
+        status:null,
+        search:'(.*?)',
+    },
+    sort:{
+        order:1,
+        sortby:'defectid'
     },
     current:null
 }
@@ -44,8 +49,20 @@ export const defectsSlice = createSlice({
       resetDataState: (state,action) =>{
         state.data = DEFAULT_DEFECT_STATE
       },
+      resetFilterState:(state,action) => {
+        state.filter = DEFAULT_DEFECT_STATE
+      },
       setFilterState:(state,action) => {
         state.filter = action.payload
+      },
+      setSearch:(state,action) => {
+        state.filter.search = action.payload
+      },
+      setOrder:(state,action)=>{
+        state.sort.order = action.payload
+      },
+      setSortBy:(state,action)=>{
+        state.sort.sortby = action.payload
       }
     },
     extraReducers:(builder)=>{
@@ -85,5 +102,5 @@ export const defectsSlice = createSlice({
     }
     })
     
-    export const {resetDataState,setFilterState} = defectsSlice.actions;
+    export const {resetDataState,resetFilterState,setFilterState,setSearch,setOrder,setSortBy} = defectsSlice.actions;
     export default defectsSlice.reducer;

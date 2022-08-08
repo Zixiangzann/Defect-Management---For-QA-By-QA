@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 //comp
 import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../../store/actions/defects';
+import { setOrder, setSearch, setSortBy } from '../../../store/reducers/defects';
 import ModalComponent from '../../../utils/modal/modal';
 
 //MUI
@@ -31,7 +32,8 @@ import TextField from '@mui/material/TextField';
 
 const PaginateComponent = ({
     defects,
-    filter
+    filter,
+    sort
 }) => {
 
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -57,25 +59,22 @@ const PaginateComponent = ({
     //For table header sorting state
     const [orderActive, setOrderActive] = useState('asc');
     const [sortActive, setSortActive] = useState('defectid');
-    //search
-    const [searchField,setSearchField] = useState('');
 
     //toggle order
     const handleOrder = () => {
         if (orderActive === 'desc') {
-            setOrderActive('asc')
+            setOrderActive('asc');
         } else if (orderActive === 'asc') {
-            setOrderActive('desc')
+            setOrderActive('desc');
         }
     }
 
     const handleSort = (header) => {
-        setSortActive(header)
-
+        setSortActive(header);
     }
 
     const handleSearch = (event) => {
-        setSearchField(event.target.value);
+        dispatch(setSearch(event.target.value));
     }
 
     //Modal
@@ -106,31 +105,33 @@ const PaginateComponent = ({
         setToRemove(null)
     }
 
-
-    useEffect(() => {
-        let sortby = ''
-        const order = orderActive === 'asc' ? 1 : -1
-        const search = searchField === '' ? '(.*?)' : searchField 
-
+    useEffect(()=>{
         switch (sortActive) {
             case "Defect ID":
-                sortby = 'defectid';
+                dispatch(setSortBy('defectid'));
                 break;
             case "Created Date":
-                sortby = 'date';
+                dispatch(setSortBy('date'));
                 break;
             default:
-                sortby = sortActive.toLocaleLowerCase();
+                 dispatch(setSortBy(sortActive.toLocaleLowerCase()));
                 break;
         }
+
+        orderActive === 'asc' ? dispatch(setOrder(1)) : dispatch(setOrder(-1))
+
+    },[sortActive,orderActive])
+
+
+    useEffect(() => {
 
         if (filter.filtered === false) {
             dispatch(getAllDefectPaginate({
                 page: page + 1,
                 limit: rowsPerPage,
-                sortby,
-                order,
-                search
+                sortby: sort.sortby,
+                order: sort.order,
+                search: filter.search
             }))
         } else {
             dispatch(filterDefect({
@@ -140,12 +141,12 @@ const PaginateComponent = ({
                 components: filter.components,
                 severity: filter.severity,
                 status: filter.status,
-                sortby,
-                order,
-                search
+                sortby: sort.sortby,
+                order: sort.order,
+                search: filter.search
             }))
         }
-    }, [page, rowsPerPage, toRemove, orderActive, sortActive,searchField]);
+    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby,filter.search]);
 
 
 
