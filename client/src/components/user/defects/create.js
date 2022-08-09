@@ -10,7 +10,11 @@ import ModalComponent from '../../../utils/modal/modal';
 import WYSIWYG from '../../../utils/form/wysiwyg';
 
 //MUI
-import { Checkbox, FormControlLabel, Tooltip, Typography } from "@mui/material";
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import ListItem from '@mui/material/ListItem';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField'
@@ -29,6 +33,11 @@ import AddIcon from '@mui/icons-material/Add';
 import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import List from '@mui/material/List';
+import AttachmentIcon from '@mui/icons-material/Attachment';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
@@ -46,6 +55,9 @@ const CreateDefect = () => {
     const [showSelectProject, setShowSelectProject] = useState(true)
     const [assignee, setAssignee] = useState([])
     const [assigneeSelectTouched, setAssigneeSelectTouched] = useState(false);
+    //add files to be uploaded in a array
+    const [filesArray, setFilesArray] = useState([])
+
 
     //WYSIWYG Blur state
     const [editorBlur, setEditorBlur] = useState(false);
@@ -82,6 +94,17 @@ const CreateDefect = () => {
         setAssignee([])
         setAssigneeSelectTouched(false)
         formik.resetForm()
+    }
+
+    //handler for file upload
+    const handleRemoveFileArray = (item) => {
+        const toRemove = item
+        const updated = filesArray.filter((item, j) => toRemove !== item)
+        setFilesArray(updated)
+    }
+
+    const handleFileArray = (e) => {
+        setFilesArray([...filesArray, e.target.files[0]]);
     }
 
     const formik = useFormik({
@@ -213,6 +236,45 @@ const CreateDefect = () => {
 
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
+                        <InputLabel>Attach Files:</InputLabel>
+                        <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
+                        
+                        <FormControl>
+                            <Button
+                                variant="contained"
+                                component="label"
+                                onChange={(e) => handleFileArray(e)}
+                                startIcon={<AttachmentIcon sx={{transform: 'rotate(265deg)'}}/>}
+                            >
+                                Upload
+                                <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/*" multiple type="file" />
+                            </Button>
+                        </FormControl>
+                        </Box>
+
+                        <Box sx={{display:'flex',maxHeight:'150px',overflow:'auto'}}>
+
+                            <List>
+                                {filesArray.map((item)=>(
+                                <ListItem
+                                    secondaryAction={
+                                        <IconButton edge="end" aria-label="delete">
+                                            <DeleteIcon sx={{color:'red'}}/>
+                                        </IconButton>}
+                                >
+                                    <ListItemIcon>
+                                            <InsertDriveFileIcon />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={item.name}
+                                    />
+                                </ListItem>
+                                ))}
+                            </List>
+                        </Box>
+
+                        <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
+
                         <FormControl
                             sx={{ margin: '1rem 1.5rem 0 0' }}>
 
@@ -258,7 +320,7 @@ const CreateDefect = () => {
                                             }
                                             onClose={() => {
                                                 setAssigneeSelectTouched(true);
-                                                formik.setFieldValue('assignee',[...assignee])
+                                                formik.setFieldValue('assignee', [...assignee])
                                             }}
                                             required
                                             renderValue={(selected) => selected.join(', ')}
