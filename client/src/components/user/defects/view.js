@@ -8,6 +8,7 @@ import Moment from 'react-moment'
 //Comp
 import { getDefectById } from '../../../store/actions/defects';
 import { addComment, getCommentByDefectIdPaginate } from '../../../store/actions/comments';
+import { saveAs } from "file-saver";
 
 //MUI
 import Box from '@mui/material/Box';
@@ -34,6 +35,10 @@ import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead'
 import TablePagination from '@mui/material/TablePagination';
 import { Tab, TableBody, TableFooter, TextField } from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import IconButton from '@mui/material/IconButton'
 
 const ViewDefect = () => {
 
@@ -61,8 +66,8 @@ const ViewDefect = () => {
     //paginate
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(3);
-    const [commentTextArea,setCommentTextArea] = useState('')
-    const [commented,setCommented] = useState(false)
+    const [commentTextArea, setCommentTextArea] = useState('')
+    const [commented, setCommented] = useState(false)
 
 
     const defects = useSelector(state => state.defects)
@@ -84,6 +89,11 @@ const ViewDefect = () => {
         setCommentTextArea(event.target.value);
     }
 
+    const handleDownload = async(downloadURL) => {
+        saveAs(downloadURL)
+      }
+
+
     useEffect(() => {
         dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
         dispatch(getDefectById(defectId))
@@ -92,7 +102,7 @@ const ViewDefect = () => {
     useEffect(() => {
         dispatch(getCommentByDefectIdPaginate({ page: page + 1, limit: rowsPerPage, defectId: defectId }))
         setCommented(false)
-    }, [page, rowsPerPage,commented])
+    }, [page, rowsPerPage, commented])
 
     return (
         <Box>
@@ -176,8 +186,36 @@ const ViewDefect = () => {
                         </ListItem>
                     </List>
 
-                                    <Typography mt={3} ml={3}>Comment:</Typography>
-                    <Paper sx={{ width: '100%', overflow: 'hidden' ,mt:3,ml:3}}>
+                    <Box sx={{ display: 'flex', maxHeight: '250px', overflow: 'auto' }}>
+                        <List
+                            className='attachment' sx={{ ml: 3, mt: 2 }}>
+                            <Typography>Attachment: </Typography>
+                            {defects.current.attachment.map((item, index) => (
+                                <ListItem
+                                    key={`${item.name}_${item.lastModified}`}
+                                    secondaryAction={
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            color='primary'
+                                            onClick={() => handleDownload(item.downloadURL)}
+                                        >
+                                            <FileDownloadIcon primary />
+                                        </IconButton>}
+                                >
+                                    <ListItemIcon>
+                                        <InsertDriveFileIcon />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={item.name}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+
+                    <Typography mt={3} ml={3}>Comment:</Typography>
+                    <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
                         <TableContainer sx={{ maxHeight: 440 }}>
                             <Table stickyHeader aria-label="sticky table">
                                 <TableHead>
@@ -190,62 +228,62 @@ const ViewDefect = () => {
                                 </TableHead>
 
                                 <TableBody>
-                                    {comments.comments.docs.map((item,index) => (
-                                        <TableRow key={'comment'+index}>
-                                            <TableCell key={item.user} sx={{wordWrap:'break-word',overflow:'auto',maxWidth:'200px'}}>{item.user}</TableCell>
-                                            <TableCell key={item.comment} sx={{wordWrap:'break-word',overflow:'auto',maxWidth:'200px'}}>{item.comment}</TableCell>
+                                    {comments.comments.docs.map((item, index) => (
+                                        <TableRow key={'comment' + index}>
+                                            <TableCell key={item.user} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.user}</TableCell>
+                                            <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell>
                                             <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
 
                                 <TableFooter>
-                                <TableRow>
-                                    <TablePagination
-                                        rowsPerPageOptions={[3,10]}
-                                        rowsPerPage={rowsPerPage}
-                                        colSpan={3}
-                                        count={comments.comments.totalDocs}
-                                        page={page}
-                                        onPageChange={handleChangePage}
-                                        onRowsPerPageChange={handleChangeRowsPerPage}
-                                    />
-                                </TableRow>
+                                    <TableRow>
+                                        <TablePagination
+                                            rowsPerPageOptions={[3, 10]}
+                                            rowsPerPage={rowsPerPage}
+                                            colSpan={3}
+                                            count={comments.comments.totalDocs}
+                                            page={page}
+                                            onPageChange={handleChangePage}
+                                            onRowsPerPageChange={handleChangeRowsPerPage}
+                                        />
+                                    </TableRow>
                                 </TableFooter>
                             </Table>
                         </TableContainer>
                     </Paper>
 
-                    <Box 
-                    className='addComment'
-                    component="form"
-                    noValidate
-                    autoComplete='off'
-                    autoCorrect="true"
-                    mt={5}
-                    
+                    <Box
+                        className='addComment'
+                        component="form"
+                        noValidate
+                        autoComplete='off'
+                        autoCorrect="true"
+                        mt={5}
+
                     >
                         <TextField className='commentTextArea'
-                        placeholder='Add a comment'
-                        value={commentTextArea}
-                        label="Comment"
-                        multiline
-                        rows={2}
-                        sx={{width:'100%'}}
-                        onChange={(e)=>handleCommentTextArea(e)}
+                            placeholder='Add a comment'
+                            value={commentTextArea}
+                            label="Comment"
+                            multiline
+                            rows={2}
+                            sx={{ width: '100%' }}
+                            onChange={(e) => handleCommentTextArea(e)}
                         >
 
                         </TextField>
 
-                        <Button 
-                        variant='outlined' 
-                        sx={{float:'right',width:'10rem',mt:1}}
-                        onClick={()=>{
-                            dispatch(addComment({defectId,comment:commentTextArea}))
-                            .unwrap()
-                            .then(setCommented(true))
-                            setCommentTextArea('')        
-                        }}
+                        <Button
+                            variant='outlined'
+                            sx={{ float: 'right', width: '10rem', mt: 1 }}
+                            onClick={() => {
+                                dispatch(addComment({ defectId, comment: commentTextArea }))
+                                    .unwrap()
+                                    .then(setCommented(true))
+                                setCommentTextArea('')
+                            }}
                         >Add</Button>
 
                     </Box>
