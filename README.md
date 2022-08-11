@@ -1,4 +1,4 @@
-# Defect-Management---By-QA-for-QA
+# Defect-Management---For QA By QA
 
 Still buidling in progress....
 A Defect Management system created by QA for QA.
