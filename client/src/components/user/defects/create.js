@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useFormik, FieldArray, FormikProvider } from 'formik';
 import { useNavigate } from 'react-router-dom'
 
+import { storage } from '../../../firebase.js'
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage"
+
 //comp
 import { errorHelper, errorHelperSelect, Loader } from '../../../utils/tools'
 import { validation, formValues } from './validationSchema'
@@ -41,7 +44,7 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAssignee, getAllComponents, getAllProjects, createDefect } from '../../../store/actions/defects';
+import { getAllAssignee, getAllComponents, getAllProjects, createDefect, updateAttachment } from '../../../store/actions/defects';
 import { resetDataState } from '../../../store/reducers/defects';
 
 
@@ -105,6 +108,7 @@ const CreateDefect = () => {
 
     const handleFileArray = (e) => {
         setFilesArray([...filesArray, e.target.files[0]]);
+        console.log(filesArray)
     }
 
     const formik = useFormik({
@@ -113,9 +117,17 @@ const CreateDefect = () => {
         validationSchema: validation,
         onSubmit: (values) => {
             formik.values.status = "New"
-            dispatch(createDefect(values))
+            dispatch(createDefect(
+                values))
                 .unwrap()
-                .then(() => {
+                .then((response) => {
+                    console.log(filesArray)
+                    dispatch(updateAttachment({
+                        defectId: response.defectid,
+                        attachment: filesArray
+                    }
+                    
+                    ))
                     navigate('/')
                 })
         }
@@ -257,8 +269,13 @@ const CreateDefect = () => {
                             <List>
                                 {filesArray.map((item)=>(
                                 <ListItem
+                                    key={`${item.name}_${item.lastModified}`}
                                     secondaryAction={
-                                        <IconButton edge="end" aria-label="delete">
+                                        <IconButton 
+                                        edge="end" 
+                                        aria-label="delete"
+                                        onClick={()=>handleRemoveFileArray(item)}
+                                        >
                                             <DeleteIcon sx={{color:'red'}}/>
                                         </IconButton>}
                                 >

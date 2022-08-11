@@ -52,6 +52,31 @@ export const createDefect = async (body,user) => {
     }
 }
 
+export const updateAttachment= async (defectId,user,body) => {
+
+    try {
+        const defect = await Defect.findOne({ defectid: defectId }).exec();
+        if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
+
+        const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
+        if (user.role !== 'admin' && !user.project.includes(defectProject)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
+        }
+
+        const addFileAttachment = Defect.findOneAndUpdate({defectid:defectId},
+            {
+                "$set": {
+                    attachment: body.attachment
+                }
+            },
+            { new: true }).exec();
+
+            return addFileAttachment;
+    }catch (error) {
+        throw error
+    } 
+}
+
 export const getDefectById = async (defectId, user) => {
     try {
 
@@ -61,7 +86,7 @@ export const getDefectById = async (defectId, user) => {
         //If it is a "user" account, the account need to be assigned to the project in order to view the defect.
         const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
         if (user.role !== 'admin' && !user.project.includes(defectProject)) {
-            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view defect');
         }
         return defect;
     } catch (error) {
@@ -69,10 +94,15 @@ export const getDefectById = async (defectId, user) => {
     }
 }
 
-export const updateDefectById = async (defectId, body) => {
+export const updateDefectById = async (defectId, user, body) => {
     try {
         const defect = await Defect.findOne({ defectid: defectId }).exec();
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
+
+        const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
+        if (user.role !== 'admin' && !user.project.includes(defectProject)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
+        }
 
         const newDefectDetail = Defect.findOneAndUpdate({ defectid: defectId },
             {

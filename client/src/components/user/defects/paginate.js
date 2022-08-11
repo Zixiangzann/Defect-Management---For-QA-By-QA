@@ -168,9 +168,10 @@ const PaginateComponent = ({
                             <Table className='defect-table' size='small' sx={{ minWidth: 650 }}>
 
                                 <TableHead sx={{ whiteSpace: 'nowrap' }}>
-                                    <TableRow>
+                                    <TableRow key={'header'}>
                                         {tableHeader.map((header) => (
-                                            <TableCell>
+                                            <TableCell
+                                            key={`table-${header}`}>
                                                 <TableSortLabel
                                                     active={sortActive === header}
                                                     direction={sortActive === header ? orderActive : 'desc'}
@@ -192,22 +193,22 @@ const PaginateComponent = ({
 
                                 <TableBody
                                 >
-                                    {defects.docs.map((item) => (
+                                    {defects.docs.map((item,index) => (
                                         <TableRow key={item._id}
                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                         >
-                                            <TableCell sx={{ maxWidth: '50px', textAlign: 'center' }}>{item.defectid}</TableCell>
+                                            <TableCell key={`${item.defectid}-${index}`} sx={{ maxWidth: '50px', textAlign: 'center' }}>{item.defectid}</TableCell>
 
-                                            <TableCell sx={{ maxWidth: '150px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
+                                            <TableCell key={`${item.title}-${index}`} sx={{ maxWidth: '150px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
 
-                                            <TableCell sx={{ maxWidth: '150px' }}>{item.project}</TableCell>
-                                            <TableCell sx={{ maxWidth: '150px', textAlign: 'center' }}>{item.components}</TableCell>
-                                            <TableCell sx={{ maxWidth: '150px' }}>{item.severity}</TableCell>
-                                            <TableCell sx={{ maxWidth: '50px' }}>{item.status}</TableCell>
-                                            <TableCell sx={{ maxWidth: '50px' }}>{item.server}</TableCell>
-                                            <TableCell sx={{ maxWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
-                                            <TableCell sx={{ maxWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
-                                            <TableCell sx={{ maxWidth: '150px' }}>
+                                            <TableCell key={`${item.project}-${index}`} sx={{ maxWidth: '150px' }}>{item.project}</TableCell>
+                                            <TableCell key={`${item.components}-${index}`} sx={{ maxWidth: '150px', textAlign: 'center' }}>{item.components}</TableCell>
+                                            <TableCell key={`${item.severity}-${index}`} sx={{ maxWidth: '150px' }}>{item.severity}</TableCell>
+                                            <TableCell key={`${item.status}-${index}`} sx={{ maxWidth: '50px' }}>{item.status}</TableCell>
+                                            <TableCell key={`${item.server}-${index}`} sx={{ maxWidth: '50px' }}>{item.server}</TableCell>
+                                            <TableCell key={`${item.reporter}-${index}`} sx={{ maxWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                            <TableCell key={`${item.date}-${index}`} sx={{ maxWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
+                                            <TableCell key={'menu'} sx={{ maxWidth: '150px' }}>
                                                 <Tooltip title="View">
                                                     <Button
                                                         sx={{ minHeight: 0, minWidth: 0, padding: 2 }}
@@ -240,7 +241,7 @@ const PaginateComponent = ({
                                         </TableRow>
 
                                     ))}
-                                    <TableRow>
+                                    <TableRow key={'tablePagination'}>
                                         <TablePagination
                                             rowsPerPageOptions={[10, 15, 25]}
                                             rowsPerPage={rowsPerPage}

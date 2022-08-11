@@ -114,11 +114,12 @@ const DefectFilter = ({
                                 label='Project'
                                 value={state.project ?? ""}
                                 onChange={handleChange}
+                                defaultValue=""
                                 sx={{ width: '85%' }}
                             >
-                                {defects.data.project ? defects.data.project.map((item) => (
+                                {defects.data.project ? defects.data.project.map((item,index) => (
                                     <MenuItem
-                                        key={item.title}
+                                        key={`${item.title}-${index}`}
                                         value={item.title}
                                         onClick={(e) => {
                                             dispatch(getAllAssignee(e.target.textContent))

@@ -158,9 +158,10 @@ const Report = () => {
             const label = report.ylabel[index]
             const value = report.yvalue[index]
 
-            content.push(<TableRow>
-                <TableCell>{label}</TableCell>
-                <TableCell>{value}</TableCell>
+            content.push(
+            <TableRow key={`${index}`}>
+                <TableCell key={`${label}-${index}`}>{label}</TableCell>
+                <TableCell key={`${value}-${index}`}>{value}</TableCell>
             </TableRow>)
         }
         return content
@@ -186,11 +187,12 @@ const Report = () => {
                             label='Project'
                             sx={{ width: '50%' }}
                             onChange={handleProject}
+                            defaultValue=""
 
                         >
-                            {defects.data.project ? defects.data.project.map((item) => (
+                            {defects.data.project ? defects.data.project.map((item,index) => (
                                 <MenuItem
-                                    key={item.title}
+                                    key={`${item.title}-main-${index}`}
                                     value={item.title}
                                 >{item.title}</MenuItem>
                             )
@@ -235,9 +237,9 @@ const Report = () => {
                                     value={project ?? project}
 
                                 >
-                                    {defects.data.project ? defects.data.project.map((item) => (
+                                    {defects.data.project ? defects.data.project.map((item,index) => (
                                         <MenuItem
-                                            key={item.title}
+                                            key={`${item.title}-inner-${index}`}
                                             value={item.title}
                                         >{item.title}</MenuItem>
                                     )
@@ -253,7 +255,8 @@ const Report = () => {
                                 <RadioGroup
                                     row
                                     onChange={handleChartType}
-                                    defaultValue={chartType}
+                                    value={chartType}
+                                    checked={chartType}
                                 >
                                     <FormControlLabel
                                         value='pie'
@@ -276,31 +279,31 @@ const Report = () => {
                                     }}
                                 >
                                     <MenuItem
-                                        key="server"
+                                        key="server-chart"
                                         value="server"
                                     >Server
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="issuetype"
+                                        key="issuetype-chart"
                                         value="issuetype"
                                     >Issue Type
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="severity"
+                                        key="severity-chart"
                                         value="severity"
                                     >Severity
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="status"
+                                        key="status-chart"
                                         value="status"
                                     >Status
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="components"
+                                        key="components-chart"
                                         value="components"
                                     >components
                                     </MenuItem>
@@ -322,31 +325,31 @@ const Report = () => {
                                     }}
                                 >
                                     <MenuItem
-                                        key="server"
+                                        key="server-table"
                                         value="server">
                                         Server
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="issuetype"
+                                        key="issuetype-table"
                                         value="issuetype">
                                         Issue Type
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="severity"
+                                        key="severity-table"
                                         value="severity">
                                         Severity
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="status"
+                                        key="status-table"
                                         value="status">
                                         Status
                                     </MenuItem>
 
                                     <MenuItem
-                                        key="components"
+                                        key="components-table"
                                         value="components"
                                     >components
                                     </MenuItem>
@@ -522,10 +525,12 @@ const Report = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell variant='head'>
+                                                <TableCell     
+                                                variant='head'>
                                                     {report.yselect.toUpperCase()}
                                                 </TableCell>
-                                                <TableCell variant='head'>
+                                                <TableCell 
+                                                variant='head'>
                                                     COUNT
                                                 </TableCell>
                                             </TableRow>

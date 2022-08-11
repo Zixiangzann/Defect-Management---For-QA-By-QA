@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { countIssueType } from '../services/defect.service.js';
+import { updateAttachment, countIssueType } from '../services/defect.service.js';
 import { defectService } from '../services/index.js';
 
 const defectController ={
@@ -8,6 +8,15 @@ const defectController ={
         try {
             const defect = await defectService.createDefect(req.body,req.user);
             res.json(defect)
+        } catch (error) {
+            next(error)
+        }
+    },
+    async updateAttachment(req,res,next){
+        try {
+            const defectId = req.params.defectId
+            const addAttachment = await defectService.updateAttachment(defectId,req.user,req.body)
+            res.json(addAttachment)
         } catch (error) {
             next(error)
         }
@@ -24,7 +33,7 @@ const defectController ={
     async updateDefectById(req,res,next){
         try {
             const defectId = req.params.defectId;
-            const defect = await defectService.updateDefectById(defectId,req.body);
+            const defect = await defectService.updateDefectById(defectId,req.user,req.body);
             res.json(defect);
         } catch (error) {
             next(error);

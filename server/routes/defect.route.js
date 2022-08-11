@@ -11,6 +11,9 @@ router.get('/:defectId',auth('readAny','defects'),defectController.getDefectById
 router.patch('/update/:defectId',auth('updateAny','defects'),defectController.updateDefectById);
 router.delete('/delete/:defectId',auth('deleteAny','defects'),defectController.deleteDefectById);
 
+//add file attachment
+router.patch('/update/attachment/:defectId',auth('createAny','defects'),defectController.updateAttachment)
+
 //get all
 router.post('/more',auth('readAny','defects'),defectController.getMoreDefects);
 router.post('/paginate',auth('readAny','defects'),defectController.defectListPaginate)

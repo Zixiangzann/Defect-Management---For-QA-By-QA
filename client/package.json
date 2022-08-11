@@ -18,6 +18,8 @@
     "chartjs-plugin-datalabels": "^2.1.0",
     "draft-js-export-html": "^1.4.1",
     "draftjs-to-html": "^0.9.1",
+    "file-saver": "^2.0.5",
+    "firebase": "^9.9.2",
     "formik": "^2.2.9",
     "htmr": "^1.0.1",
     "jspdf": "^2.5.1",

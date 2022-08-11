@@ -52,6 +52,9 @@ export const defectSchema = mongoose.Schema({
     assignee:{
         type:[String]
     },
+    attachment:{
+        type:[{}]
+    },
     date:{
         type: Date,
         default: Date.now

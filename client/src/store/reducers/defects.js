@@ -25,7 +25,8 @@ let DEFAULT_DEFECT_STATE = {
     issuetype: null,
     severity: null,
     status: null,
-    assignee: null
+    assignee: null,
+    attachment:[]
   },
   filter: {
     filtered: false,

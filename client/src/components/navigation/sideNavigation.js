@@ -39,6 +39,7 @@ const SideDrawer = ({ users }) => {
                 <Box sx={{ width: 300 }}>
                     <List>
                         <ListItem
+                            key="sideNavigation-Home"
                             button
                             component={RouterLink}
                             to="/"
@@ -52,6 +53,7 @@ const SideDrawer = ({ users }) => {
 
                         {!users.auth ?
                             <ListItem
+                                key="sideNavigation-SignIn"
                                 button
                                 component={RouterLink}
                                 to="/auth"
@@ -65,6 +67,7 @@ const SideDrawer = ({ users }) => {
                             :
 
                             <ListItem
+                                key="sideNavigation-SignOut"
                                 button
                                 component={RouterLink}
                                 to="/"
@@ -83,6 +86,7 @@ const SideDrawer = ({ users }) => {
                         <>
                             <Divider />
                             <ListItem
+                                key="sideNavigation-Defect"
                                 button
                                 component={RouterLink}
                                 to="/defect"
@@ -94,6 +98,7 @@ const SideDrawer = ({ users }) => {
                                 <ListItemText primary="Defect" />
                             </ListItem>
                             <ListItem
+                                key="sideNavigation-Projects"
                                 button
                                 component={RouterLink}
                                 to="/projects"
@@ -105,6 +110,7 @@ const SideDrawer = ({ users }) => {
                                 <ListItemText primary="Projects" />
                             </ListItem>
                             <ListItem
+                                key="sideNavigation-Dashboards"
                                 button
                                 component={RouterLink}
                                 to="/dashboard"
@@ -117,6 +123,7 @@ const SideDrawer = ({ users }) => {
                             </ListItem>
 
                             <ListItem
+                                key="sideNavigation-Reports"
                                 button
                                 component={RouterLink}
                                 to="/defect/report"
@@ -130,6 +137,7 @@ const SideDrawer = ({ users }) => {
 
                             {users.data.role === 'admin' ?
                                 <ListItem
+                                    key="sideNavigation-UserManagement"
                                     button
                                     component={RouterLink}
                                     to="/usermanagement/users"

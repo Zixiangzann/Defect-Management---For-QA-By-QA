@@ -1,18 +1,21 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
+import { storage } from '../../firebase';
+import { ref, getDownloadURL, uploadBytes, uploadBytesResumable } from "firebase/storage"
+import { async } from '@firebase/util';
 
 //Get details for creating defects
 //Get all available assignee of a project
 export const getAllAssignee = createAsyncThunk(
     'defects/getAllAssignee',
-    async(title) =>{
+    async (title) => {
         try {
             const request = await axios.post('/api/defect/assignee',
-            {title:title}
-            ,getAuthHeader())
-            return {assignee: request.data[0].assignee.sort()}
+                { title: title }
+                , getAuthHeader())
+            return { assignee: request.data[0].assignee.sort() }
         } catch (error) {
             throw error;
         }
@@ -22,12 +25,12 @@ export const getAllAssignee = createAsyncThunk(
 //Get all available components of a project
 export const getAllComponents = createAsyncThunk(
     'defects/getAllComponents',
-    async(title) =>{
+    async (title) => {
         try {
             const request = await axios.post('/api/defect/components',
-            {title:title}
-            ,getAuthHeader())
-            return {components: request.data[0].components.sort()}
+                { title: title }
+                , getAuthHeader())
+            return { components: request.data[0].components.sort() }
         } catch (error) {
             throw error;
         }
@@ -39,10 +42,10 @@ export const getAllComponents = createAsyncThunk(
 //user or any other role can only see project that is assigned to them.
 export const getAllProjects = createAsyncThunk(
     'defects/getAllProjects',
-    async()=>{
+    async () => {
         try {
-            const request = await axios.post('/api/defect/projects',{},getAuthHeader())
-            return{project: request.data}
+            const request = await axios.post('/api/defect/projects', {}, getAuthHeader())
+            return { project: request.data }
         } catch (error) {
             throw error;
         }
@@ -52,9 +55,12 @@ export const getAllProjects = createAsyncThunk(
 //create defect
 export const createDefect = createAsyncThunk(
     'defects/createDefect',
-    async(defect,{dispatch}) => {
+    async (defect, { dispatch }) => {
         try {
-            const request = await axios.post('/api/defect/create',defect,getAuthHeader())
+            const request = await axios.post('/api/defect/create',
+                defect
+                , getAuthHeader())
+
             dispatch(successGlobal(<div>Defect created<br /> Defect ID: {request.data.defectid}</div>));
             return request.data
         } catch (error) {
@@ -64,13 +70,57 @@ export const createDefect = createAsyncThunk(
     }
 )
 
+export const updateAttachment = createAsyncThunk(
+    'defects/updateAttachment',
+    async ({
+        defectId,
+        attachment
+    }, { dispatch }) => {
+        try {
+
+            let fileDetailsArray = [];
+
+            attachment.map((item, index) => {
+                const storageRef = ref(storage, `DefectID_${defectId}/${item.name}`)
+                if (!item) return null;
+                const uploadTask = uploadBytesResumable(storageRef, item)
+
+                uploadTask.then((snapshot) => {
+                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                        fileDetailsArray.push({
+                            "name": item.name,
+                            "lastModified": item.lastModified,
+                            "size": item.size,
+                            "type": item.type,
+                            "webkitRelativePath": item.webkitRelativePath,
+                            "downloadURL": downloadURL
+                        })
+                        console.log(fileDetailsArray)
+                        console.log(downloadURL)
+                    }).then(async()=>{
+                        const request = await axios.patch(
+                            `/api/defect/update/attachment/${defectId}`, {
+                            attachment: fileDetailsArray
+                        }, getAuthHeader())
+                        return request.data
+                    })
+                })
+            })
+
+        } catch (error) {
+            dispatch(errorGlobal(<div>Fail to attach file<br /> Defect ID: {defectId}</div>));
+            throw error
+        }
+    }
+)
+
 export const getDefectById = createAsyncThunk(
     'defects/getDefectById',
-    async(defectId,{ dispatch })=>{
-        try{
-            const request = await axios.get(`/api/defect/${defectId}`,getAuthHeader());
+    async (defectId, { dispatch }) => {
+        try {
+            const request = await axios.get(`/api/defect/${defectId}`, getAuthHeader());
             return request.data;
-        } catch(error){
+        } catch (error) {
             dispatch(errorGlobal(<div>{error.response.data.message}</div>));
             throw error
         }
@@ -79,16 +129,16 @@ export const getDefectById = createAsyncThunk(
 
 export const getAllDefectPaginate = createAsyncThunk(
     'defects/getAllDefectPaginate',
-    async({
-        page=1,
-        limit=10,
-        project="",
-        sortby='defectid',
-        order=1,
+    async ({
+        page = 1,
+        limit = 10,
+        project = "",
+        sortby = 'defectid',
+        order = 1,
         search
-    },{dispatch})=>{
+    }, { dispatch }) => {
         try {
-            const request = await axios.post('/api/defect/paginate',{
+            const request = await axios.post('/api/defect/paginate', {
                 page,
                 limit,
                 project,
@@ -96,8 +146,8 @@ export const getAllDefectPaginate = createAsyncThunk(
                 order,
                 search
             }
-                ,getAuthHeader())
-                return request.data;
+                , getAuthHeader())
+            return request.data;
         } catch (error) {
             dispatch(errorGlobal(<div>Error fetching defect list</div>));
             throw error
@@ -107,12 +157,12 @@ export const getAllDefectPaginate = createAsyncThunk(
 
 export const updateDefect = createAsyncThunk(
     'defects/updateDefect',
-    async({values,defectId},{ dispatch })=>{
-        try{
-            const request = await axios.patch(`/api/defect/update/${defectId}`,values,getAuthHeader());
+    async ({ values, defectId }, { dispatch }) => {
+        try {
+            const request = await axios.patch(`/api/defect/update/${defectId}`, values, getAuthHeader());
             dispatch(successGlobal(<div>Defect updated<br /> Defect ID: {defectId}</div>));
             return true;
-        } catch(error){
+        } catch (error) {
             dispatch(errorGlobal(error.response.data.message))
             throw error
         }
@@ -121,9 +171,9 @@ export const updateDefect = createAsyncThunk(
 
 export const deleteDefect = createAsyncThunk(
     'defects/deleteDefect',
-    async({defectId},{dispatch})=>{
+    async ({ defectId }, { dispatch }) => {
         try {
-            const request = await axios.delete(`/api/defect/delete/${defectId}`,getAuthHeader());
+            const request = await axios.delete(`/api/defect/delete/${defectId}`, getAuthHeader());
             dispatch(successGlobal(<div>Defect deleted<br /> Defect ID: {defectId}</div>));
             return true
         } catch (error) {
@@ -135,20 +185,20 @@ export const deleteDefect = createAsyncThunk(
 
 export const filterDefect = createAsyncThunk(
     'defects/filterDefect',
-    async({
-        page=1,
-        limit=10,
+    async ({
+        page = 1,
+        limit = 10,
         project,
         components,
         status,
         severity,
         server,
-        sortby='defectid',
-        order=1,
+        sortby = 'defectid',
+        order = 1,
         search
     }) => {
         try {
-            const request = await axios.post('/api/defect/filter',{
+            const request = await axios.post('/api/defect/filter', {
                 page,
                 limit,
                 project,
@@ -159,7 +209,7 @@ export const filterDefect = createAsyncThunk(
                 sortby,
                 order,
                 search
-            },getAuthHeader());
+            }, getAuthHeader());
             return request.data;
 
         } catch (error) {
