@@ -4,7 +4,6 @@ import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 import { storage } from '../../firebase';
 import { ref, getDownloadURL, uploadBytes, uploadBytesResumable } from "firebase/storage"
-import { async } from '@firebase/util';
 
 //Get details for creating defects
 //Get all available assignee of a project
