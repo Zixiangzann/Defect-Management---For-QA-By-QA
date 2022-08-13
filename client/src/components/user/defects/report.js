@@ -32,7 +32,6 @@ import Button from '@mui/material/Button'
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
 import Table from '@mui/material/Table';
-import { DataGrid } from '@material-ui/data-grid'
 import Drawer from '@mui/material/Drawer';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PictureAsPdf from '@mui/icons-material/PictureAsPdf';

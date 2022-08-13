@@ -41,6 +41,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import List from '@mui/material/List';
 import AttachmentIcon from '@mui/icons-material/Attachment';
+import PhotoIcon from '@mui/icons-material/Photo';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
+import ArticleIcon from '@mui/icons-material/Article';
+import FolderZipIcon from '@mui/icons-material/FolderZip';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
@@ -109,6 +115,25 @@ const CreateDefect = () => {
     const handleFileArray = (e) => {
         setFilesArray([...filesArray, e.target.files[0]]);
         console.log(filesArray)
+    }
+
+    const attachmentIcon = (filetype) => {
+        let icon = <InsertDriveFileIcon />
+
+        if(filetype.includes('image')) icon = <PhotoIcon />
+        if(filetype.includes('pdf')) icon = <PictureAsPdfIcon/>
+        if(filetype.includes('audio')) icon = <AudioFileIcon/>
+        if(filetype.includes('video')) icon = <VideoFileIcon/>
+        if(filetype.includes('text')) icon = <ArticleIcon/>
+        if(filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz') 
+        || filetype.includes('rar') || filetype.includes('tar') ) icon = <FolderZipIcon/>
+        
+        
+        return (
+            <ListItemIcon>
+                {icon}
+            </ListItemIcon>
+        )
     }
 
     const formik = useFormik({
@@ -259,7 +284,7 @@ const CreateDefect = () => {
                                 startIcon={<AttachmentIcon sx={{transform: 'rotate(265deg)'}}/>}
                             >
                                 Upload
-                                <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/*" multiple type="file" />
+                                <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
                             </Button>
                         </FormControl>
                         </Box>
@@ -279,9 +304,7 @@ const CreateDefect = () => {
                                             <DeleteIcon sx={{color:'red'}}/>
                                         </IconButton>}
                                 >
-                                    <ListItemIcon>
-                                            <InsertDriveFileIcon />
-                                    </ListItemIcon>
+                                    {attachmentIcon(item.type)}
                                     <ListItemText
                                         primary={item.name}
                                     />

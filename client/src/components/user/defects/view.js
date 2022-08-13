@@ -9,6 +9,11 @@ import Moment from 'react-moment'
 import { getDefectById } from '../../../store/actions/defects';
 import { addComment, getCommentByDefectIdPaginate } from '../../../store/actions/comments';
 import { saveAs } from "file-saver";
+import ModalComponent from '../../../utils/modal/modal';
+
+//firebase
+import { ref, getStorage, getDownloadURL, deleteObject, getBlob } from "firebase/storage";
+import { storage } from '../../../firebase';
 
 //MUI
 import Box from '@mui/material/Box';
@@ -39,6 +44,13 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import IconButton from '@mui/material/IconButton'
+import PreviewIcon from '@mui/icons-material/Preview';
+import PhotoIcon from '@mui/icons-material/Photo';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
+import ArticleIcon from '@mui/icons-material/Article';
+import FolderZipIcon from '@mui/icons-material/FolderZip';
 
 const ViewDefect = () => {
 
@@ -69,6 +81,24 @@ const ViewDefect = () => {
     const [commentTextArea, setCommentTextArea] = useState('')
     const [commented, setCommented] = useState(false)
 
+    //Modal
+    const [openModal, setOpenModal] = useState(false);
+
+    //Preview
+    const [previewTitle, setPreviewTitle] = useState('')
+
+    const [showImage, setShowImage] = useState(false);
+    const [previewImageURL, setPreviewImageURL] = useState('');
+
+    const [showVideo, setShowVideo] = useState(false);
+    const [previewVideoURL, setPreviewVideoURL] = useState('');
+
+    const [showAudio, setShowAudio] = useState(false);
+    const [previewAudioURL, setPreviewAudioURL] = useState('');
+
+    const [showDoc, setShowDoc] = useState(false);
+    const [previewDocURL, setPreviewDocURL] = useState('');
+
 
     const defects = useSelector(state => state.defects)
     const comments = useSelector(state => state.comments)
@@ -89,10 +119,141 @@ const ViewDefect = () => {
         setCommentTextArea(event.target.value);
     }
 
-    const handleDownload = async(downloadURL) => {
-        saveAs(downloadURL)
-      }
+    const handleDownload = async (downloadURL) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, downloadURL)
+        getDownloadURL(storageRef)
+            .then((url) => {
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = (event) => {
+                    const a = document.createElement('a');
+                    a.href = window.URL.createObjectURL(xhr.response);
+                    a.download = storageRef.name;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    var blob = xhr.response;
+                };
+                xhr.open('GET', url);
+                xhr.send();
 
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+
+    }
+
+    const handlePreviewImage = async (downloadURL) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, downloadURL)
+        getDownloadURL(storageRef)
+            .then((url) => {
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = (event) => {
+                    setPreviewImageURL(url)
+                    setPreviewTitle(storageRef.name)
+                    setShowImage(true)
+                    console.log(url)
+                };
+                xhr.open('GET', url);
+                xhr.send();
+
+            })
+            .then(() => {
+                setOpenModal(true)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+
+    }
+
+    const handlePreviewVideo = async (downloadURL) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, downloadURL)
+        getDownloadURL(storageRef)
+            .then((url) => {
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = (event) => {
+                    setPreviewVideoURL(url)
+                    setPreviewTitle(storageRef.name)
+                    setShowVideo(true)
+                    console.log(url)
+                };
+                xhr.open('GET', url);
+                xhr.send();
+
+            })
+            .then(() => {
+                setOpenModal(true)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+
+    }
+
+    const handlePreviewAudio = async (downloadURL) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, downloadURL)
+        getDownloadURL(storageRef)
+            .then((url) => {
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = (event) => {
+                    setPreviewAudioURL(url)
+                    setPreviewTitle(storageRef.name)
+                    setShowAudio(true)
+                    console.log(url)
+                };
+                xhr.open('GET', url);
+                xhr.send();
+
+            })
+            .then(() => {
+                setOpenModal(true)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+
+    }
+
+
+    const attachmentIcon = (filetype) => {
+        let icon = <InsertDriveFileIcon />
+
+        if (filetype.includes('image')) icon = <PhotoIcon />
+        if (filetype.includes('pdf')) icon = <PictureAsPdfIcon />
+        if (filetype.includes('audio')) icon = <AudioFileIcon />
+        if (filetype.includes('video')) icon = <VideoFileIcon />
+        if (filetype.includes('text')) icon = <ArticleIcon />
+        if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
+            || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
+
+
+        return (
+            <ListItemIcon>
+                {icon}
+            </ListItemIcon>
+        )
+    }
+
+    useEffect(() => {
+        if (openModal === false) {
+            setShowImage(false);
+            setPreviewTitle('')
+            setPreviewImageURL('');
+            setShowVideo(false);
+            setPreviewVideoURL('');
+            setShowAudio(false);
+            setPreviewAudioURL('');
+        }
+    }, [openModal])
 
     useEffect(() => {
         dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
@@ -194,21 +355,75 @@ const ViewDefect = () => {
                                 <ListItem
                                     key={`${item.name}_${item.lastModified}`}
                                     secondaryAction={
-                                        <IconButton
-                                            edge="end"
-                                            aria-label="delete"
-                                            color='primary'
-                                            onClick={() => handleDownload(item.downloadURL)}
-                                        >
-                                            <FileDownloadIcon primary />
-                                        </IconButton>}
+                                        <Tooltip title="Download">
+                                            <IconButton
+                                                edge="end"
+                                                aria-label="delete"
+                                                color='primary'
+                                                onClick={() => {
+                                                    console.log(item.type)
+                                                    handleDownload(item.downloadURL)
+                                                }}
+                                            >
+                                                <FileDownloadIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    }
                                 >
-                                    <ListItemIcon>
-                                        <InsertDriveFileIcon />
-                                    </ListItemIcon>
+                                    {attachmentIcon(item.type)}
                                     <ListItemText
                                         primary={item.name}
                                     />
+
+                                    {item.type.includes('image') ?
+                                        <Tooltip title="Preview image">
+                                            <IconButton
+                                                onClick={() => {
+                                                    handlePreviewImage(item.downloadURL)
+                                                }
+                                                }
+                                                sx={{ color: 'rebeccapurple' }}
+                                            >
+                                                <PreviewIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        :
+                                        null
+                                    }
+
+                                    {item.type.includes('video') ?
+                                        <Tooltip title="Preview video">
+                                            <IconButton
+                                                onClick={() => {
+                                                    handlePreviewVideo(item.downloadURL)
+                                                }
+                                                }
+                                                sx={{ color: 'rebeccapurple' }}
+                                            >
+                                                <PreviewIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        :
+                                        null
+                                    }
+
+
+                                    {item.type.includes('audio') ?
+                                        <Tooltip title="Preview audio">
+                                            <IconButton
+                                                onClick={() => {
+                                                    handlePreviewAudio(item.downloadURL)
+                                                }
+                                                }
+                                                sx={{ color: 'rebeccapurple' }}
+                                            >
+                                                <PreviewIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        :
+                                        null
+                                    }
+
                                 </ListItem>
                             ))}
                         </List>
@@ -228,7 +443,7 @@ const ViewDefect = () => {
                                 </TableHead>
 
                                 <TableBody>
-                                    {comments.comments.docs.map((item, index) => (
+                                    {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
                                         <TableRow key={'comment' + index}>
                                             <TableCell key={item.user} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.user}</TableCell>
                                             <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell>
@@ -287,6 +502,20 @@ const ViewDefect = () => {
                         >Add</Button>
 
                     </Box>
+
+                    <ModalComponent
+                        open={openModal}
+                        setOpenModal={setOpenModal}
+                        title={previewTitle}
+                        showImage={showImage}
+                        showVideo={showVideo}
+                        showAudio={showAudio}
+                        image={previewImageURL}
+                        video={previewVideoURL}
+                        audio={previewAudioURL}
+                        titleColor="black"
+                    >
+                    </ModalComponent>
 
                 </Box>
                 : null}
