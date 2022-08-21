@@ -10,6 +10,7 @@ import ReactAudioPlayer from 'react-audio-player';
 //MUI
 import Modal from "@mui/material/Modal"
 import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography";
 import { Button, IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
@@ -29,9 +30,11 @@ const ModalComponent = ({
     showImage,
     showVideo,
     showAudio,
+    showDoc,
     image,
     video,
     audio,
+    doc
 }) => {
 
 
@@ -101,6 +104,14 @@ const ModalComponent = ({
                     null
                 }
 
+                {showDoc ?
+                <Paper sx={{height:"350px",overflow:'scroll'}}>
+                   <p>{doc}</p> 
+
+                </Paper> 
+            :
+            null
+            }
 
 
                 <Typography id="modal-modal-warn" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>

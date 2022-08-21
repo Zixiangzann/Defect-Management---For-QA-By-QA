@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.5.1",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.8.4",
@@ -31,6 +32,7 @@
     "react-doc-viewer": "^0.1.5",
     "react-dom": "^18.2.0",
     "react-draft-wysiwyg": "^1.14.7",
+    "react-file-reader": "^1.1.4",
     "react-html-table-to-excel": "^2.0.0",
     "react-medium-image-zoom": "^5.0.1",
     "react-moment": "^1.1.2",

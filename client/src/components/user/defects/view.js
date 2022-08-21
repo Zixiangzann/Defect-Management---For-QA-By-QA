@@ -10,6 +10,7 @@ import { getDefectById } from '../../../store/actions/defects';
 import { addComment, getCommentByDefectIdPaginate } from '../../../store/actions/comments';
 import { saveAs } from "file-saver";
 import ModalComponent from '../../../utils/modal/modal';
+import ReactFileReader from 'react-file-reader';
 
 //firebase
 import { ref, getStorage, getDownloadURL, deleteObject, getBlob } from "firebase/storage";
@@ -25,11 +26,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import Avatar from '@mui/material/Avatar'
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
-import MovieIcon from '@mui/icons-material/Movie';
 import PersonIcon from '@mui/icons-material/Person';
-import StarIcon from '@mui/icons-material/Star';
-import ExtensionIcon from '@mui/icons-material/Extension';
-import TimelineIcon from '@mui/icons-material/Timeline';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button'
 import TableCell from '@mui/material/TableCell';
@@ -97,7 +94,7 @@ const ViewDefect = () => {
     const [previewAudioURL, setPreviewAudioURL] = useState('');
 
     const [showDoc, setShowDoc] = useState(false);
-    const [previewDocURL, setPreviewDocURL] = useState('');
+    const [previewDocContent, setPreviewDocContent] = useState('');
 
 
     const defects = useSelector(state => state.defects)
@@ -145,84 +142,72 @@ const ViewDefect = () => {
 
     }
 
-    const handlePreviewImage = async (downloadURL) => {
+    const handlePreview = async (downloadURL, itemType) => {
         const storage = getStorage();
         const storageRef = ref(storage, downloadURL)
         getDownloadURL(storageRef)
             .then((url) => {
                 const xhr = new XMLHttpRequest();
+                let blob = ''
+                let fileURL = ''
                 xhr.responseType = 'blob';
-                xhr.onload = (event) => {
-                    setPreviewImageURL(url)
-                    setPreviewTitle(storageRef.name)
-                    setShowImage(true)
-                    console.log(url)
+                xhr.onload = async (event) => {
+
+                    switch (itemType) {
+                        case 'Image':
+                            setPreviewImageURL(url)
+                            setPreviewTitle(storageRef.name)
+                            setShowImage(true)
+                            break;
+                        case 'Video':
+                            setPreviewVideoURL(url)
+                            setPreviewTitle(storageRef.name)
+                            setShowVideo(true)
+                            break;
+                        case 'Audio':
+                            setPreviewAudioURL(url)
+                            setPreviewTitle(storageRef.name)
+                            setShowAudio(true)
+                            break;
+                        case 'Pdf':
+                            blob = getBlob(storageRef)
+                            fileURL = URL.createObjectURL(await blob);
+                            window.open(fileURL);
+                            break;
+                        case 'Text':
+                            blob = getBlob(storageRef)
+                            fileURL = URL.createObjectURL(await blob);
+                            const reader = new FileReader();
+                            reader.onload = function (event) {
+                                setPreviewDocContent(event.target.result)
+                                setPreviewTitle(storageRef.name)
+                                setShowDoc(true)
+                                console.log(event.target.result)
+
+                            }
+                            reader.readAsText(new File([await blob], {
+                                type: "text/plain",
+                            }))
+
+
+
+                        default:
+                            break;
+                    }
                 };
                 xhr.open('GET', url);
                 xhr.send();
 
             })
             .then(() => {
-                setOpenModal(true)
+                //pdf type open in new tab
+                if (itemType !== 'Pdf') setOpenModal(true)
             })
             .catch((error) => {
                 console.log(error)
             });
 
     }
-
-    const handlePreviewVideo = async (downloadURL) => {
-        const storage = getStorage();
-        const storageRef = ref(storage, downloadURL)
-        getDownloadURL(storageRef)
-            .then((url) => {
-                const xhr = new XMLHttpRequest();
-                xhr.responseType = 'blob';
-                xhr.onload = (event) => {
-                    setPreviewVideoURL(url)
-                    setPreviewTitle(storageRef.name)
-                    setShowVideo(true)
-                    console.log(url)
-                };
-                xhr.open('GET', url);
-                xhr.send();
-
-            })
-            .then(() => {
-                setOpenModal(true)
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-
-    }
-
-    const handlePreviewAudio = async (downloadURL) => {
-        const storage = getStorage();
-        const storageRef = ref(storage, downloadURL)
-        getDownloadURL(storageRef)
-            .then((url) => {
-                const xhr = new XMLHttpRequest();
-                xhr.responseType = 'blob';
-                xhr.onload = (event) => {
-                    setPreviewAudioURL(url)
-                    setPreviewTitle(storageRef.name)
-                    setShowAudio(true)
-                    console.log(url)
-                };
-                xhr.open('GET', url);
-                xhr.send();
-
-            })
-            .then(() => {
-                setOpenModal(true)
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-
-    }
-
 
     const attachmentIcon = (filetype) => {
         let icon = <InsertDriveFileIcon />
@@ -244,6 +229,8 @@ const ViewDefect = () => {
     }
 
     useEffect(() => {
+
+        //clear preview state on modal close
         if (openModal === false) {
             setShowImage(false);
             setPreviewTitle('')
@@ -252,6 +239,8 @@ const ViewDefect = () => {
             setPreviewVideoURL('');
             setShowAudio(false);
             setPreviewAudioURL('');
+            setShowDoc(false);
+            setPreviewDocContent('');
         }
     }, [openModal])
 
@@ -379,7 +368,7 @@ const ViewDefect = () => {
                                         <Tooltip title="Preview image">
                                             <IconButton
                                                 onClick={() => {
-                                                    handlePreviewImage(item.downloadURL)
+                                                    handlePreview(item.downloadURL, 'Image')
                                                 }
                                                 }
                                                 sx={{ color: 'rebeccapurple' }}
@@ -395,7 +384,7 @@ const ViewDefect = () => {
                                         <Tooltip title="Preview video">
                                             <IconButton
                                                 onClick={() => {
-                                                    handlePreviewVideo(item.downloadURL)
+                                                    handlePreview(item.downloadURL, 'Video')
                                                 }
                                                 }
                                                 sx={{ color: 'rebeccapurple' }}
@@ -412,7 +401,39 @@ const ViewDefect = () => {
                                         <Tooltip title="Preview audio">
                                             <IconButton
                                                 onClick={() => {
-                                                    handlePreviewAudio(item.downloadURL)
+                                                    handlePreview(item.downloadURL, 'Audio')
+                                                }
+                                                }
+                                                sx={{ color: 'rebeccapurple' }}
+                                            >
+                                                <PreviewIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        :
+                                        null
+                                    }
+
+                                    {item.type.includes('pdf') ?
+                                        <Tooltip title="Preview document">
+                                            <IconButton
+                                                onClick={() => {
+                                                    handlePreview(item.downloadURL, 'Pdf')
+                                                }
+                                                }
+                                                sx={{ color: 'rebeccapurple' }}
+                                            >
+                                                <PreviewIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        :
+                                        null
+                                    }
+
+                                    {item.type.includes('text') ?
+                                        <Tooltip title="Preview document">
+                                            <IconButton
+                                                onClick={() => {
+                                                    handlePreview(item.downloadURL, 'Text')
                                                 }
                                                 }
                                                 sx={{ color: 'rebeccapurple' }}
@@ -510,9 +531,12 @@ const ViewDefect = () => {
                         showImage={showImage}
                         showVideo={showVideo}
                         showAudio={showAudio}
+                        showDoc={showDoc}
                         image={previewImageURL}
                         video={previewVideoURL}
                         audio={previewAudioURL}
+                        doc={previewDocContent}
+
                         titleColor="black"
                     >
                     </ModalComponent>
