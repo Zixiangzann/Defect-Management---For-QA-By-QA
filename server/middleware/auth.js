@@ -17,7 +17,8 @@ const verify = (req,res,resolve,reject,rights) => async(err,user) => {
         project:user.project,
         age:user.age,
         role:user.role,
-        verified:user.verified
+        verified:user.verified,
+        firstlogin:user.firstlogin
     }
 
     if(rights.length){

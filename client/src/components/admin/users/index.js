@@ -27,13 +27,14 @@ import { Divider, FormControlLabel, FormLabel, Radio, RadioGroup, Typography } f
 
 const AdminUsers = () => {
 
-    const [firstname,setFirstName] = useState('')
-    const [lastname,setLastName] = useState('')
-    const [username,setUserName] = useState('')
+    const [firstname, setFirstName] = useState('')
+    const [lastname, setLastName] = useState('')
+    const [username, setUserName] = useState('')
     const [email, setEmail] = useState('');
     const [emailCheck, setEmailCheck] = useState(false);
     const [password, setPassword] = useState('');
-    const [role,setRole] = useState('user');
+    const [role, setRole] = useState('user');
+    const [jobtitle,setJobTitle] = useState('');
 
     const dispatch = useDispatch();
 
@@ -66,8 +67,12 @@ const AdminUsers = () => {
         setEmailCheck(!validator.isEmail(email));
     }
 
-    const handleChangeRole = (event)=>{
+    const handleChangeRole = (event) => {
         setRole(event.target.value);
+    }
+
+    const handleJobTitle = (event) => {
+        setJobTitle(event.target.value)
     }
 
     const admin = useSelector(state => state.admin)
@@ -89,7 +94,7 @@ const AdminUsers = () => {
         showToast('SUCCESS', 'Copied')
     }
 
-    const handleSubmit = (event) =>{
+    const handleSubmit = (event) => {
         event.preventDefault();
         dispatch(addUser({
             username,
@@ -97,150 +102,168 @@ const AdminUsers = () => {
             lastname,
             email,
             password,
-            role}))
-        .unwrap()
-        .then(()=>setOpenModal(true))
-        .catch((error)=>console.log(error))
+            role,
+            jobtitle
+        }))
+            .unwrap()
+            .then(() => setOpenModal(true))
+            .catch((error) => console.log(error))
     }
 
     return (
         <Box mt={5} >
 
-            <form style={{width:'100%',padding:'2rem',display:'flex',flexDirection:'row',flexWrap:'wrap'}} onSubmit={handleSubmit}>
+            <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
 
-            <Typography variant='h5' mb={5} flexBasis='60%'>Add User</Typography>
+                <Typography variant='h5' mb={5} flexBasis='60%'>Add User</Typography>
 
-            <FormControl
-            id='addUserFirstNameForm'
-            sx={{m:1,flexBasis:'45%'}}>
-            <InputLabel htmlFor='firstname'
-            >First Name</InputLabel>
-            <OutlinedInput
-                required
-                id="firstname"
-                text="text"
-                value={firstname}
-                label="First Name"
-                onChange={handleFirstName}
-                fullWidth
-                />
-            </FormControl>
-
-            <FormControl
-            id='addUserLastNameForm'
-            sx={{m:1,flexBasis:'45%'}}>
-            <InputLabel htmlFor='lastname'
-            >Last Name</InputLabel>
-            <OutlinedInput
-                required
-                id="lastname"
-                text="text"
-                value={lastname}
-                label="Last Name"
-                onChange={handleLastName}
-                fullWidth
-                />
-            </FormControl>
-
-            <FormControl
-            id='addUserUserNameForm'
-            sx={{m:1,flexBasis:'45%'}}>
-            <InputLabel htmlFor='username'
-            >Username</InputLabel>
-            <OutlinedInput
-                required
-                id="username"
-                text="text"
-                value={username}
-                label="Username"
-                onChange={handleUserName}
-                fullWidth
-                onBlur={(e)=>{
-                    dispatch(checkUsernameExist({username}))
-                }}
-                />
-            <FormHelperText error>{admin.error.usernameTaken ? admin.error.usernameTaken : null}</FormHelperText>
-            </FormControl>
-
-
-            <FormControl id='addUserEmailForm' sx={{m:1,flexBasis:'45%'}}>
-            <InputLabel htmlFor="email"
-            >Email</InputLabel>
-            <OutlinedInput
-                required
-                id="email"
-                type='text'
-                error={emailCheck}
-                value={email}
-                label="Email"
-                onChange={(e) => handleEmail(e)}
-                onBlur={(e) => {
-                    handleEmailCheck(e)
-                    dispatch(checkEmailExist({email}))
-                }}
-                fullWidth
-            />
-            <FormHelperText error>{emailCheck ? "Invalid email" : null}</FormHelperText>
-            <FormHelperText error>{admin.error.emailTaken ? admin.error.emailTaken : null}</FormHelperText>
-       
-            </FormControl>
-
-            <br></br>
-
-            <FormControl id='addUserPasswordForm'sx={{m:1,flexBasis:'45%'}}>
-            <InputLabel htmlFor="password"
-            >Password</InputLabel>
-            <OutlinedInput
-                id="password"
-                type='text'
-                value={password}
-                label="Password"
-                fullWidth
-                disabled
-            />
-            </FormControl>
-
-            <Button
-                id="addUserGeneratePasswordBtn"
-                onClick={handleGeneratePassword}
-                sx={{flexBasis:'20%'}}
-                // variant='outlined'
-            >Generate Password</Button>
-
-            <FormControl  id="addUserRoleForm" sx={{m:1,flexBasis:'45%'}}>
-                <FormLabel>Role:</FormLabel>
-                <RadioGroup
-                    row
-                    defaultValue="user">
-                    <FormControlLabel 
-                    value='user'
-                    control={<Radio /> }
-                    label='User' 
-                    onChange={handleChangeRole}/>
-
-                    <FormControlLabel
-                    value='admin'
-                    control={<Radio />}
-                    label='Admin' 
-                    onChange={handleChangeRole}
-                    
+                <FormControl
+                    id='addUserFirstNameForm'
+                    sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor='firstname'
+                    >First Name</InputLabel>
+                    <OutlinedInput
+                        required
+                        id="firstname"
+                        text="text"
+                        value={firstname}
+                        label="First Name"
+                        onChange={handleFirstName}
+                        fullWidth
                     />
-                </RadioGroup>
-            </FormControl>
+                </FormControl>
+
+                <FormControl
+                    id='addUserLastNameForm'
+                    sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor='lastname'
+                    >Last Name</InputLabel>
+                    <OutlinedInput
+                        required
+                        id="lastname"
+                        text="text"
+                        value={lastname}
+                        label="Last Name"
+                        onChange={handleLastName}
+                        fullWidth
+                    />
+                </FormControl>
+
+                <FormControl
+                    id='addUserUserNameForm'
+                    sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor='username'
+                    >Username</InputLabel>
+                    <OutlinedInput
+                        required
+                        id="username"
+                        text="text"
+                        value={username}
+                        label="Username"
+                        onChange={handleUserName}
+                        fullWidth
+                        onBlur={(e) => {
+                            dispatch(checkUsernameExist({ username }))
+                        }}
+                    />
+                    <FormHelperText error>{admin.error.usernameTaken ? admin.error.usernameTaken : null}</FormHelperText>
+                </FormControl>
 
 
-            <Divider sx={{flexBasis:'100%'}}></Divider>
+                <FormControl id='addUserEmailForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor="email"
+                    >Email</InputLabel>
+                    <OutlinedInput
+                        required
+                        id="email"
+                        type='text'
+                        error={emailCheck}
+                        value={email}
+                        label="Email"
+                        onChange={(e) => handleEmail(e)}
+                        onBlur={(e) => {
+                            handleEmailCheck(e)
+                            dispatch(checkEmailExist({ email }))
+                        }}
+                        fullWidth
+                    />
+                    <FormHelperText error>{emailCheck ? "Invalid email" : null}</FormHelperText>
+                    <FormHelperText error>{admin.error.emailTaken ? admin.error.emailTaken : null}</FormHelperText>
 
-            <Button
-                id='addUserBtn'
-                variant='contained'
-                type='submit'
-                sx={{mt:5,flexBasis:'25%'}}
-            >Add user</Button>
+                </FormControl>
 
-       
+                <br></br>
 
-</form>
+                <FormControl id='addUserPasswordForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor="password"
+                    >Password</InputLabel>
+                    <OutlinedInput
+                        id="password"
+                        type='text'
+                        value={password}
+                        label="Password"
+                        fullWidth
+                        disabled
+                    />
+                </FormControl>
+
+                <Button
+                    id="addUserGeneratePasswordBtn"
+                    onClick={handleGeneratePassword}
+                    sx={{ flexBasis: '20%' }}
+                // variant='outlined'
+                >Generate Password</Button>
+
+
+                <FormControl id='jobTitleForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor="jobtitle"
+                    >Job Title</InputLabel>
+                    <OutlinedInput
+                        id="jobtitle"
+                        type='text'
+                        value={jobtitle}
+                        label="Job Title"
+                        fullWidth
+                        onChange={handleJobTitle}
+                    />
+                </FormControl>
+                
+                <Divider></Divider>
+
+                <FormControl id="addUserRoleForm" sx={{ m: 1, flexBasis: '55%' }}>
+                    <FormLabel>Role:</FormLabel>
+                    <RadioGroup
+                        row
+                        defaultValue="user">
+                        <FormControlLabel
+                            value='user'
+                            control={<Radio />}
+                            label='User'
+                            onChange={handleChangeRole} />
+
+                        <FormControlLabel
+                            value='admin'
+                            control={<Radio />}
+                            label='Admin'
+                            onChange={handleChangeRole}
+
+                        />
+                    </RadioGroup>
+                </FormControl>
+
+
+                <Divider sx={{ flexBasis: '100%' }}></Divider>
+
+                <Button
+                    id='addUserBtn'
+                    variant='contained'
+                    type='submit'
+                    sx={{ mt: 5, flexBasis: '25%' }}
+                >Add user</Button>
+
+
+
+            </form>
 
 
             <ModalComponent

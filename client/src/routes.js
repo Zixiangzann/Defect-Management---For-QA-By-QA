@@ -21,6 +21,7 @@ import ViewDefect from './components/defects/view';
 import Report from './components/defects/report';
 
 import * as AuthGuard from './hoc/authGuard';
+import FirstLogin from './components/auth/firstLogin';
 
 
 
@@ -60,6 +61,14 @@ const Router = () => {
                                 </AuthGuard.PreventReLoginGuard>
                             }
                             />
+
+                            <Route path="/firstlogin" element={
+                                <AuthGuard.LoginGuard>
+                                    <FirstLogin />
+                                </AuthGuard.LoginGuard>
+                            }
+                            />
+
                             <Route path="/defect" element={
                                 <AuthGuard.LoginGuard>
                                     <Defect />

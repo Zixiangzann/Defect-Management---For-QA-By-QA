@@ -23,7 +23,8 @@ export const addUser = async(body) => {
             username:body.username,
             email:body.email,
             password:body.password,
-            role:body.role
+            role:body.role,
+            jobtitle:body.jobtitle
         });
 
         await user.save();

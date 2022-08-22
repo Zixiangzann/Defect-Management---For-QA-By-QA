@@ -11,7 +11,8 @@ export const addUser = createAsyncThunk(
         username,
         email,
         password,
-        role
+        role,
+        jobtitle
     },{dispatch}) =>{
 
         try {
@@ -21,7 +22,8 @@ export const addUser = createAsyncThunk(
                 username,
                 email,
                 password,
-                role
+                role,
+                jobtitle
             },getAuthHeader());
             return {data:request.data.user}
         } catch (error) {

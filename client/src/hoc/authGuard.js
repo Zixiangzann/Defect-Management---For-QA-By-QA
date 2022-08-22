@@ -1,13 +1,21 @@
 import {useSelector} from "react-redux";
-import {Navigate,useLocation} from 'react-router-dom';
+import {Navigate,useLocation,useNavigate} from 'react-router-dom';
 
 export const LoginGuard = (props) => {
     const users = useSelector(state=>state.users);
     let location = useLocation();
+    const navigate = useNavigate();
 
     if(!users.auth){
         return <Navigate to ="/auth" state={{from:location}} replace/>
     }
+
+    if(users.data.firstlogin){
+        setTimeout(()=>{
+            navigate('/firstlogin')
+        },100)   
+    }
+
     return props.children
 }
 

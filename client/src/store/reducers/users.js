@@ -12,7 +12,8 @@ let DEFAULT_USER_STATE ={
         project:null,
         age:null,
         role:null,
-        verified:null
+        verified:null,
+        firstlogin:null,
     },
     auth:null
 }

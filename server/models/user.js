@@ -45,11 +45,16 @@ const userSchema = mongoose.Schema({
         maxLength: 100
     },
     verified:{
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     firstlogin:{
         type: Boolean,
         default: true
+    },
+    jobtitle:{
+        type: String,
+        maxLength: 100
     },
     date: {
         type: Date,

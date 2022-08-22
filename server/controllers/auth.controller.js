@@ -18,7 +18,9 @@ const authController = {
                     project:user.project,
                     age:user.age,
                     role:user.role,
-                    verified:user.verified
+                    jobtitle:user.jobtitle,
+                    verified:user.verified,
+                    firstlogin:user.firstlogin
                 }
                 ,token:token })
         } catch (error) {
