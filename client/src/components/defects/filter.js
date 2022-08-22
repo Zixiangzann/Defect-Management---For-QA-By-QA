@@ -4,10 +4,10 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from "react-redux";
-import { resetDataState, setFilterState } from '../../../store/reducers/defects';
+import { resetDataState, setFilterState } from '../../store/reducers/defects';
 
 //comp
-import { getAllAssignee, getAllComponents, getAllProjects,filterDefect } from '../../../store/actions/defects';
+import { getAllAssignee, getAllComponents, getAllProjects,filterDefect } from '../../store/actions/defects';
 
 //MUI
 import Container from '@mui/material/Container';

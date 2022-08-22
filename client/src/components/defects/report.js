@@ -6,9 +6,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 
 //comp
-import { getCountComponents, getCountIssueType, getCountServer, getCountSeverity, getCountStatus, getDefectId } from '../../../store/actions/report'
-import { setXSelect, setYSelect, resetReportState } from '../../../store/reducers/report';
-import { getAllProjects } from '../../../store/actions/defects';
+import { getCountComponents, getCountIssueType, getCountServer, getCountSeverity, getCountStatus, getDefectId } from '../../store/actions/report'
+import { setXSelect, setYSelect, resetReportState } from '../../store/reducers/report';
+import { getAllProjects } from '../../store/actions/defects';
 import Moment from 'react-moment';
 import JsPDF from 'jspdf';
 import html2canvas from 'html2canvas'

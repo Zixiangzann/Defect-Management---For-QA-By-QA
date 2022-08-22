@@ -3,36 +3,27 @@ import { useState, useEffect, useRef } from 'react'
 import { useFormik, FieldArray, FormikProvider } from 'formik';
 import { useNavigate } from 'react-router-dom'
 
-import { storage } from '../../../firebase.js'
-import { ref, getDownloadURL, uploadBytes } from "firebase/storage"
-
 //comp
-import { errorHelper, errorHelperSelect, Loader } from '../../../utils/tools'
+import { errorHelper, errorHelperSelect, Loader } from '../../utils/tools'
 import { validation, formValues } from './validationSchema'
-import ModalComponent from '../../../utils/modal/modal';
-import WYSIWYG from '../../../utils/form/wysiwyg';
+import ModalComponent from '../../utils/modal/modal';
+import WYSIWYG from '../../utils/form/wysiwyg';
 
 //MUI
 import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import ListItem from '@mui/material/ListItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import FormGroup from '@mui/material/FormGroup';
-import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import Chip from '@mui/material/Chip'
-import Paper from '@mui/material/Paper'
-import InputBase from '@mui/material/InputBase'
 import IconButton from '@mui/material/IconButton'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputLabel from '@mui/material/InputLabel';
-import AddIcon from '@mui/icons-material/Add';
 import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -50,8 +41,8 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAssignee, getAllComponents, getAllProjects, createDefect, updateAttachment } from '../../../store/actions/defects';
-import { resetDataState } from '../../../store/reducers/defects';
+import { getAllAssignee, getAllComponents, getAllProjects, createDefect, updateAttachment } from '../../store/actions/defects';
+import { resetDataState } from '../../store/reducers/defects';
 
 
 const CreateDefect = () => {
@@ -113,8 +104,24 @@ const CreateDefect = () => {
     }
 
     const handleFileArray = (e) => {
-        setFilesArray([...filesArray, e.target.files[0]]);
-        console.log(filesArray)
+
+        const fileSizeKb = e.target.files[0].size / 1024;
+        const MAX_FILE_SIZE = 5120;
+        const fileName = e.target.files[0].name
+
+        //max 5mb
+        if(fileSizeKb > MAX_FILE_SIZE){
+            alert('Maximum file size limit is 5MB')
+        }else if(filesArray.some(e => e.name === fileName)){
+            alert('Filename must be unique, not allowed to attach file with same name')
+            console.log(filesArray)
+            console.log(filesArray.values('name'))
+        }else{
+            setFilesArray([...filesArray, e.target.files[0]]);
+            console.log(filesArray)
+        }
+       
+
     }
 
     const attachmentIcon = (filetype) => {
@@ -149,7 +156,8 @@ const CreateDefect = () => {
                     console.log(filesArray)
                     dispatch(updateAttachment({
                         defectId: response.defectid,
-                        attachment: filesArray
+                        attachment: filesArray,
+                        action: 'uploadFile'
                     }
                     
                     ))
@@ -274,6 +282,7 @@ const CreateDefect = () => {
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
                         <InputLabel>Attach Files:</InputLabel>
+                        <InputLabel sx={{fontSize:'0.8rem',color:'darkred'}}>Note: Max File size: 5MB</InputLabel>
                         <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
                         
                         <FormControl>

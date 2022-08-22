@@ -77,6 +77,7 @@ export const updateAttachment= async (defectId,user,body) => {
     } 
 }
 
+
 export const getDefectById = async (defectId, user) => {
     try {
 

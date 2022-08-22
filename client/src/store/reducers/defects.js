@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import EditDefect from '../../components/user/defects/edit'
+import EditDefect from '../../components/defects/edit'
+import { showToast } from '../../utils/tools';
 import {
   createDefect,
   deleteDefect,
@@ -10,6 +11,7 @@ import {
   getAllDefectPaginate,
   getAllProjects,
   getDefectById,
+  updateAttachment,
   updateDefect,
 } from '../actions/defects'
 

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 //comp
-import { getAllDefectPaginate } from '../../../store/actions/defects';
+import { getAllDefectPaginate } from '../../store/actions/defects';
+import { resetDataState, resetFilterState } from '../../store/reducers/defects';
 
 
 
@@ -20,7 +21,7 @@ import ListItem from '@mui/material/ListItem';
 import List from '@mui/material/List';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { resetDataState, resetFilterState } from '../../../store/reducers/defects';
+
 
 
 const Defect = () => {

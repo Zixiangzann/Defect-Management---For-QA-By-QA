@@ -5,9 +5,9 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 //comp
-import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../../store/actions/defects';
-import { setOrder, setSearch, setSortBy } from '../../../store/reducers/defects';
-import ModalComponent from '../../../utils/modal/modal';
+import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../store/actions/defects';
+import { setOrder, setSearch, setSortBy } from '../../store/reducers/defects';
+import ModalComponent from '../../utils/modal/modal';
 
 //MUI
 import Table from '@mui/material/Table'

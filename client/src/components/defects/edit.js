@@ -5,10 +5,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 
 //comp
-import { errorHelper, errorHelperSelect, Loader } from '../../../utils/tools'
+import { errorHelper, errorHelperSelect, Loader } from '../../utils/tools'
 import { validation, formValues } from './validationSchema'
-import ModalComponent from '../../../utils/modal/modal';
-import WYSIWYG from '../../../utils/form/wysiwyg';
+import ModalComponent from '../../utils/modal/modal';
+import WYSIWYG from '../../utils/form/wysiwyg';
 
 //MUI
 import { Checkbox, FormControlLabel, Tooltip, Typography } from "@mui/material";
@@ -25,13 +25,22 @@ import InputLabel from '@mui/material/InputLabel';
 import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import Modal from '@mui/material/Modal';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import PhotoIcon from '@mui/icons-material/Photo';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
+import ArticleIcon from '@mui/icons-material/Article';
+import FolderZipIcon from '@mui/icons-material/FolderZip';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AttachmentIcon from '@mui/icons-material/Attachment';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAssignee, getAllComponents, getAllProjects, createDefect, getDefectById, updateDefect } from '../../../store/actions/defects';
-import { resetDataState } from '../../../store/reducers/defects';
-
+import { getAllAssignee, getAllComponents, getAllProjects, createDefect, getDefectById, updateDefect,updateAttachment } from '../../store/actions/defects';
 
 
 const EditDefect = () => {
@@ -55,6 +64,15 @@ const EditDefect = () => {
 
     //Modal
     const [openModal, setOpenModal] = useState(false);
+    const [modalDescription, setModalDescription] = useState('');
+    const [modalType , setModalType] = useState('');
+
+    //add files to be uploaded in a array
+    const [ filesArray, setFilesArray ] = useState([])
+    //item state for to be deleted
+    const [toBeDeleted, setToBeDeleted] = useState('')
+    //Attachment action
+    const [attachmentAction,setAttachmentAction] = useState('')
 
 
     const handleChange = async (event) => {
@@ -76,12 +94,142 @@ const EditDefect = () => {
     }
 
     const handleModalConfirm = () => {
+
+        if(modalType === 'changeProject'){
         setShowSelectProject(true)
         dispatch(getAllProjects());
         setAssignee([])
         setAssigneeSelectTouched(false)
         formik.resetForm()
+    }
 
+        if(modalType === 'deleteFile'){
+            handleDeleteFile(toBeDeleted)
+    }
+        
+    }
+
+    useEffect(()=>{
+        if(modalType === 'changeProject'){
+            setModalDescription("Changing of Project will require to re-select Assignee and Components.")
+        }else if(modalType === 'deleteFile'){
+            setModalDescription(`You are about to permanently delete file "${toBeDeleted.name}"`)
+        }
+    },[openModal])
+
+    //handler for file delete
+    const handleDeleteFile = (item) => {
+        const toRemove = item
+        const updated = filesArray.filter((item, j) => toRemove !== item)
+        setFilesArray([...updated])
+        setAttachmentAction('deleteFile')
+    }
+
+    //handler for file upload
+    const handleUploadFile = (e) => {
+
+        const fileSizeKb = e.target.files[0].size / 1024;
+        const MAX_FILE_SIZE = 5120;
+        const fileName = e.target.files[0].name
+
+        //max 5mb
+        if(fileSizeKb > MAX_FILE_SIZE){
+            alert('Maximum file size limit is 5MB')
+        }else if(filesArray.some(e => e.name === fileName)){
+            alert('Filename must be unique, not allowed to attach file with same name')
+            console.log(filesArray)
+            console.log(filesArray.values('name'))
+        }else{
+            setFilesArray([...filesArray, e.target.files[0]]);
+            console.log(filesArray)
+            setAttachmentAction('uploadFile')
+        }
+
+    }
+
+    useEffect(()=>{
+        console.log(filesArray)
+        console.log(toBeDeleted)
+        dispatch(updateAttachment({
+            defectId: defectId,
+            attachment: filesArray,
+            action: attachmentAction,
+            toBeDeleted: toBeDeleted.name
+        }))
+    },[filesArray])
+
+
+    const attachmentRender = () => {
+
+        return(
+<>
+        <InputLabel>Attach Files:</InputLabel>
+        <InputLabel sx={{fontSize:'0.8rem',color:'darkred'}}>Note: Max File size: 5MB</InputLabel>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+
+            <FormControl>
+                <Button
+                    variant="contained"
+                    component="label"
+                    onChange={(e) => handleUploadFile(e)}
+                    startIcon={<AttachmentIcon sx={{ transform: 'rotate(265deg)' }} />}
+                >
+                    Upload
+                    <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
+                </Button>
+            </FormControl>
+        </Box>
+
+        <Box sx={{ display: 'flex', maxHeight: '150px', overflow: 'auto' }}>
+
+            <List>
+
+                {filesArray.map((item) => (
+                    <ListItem
+                        key={`${item.name}_${item.lastModified}`}
+                        secondaryAction={
+                            <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => {
+                                    setModalType('deleteFile');
+                                    setToBeDeleted(item);
+                                    setOpenModal(true);
+                                }}
+                            >
+                                <DeleteIcon sx={{ color: 'red' }} />
+                            </IconButton>}
+                    >
+                        {attachmentIcon(item.type)}
+                        <ListItemText
+                            primary={item.name}
+                        />
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+        </>
+)
+    }
+
+
+    const attachmentIcon = (filetype) => {
+        let icon = <InsertDriveFileIcon />
+
+        if (filetype.includes('image')) icon = <PhotoIcon />
+        if (filetype.includes('pdf')) icon = <PictureAsPdfIcon />
+        if (filetype.includes('audio')) icon = <AudioFileIcon />
+        if (filetype.includes('video')) icon = <VideoFileIcon />
+        if (filetype.includes('text')) icon = <ArticleIcon />
+        if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
+            || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
+
+
+        return (
+            <ListItemIcon>
+                {icon}
+            </ListItemIcon>
+        )
     }
 
     const formik = useFormik({
@@ -91,7 +239,7 @@ const EditDefect = () => {
         onSubmit: (values) => {
             dispatch(updateDefect({ values, defectId }))
                 .unwrap()
-                .then(() => {
+                .then((response) => {
                     navigate('/')
                 })
         }
@@ -110,6 +258,7 @@ const EditDefect = () => {
                     // On autofill we get a stringified value.
                     typeof response.assignee === 'string' ? response.assignee.split(',') : response.assignee,
                 )
+                setFilesArray([...response.attachment])
             })
     }, [dispatch, defectId])
 
@@ -170,7 +319,8 @@ const EditDefect = () => {
                             <IconButton
                                 color="primary"
                                 onClick={() => {
-                                    setOpenModal(true)
+                                    setModalType('changeProject');
+                                    setOpenModal(true);
                                 }
                                 }
                                 sx={{ marginRight: '3rem' }}>
@@ -182,7 +332,7 @@ const EditDefect = () => {
                             open={openModal}
                             setOpenModal={setOpenModal}
                             title="Warning"
-                            description={"Changing of Project will require to re-select Assignee and Components."}
+                            description={modalDescription}
                             warn={"Are you sure you want to continue?"}
                             handleModalConfirm={handleModalConfirm}
                             button1="Confirm"
@@ -255,6 +405,8 @@ const EditDefect = () => {
                         </FormControl>
 
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
+                        {attachmentRender()}
+                        <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
                         <FormControl
                             sx={{ margin: '1rem 1.5rem 0 0' }}>
@@ -281,56 +433,56 @@ const EditDefect = () => {
                             {errorHelperSelect(formik, 'components')}
                         </FormControl>
 
-<FormikProvider value={formik}>
-<FieldArray
-name="assignee"
-render={arrayHelpers => (
-                        <FormControl
-                            sx={{ margin: '1rem 1.5rem 0 0' }}>
-                            <InputLabel>Assignee</InputLabel>
-                            <Select
-                                sx={{ width: '250px' }}
-                                multiple
-                                name='assignee'
-                                label='Assignee'
-                                value={assignee}
-                                
-                                onChange={
-                                    (e) => {
-                                        handleChange(e)
-                                    }
-                                }
-                                onClose={() => {
-                                    setAssigneeSelectTouched(true);
-                                    // formik.values.assignee = assignee
-                                    formik.setFieldValue('assignee',[...assignee])
-                                }}
-                                required
-                                renderValue={(selected) => selected.join(', ')}
-                            >
-                                
-                                {defects.data.assignee ? defects.data.assignee.map((item) => (
-                                    <MenuItem key={item} value={item}>
-                                        <Checkbox
-                                            checked={assignee.indexOf(item) > -1}
-                                        />
-                                        <ListItemText primary={item} />
-                                    </MenuItem>
-                                )
-                                ) : null}
+                        <FormikProvider value={formik}>
+                            <FieldArray
+                                name="assignee"
+                                render={arrayHelpers => (
+                                    <FormControl
+                                        sx={{ margin: '1rem 1.5rem 0 0' }}>
+                                        <InputLabel>Assignee</InputLabel>
+                                        <Select
+                                            sx={{ width: '250px' }}
+                                            multiple
+                                            name='assignee'
+                                            label='Assignee'
+                                            value={assignee}
 
-                            </Select>
-                            {assignee.length === 0 && assigneeSelectTouched === true ?
-                                <FormHelperText error={true}>
-                                    Please select a assignee
-                                </FormHelperText>
-                                :
-                                null
-                            }
-                        </FormControl>
-                        )}
-                />
-                 </FormikProvider>
+                                            onChange={
+                                                (e) => {
+                                                    handleChange(e)
+                                                }
+                                            }
+                                            onClose={() => {
+                                                setAssigneeSelectTouched(true);
+                                                // formik.values.assignee = assignee
+                                                formik.setFieldValue('assignee', [...assignee])
+                                            }}
+                                            required
+                                            renderValue={(selected) => selected.join(', ')}
+                                        >
+
+                                            {defects.data.assignee ? defects.data.assignee.map((item) => (
+                                                <MenuItem key={item} value={item}>
+                                                    <Checkbox
+                                                        checked={assignee.indexOf(item) > -1}
+                                                    />
+                                                    <ListItemText primary={item} />
+                                                </MenuItem>
+                                            )
+                                            ) : null}
+
+                                        </Select>
+                                        {assignee.length === 0 && assigneeSelectTouched === true ?
+                                            <FormHelperText error={true}>
+                                                Please select a assignee
+                                            </FormHelperText>
+                                            :
+                                            null
+                                        }
+                                    </FormControl>
+                                )}
+                            />
+                        </FormikProvider>
 
                         <br></br>
 

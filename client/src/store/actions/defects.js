@@ -3,7 +3,7 @@ import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 import { storage } from '../../firebase';
-import { ref, getDownloadURL, uploadBytes, uploadBytesResumable } from "firebase/storage"
+import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject } from "firebase/storage"
 
 //Get details for creating defects
 //Get all available assignee of a project
@@ -73,40 +73,88 @@ export const updateAttachment = createAsyncThunk(
     'defects/updateAttachment',
     async ({
         defectId,
-        attachment
+        attachment,
+        action,
+        toBeDeleted
     }, { dispatch }) => {
         try {
 
-            let fileDetailsArray = [];
+            const uploadAndGetFileDetails = async () => {
+                const fileDetailsArray = []
 
-            attachment.map((item, index) => {
-                const storageRef = ref(storage, `DefectID_${defectId}/${item.name}`)
-                if (!item) return null;
-                const uploadTask = uploadBytesResumable(storageRef, item)
+                const p1 = new Promise((resolve, reject) => {
+                    attachment.map((item, index) => {
+                        //Only upload if it is a new file type
+                        //if already have downloadURL, do NOT reupload.  
+                        if (item.downloadURL) {
+                            console.log(item)
+                            fileDetailsArray.push(item)
+                        }
+                    })
+                    console.log(fileDetailsArray)
+                    resolve(fileDetailsArray);
+                })
 
-                uploadTask.then((snapshot) => {
-                    getDownloadURL(snapshot.ref).then((downloadURL) => {
-                        fileDetailsArray.push({
-                            "name": item.name,
-                            "lastModified": item.lastModified,
-                            "size": item.size,
-                            "type": item.type,
-                            "webkitRelativePath": item.webkitRelativePath,
-                            "downloadURL": downloadURL
+                const p2 = new Promise((resolve, reject) => {
+
+
+                    //Only upload if it is a new file type and action is "uploadFile"
+                    if (action === 'uploadFile') {
+                        attachment.map((item, index) => {
+                            if (!item.downloadURL) {
+                                const storageRef = ref(storage, `DefectID_${defectId}/${item.name}`)
+                                if (!item) return null;
+                                const uploadTask = uploadBytesResumable(storageRef, item)
+
+                                uploadTask.then((snapshot) => {
+                                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                                        fileDetailsArray.push({
+                                            "name": item.name,
+                                            "lastModified": item.lastModified,
+                                            "size": item.size,
+                                            "type": item.type,
+                                            "webkitRelativePath": item.webkitRelativePath,
+                                            "downloadURL": downloadURL
+                                        })
+                                    })
+                                })
+                            }
+                        }
+                        )
+                    }
+                    //Delete file
+
+                    if (action === 'deleteFile') {
+                        const storageRef = ref(storage, `DefectID_${defectId}/${toBeDeleted}`)
+
+                        deleteObject(storageRef).then(() => {
+                            console.log('File deleted')
+                        }).catch((error) => {
+                            console.log('Error deleting file')
                         })
-                        console.log(fileDetailsArray)
-                        console.log(downloadURL)
-                    }).then(async()=>{
+                    }
+                    console.log(fileDetailsArray)
+                    resolve(fileDetailsArray);
+                })
+
+                Promise.all([p1, p2]).then(async (values) => {
+                    console.log(values[1])
+                    setTimeout(async () => {
                         const request = await axios.patch(
                             `/api/defect/update/attachment/${defectId}`, {
-                            attachment: fileDetailsArray
+                            attachment: values[1]
                         }, getAuthHeader())
+
                         return request.data
-                    })
+                    }
+                        , 3000)
                 })
-            })
+            }
+
+            uploadAndGetFileDetails();
 
         } catch (error) {
+            console.log(error)
             dispatch(errorGlobal(<div>Fail to attach file<br /> Defect ID: {defectId}</div>));
             throw error
         }

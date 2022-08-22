@@ -1,53 +1,50 @@
 //Lib
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import Moment from 'react-moment';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Loader, htmlDecode } from '../../../utils/tools';
-import { useDispatch, useSelector } from 'react-redux'
-import Moment from 'react-moment'
+import { htmlDecode } from '../../utils/tools';
 
 //Comp
-import { getDefectById } from '../../../store/actions/defects';
-import { addComment, getCommentByDefectIdPaginate } from '../../../store/actions/comments';
-import { saveAs } from "file-saver";
-import ModalComponent from '../../../utils/modal/modal';
-import ReactFileReader from 'react-file-reader';
+import { addComment, getCommentByDefectIdPaginate } from '../../store/actions/comments';
+import { getDefectById } from '../../store/actions/defects';
+import ModalComponent from '../../utils/modal/modal';
 
 //firebase
-import { ref, getStorage, getDownloadURL, deleteObject, getBlob } from "firebase/storage";
-import { storage } from '../../../firebase';
+import { getBlob, getDownloadURL, getStorage, ref } from "firebase/storage";
 
 //MUI
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import Avatar from '@mui/material/Avatar'
-import Divider from '@mui/material/Divider';
-import Chip from '@mui/material/Chip';
-import PersonIcon from '@mui/icons-material/Person';
-import Tooltip from '@mui/material/Tooltip';
-import Button from '@mui/material/Button'
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper'
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead'
-import TablePagination from '@mui/material/TablePagination';
-import { Tab, TableBody, TableFooter, TextField } from '@mui/material';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import ArticleIcon from '@mui/icons-material/Article';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import IconButton from '@mui/material/IconButton'
-import PreviewIcon from '@mui/icons-material/Preview';
+import FolderZipIcon from '@mui/icons-material/FolderZip';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import PersonIcon from '@mui/icons-material/Person';
 import PhotoIcon from '@mui/icons-material/Photo';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import PreviewIcon from '@mui/icons-material/Preview';
 import VideoFileIcon from '@mui/icons-material/VideoFile';
-import AudioFileIcon from '@mui/icons-material/AudioFile';
-import ArticleIcon from '@mui/icons-material/Article';
-import FolderZipIcon from '@mui/icons-material/FolderZip';
+import { TableBody, TableFooter, TextField } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 
 const ViewDefect = () => {
 
@@ -347,7 +344,7 @@ const ViewDefect = () => {
                                         <Tooltip title="Download">
                                             <IconButton
                                                 edge="end"
-                                                aria-label="delete"
+                                                aria-label="download"
                                                 color='primary'
                                                 onClick={() => {
                                                     console.log(item.type)

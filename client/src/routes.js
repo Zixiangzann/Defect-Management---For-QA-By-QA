@@ -8,18 +8,17 @@ import MainLayout from './hoc/mainLayout';
 import Header from './components/navigation/header'
 import Home from './components/home'
 
-import Defect from './components/user/defects';
-import CreateDefect from './components/user/defects/create';
-import EditDefect from './components/user/defects/edit';
+import Defect from './components/defects';
+import CreateDefect from './components/defects/create';
+import EditDefect from './components/defects/edit';
 import UserManagement from './components/admin';
 import AdminAssignProject from './components/admin/assign';
 import AdminUsers from './components/admin/users';
-import AdminDefects from './components/admin/defects';
 import AdminProjects from './components/admin/projects';
 import Projects from './components/Projects';
 import Auth from './components/auth';
-import ViewDefect from './components/user/defects/view';
-import Report from './components/user/defects/report';
+import ViewDefect from './components/defects/view';
+import Report from './components/defects/report';
 
 import * as AuthGuard from './hoc/authGuard';
 
