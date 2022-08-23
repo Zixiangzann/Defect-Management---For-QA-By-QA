@@ -16,6 +16,7 @@ const authController = {
                     email: user.email,
                     firstname: user.firstname,
                     lastname: user.lastname,
+                    username: user.username,
                     project:user.project,
                     role:user.role,
                     jobtitle:user.jobtitle,

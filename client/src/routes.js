@@ -54,7 +54,14 @@ const Router = () => {
                     <Header />
                     <MainLayout>
                         <Routes>
-                            <Route path="/" element={<Home />} />
+                            
+                            <Route path="/" element={
+                             <AuthGuard.LoginGuard>
+                            <Home />
+                            </AuthGuard.LoginGuard>
+                            } />
+
+
                             <Route path="/auth" element={
                                 <AuthGuard.PreventReLoginGuard>
                                     <Auth />

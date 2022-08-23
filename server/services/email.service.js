@@ -14,28 +14,28 @@ let transporter = nodemailer.createTransport({
 
 export const registerEmail = async(userEmail,user) => {
     try{
-        const emailToken = user.generateRegisterToken();
+        // const emailToken = user.generateRegisterToken();
         let mailGenerator = new Mailgen({
             theme:"default",
             product:{
-                name:"Defect Tracker",
+                name:"Defect Management(ForQAByQA)",
                 link:`${process.env.EMAIL_MAIN_URL}`
             }
         });
 
         const email = {
           body:{
-              name: userEmail,
-              intro: 'Welcome to Defect Tracker!',
+              name: `${user.firstname} ${user.lastname}`,
+              intro: 'Welcome to Defect Management(ForQAByQA)! \n A admin have created a account for you.',
               action:{
-                instructions: 'To validate your account, please click here:',
+                instructions: 'Please get your account credentials from your admin and login to change your password to proceed',
                 button:{
                     color:'#1a73e8',
-                    text: 'Validate your account',
-                    link: `${process.env.SITE_DOMAIN}verification?t=${emailToken}`
+                    text: 'Account validation',
+                    link: `${process.env.SITE_DOMAIN}auth`
                 }
                 },
-                outro: 'Please reply to this email if you need help, or have any questions.'
+                outro: 'Please contact your admin if you have any questions.'
           }
         }
 

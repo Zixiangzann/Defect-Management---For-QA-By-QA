@@ -38,6 +38,9 @@ const SideDrawer = ({ users }) => {
             <Drawer anchor={"right"} open={state} onClose={() => setState(false)}>
                 <Box sx={{ width: 300 }}>
                     <List>
+
+{/* still deciding if there should be any homepage for user that not logged in. Likely not  */}
+                    {users.auth ?
                         <ListItem
                             key="sideNavigation-Home"
                             button
@@ -50,6 +53,9 @@ const SideDrawer = ({ users }) => {
                             </ListItemIcon>
                             <ListItemText primary="Home" />
                         </ListItem>
+                        :
+                        null
+                    }
 
                         {!users.auth ?
                             <ListItem

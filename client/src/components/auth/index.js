@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useFormik } from 'formik';
@@ -10,6 +10,7 @@ import Button from '@mui/material/Button'
 
 import { errorHelper, Loader } from '../../utils/tools';
 import { signInUser } from '../../store/actions/users';
+import { Divider, Typography } from '@mui/material';
 
 
 
@@ -17,7 +18,7 @@ const Auth = () => {
 
     // redux
     const users = useSelector((state) => state.users);
-    const notifications = useSelector((state)=>state.notifications);
+    const notifications = useSelector((state) => state.notifications);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -29,31 +30,31 @@ const Auth = () => {
                 .email('Please enter a valid email'),
             password: Yup.string()
                 .required('Password is required')
-                // .min(8, 'Password require a minimum length of 8')
+            // .min(8, 'Password require a minimum length of 8')
         }),
         onSubmit: (values) => {
             handleSubmit(values)
         }
     })
 
-    const handleSubmit = (values) => { dispatch(signInUser(values)) }
-
-    useEffect(()=>{
-        if(notifications && notifications.global.success){
-            navigate('/projects')
-        }
-    },[notifications])
+    const handleSubmit = (values) => {
+        dispatch(signInUser(values))
+    }
 
     return (
-        <div className='login'>
-            <h1>Login</h1>
+        <Box className='loginpage' sx={{ display: 'flex', flexDirection: 'column'}}>
+            <Typography variant='h4' sx={{ flexBasis: '50%', mt: 3,ml:6 }}>Login</Typography>
+
+
             <Box
                 sx={{
-                    '& .MuiTextField-root': { width: '100%', marginTop: '20px' },
+                    display: 'flex', flexWrap:'wrap',  mt:1,ml:5
                 }}
                 component="form"
                 onSubmit={formik.handleSubmit}
             >
+
+                
 
                 <TextField
                     name="email"
@@ -61,6 +62,7 @@ const Auth = () => {
                     variant='outlined'
                     {...formik.getFieldProps('email')}
                     {...errorHelper(formik, 'email')}
+                    sx={{ flexBasis: '100%', mt: 1 }}
                 />
 
                 <TextField
@@ -70,8 +72,11 @@ const Auth = () => {
                     variant='outlined'
                     {...formik.getFieldProps('password')}
                     {...errorHelper(formik, 'password')}
+                    sx={{  flexBasis: '100%', mt: 1 }}
                 />
+                <Box flexBasis='100%'></Box>
 
+                <Box display={'flex'} justifyContent={'flex-end'} flexBasis='100%' mt={2}>
                 {
                     users.loading ?
                         <Loader />
@@ -79,15 +84,17 @@ const Auth = () => {
                         <Button
                             className='login-btn'
                             variant='outlined'
-                            color="secondary"
+                            color="primary"
                             size="small"
                             onClick={() => console.log("login")}
                             type='submit'
+                            sx={{  flexBasis: '25%', mt: 2 }}
                         >Login
                         </Button>
                 }
+                </Box>
             </Box>
-        </div>
+        </Box>
 
 
     )
