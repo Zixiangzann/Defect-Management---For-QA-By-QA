@@ -63,9 +63,9 @@ const Router = () => {
                             />
 
                             <Route path="/firstlogin" element={
-                                <AuthGuard.LoginGuard>
+                                <AuthGuard.FirstLoginGuard>
                                     <FirstLogin />
-                                </AuthGuard.LoginGuard>
+                                </AuthGuard.FirstLoginGuard>
                             }
                             />
 

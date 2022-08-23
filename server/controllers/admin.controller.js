@@ -34,7 +34,7 @@ const adminController = {
 
             // send verification email
             //TODO, member will receive a email when the admin created the account.
-            //Upon clicking on the email, the member will be ask to create profile and force change of password.
+            //Upon clicking on the email, the member will be ask to validate profile and force change of password.
             await emailService.registerEmail(req.body.email, createdAccount);
 
             res.status(httpStatus.CREATED).json(createdAccount)

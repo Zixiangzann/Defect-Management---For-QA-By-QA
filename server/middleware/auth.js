@@ -14,8 +14,8 @@ const verify = (req,res,resolve,reject,rights) => async(err,user) => {
         email: user.email,
         firstname: user.firstname,
         lastname: user.lastname,
+        username: user.username,
         project:user.project,
-        age:user.age,
         role:user.role,
         verified:user.verified,
         firstlogin:user.firstlogin

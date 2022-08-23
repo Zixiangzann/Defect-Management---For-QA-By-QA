@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { showToast } from '../../utils/tools';
-import {signInUser,isAuth, signOut} from '../actions/users'; 
+import {signInUser,isAuth, signOut, firstLoginValidation} from '../actions/users'; 
 
 let DEFAULT_USER_STATE ={
     loading:false,
@@ -10,7 +10,6 @@ let DEFAULT_USER_STATE ={
         firstname:null,
         lastname:null,
         project:null,
-        age:null,
         role:null,
         verified:null,
         firstlogin:null,
@@ -22,8 +21,6 @@ export const usersSlice = createSlice({
 name:'users',
 initialState:DEFAULT_USER_STATE,
 reducers:{
-
-
 
 },
 extraReducers:(builder)=>{
@@ -48,7 +45,11 @@ extraReducers:(builder)=>{
         state.auth = null;
         showToast('SUCCESS',<div>Logged out</div>);
      })
+     .addCase(firstLoginValidation.fulfilled,(state,action)=>{
+        state.data = action.payload.data
+     })
 }
 })
 
+export const {setFirstLoginFalse} = usersSlice.actions;
 export default usersSlice.reducer;

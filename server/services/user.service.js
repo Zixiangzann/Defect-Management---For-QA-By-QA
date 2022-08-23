@@ -44,7 +44,6 @@ export const updateUserProfile = async (req) => {
                 "$set": {
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
-                    age: req.body.age
                 }
             },
             { new: true }
@@ -91,6 +90,7 @@ export const updateUserEmail = async(req) => {
         throw error;
     } 
 }
+
 
 export const validateToken = (token) => {
     return jwt.verify(token,process.env.DB_SECRET);

@@ -32,6 +32,24 @@ export const isAuth = createAsyncThunk(
     }
 )
 
+export const firstLoginValidation = createAsyncThunk(
+    'users/firstLoginValidation',
+    async({email,oldPassword,newPassword},{dispatch})=>{
+        try {
+            const request = await axios.post('/api/auth/firstloginvalidation',{
+                email,
+                oldPassword,
+                newPassword
+            },getAuthHeader());
+            dispatch(successGlobal(<div>Validation Success</div>))
+            return {data:request.data.user}
+        } catch (error) {
+            dispatch(errorGlobal(<div>Validation failed.<br /> {error.response.data.message}</div>));
+            throw error;
+        }
+    }
+)
+
 export const signOut = createAsyncThunk(
     'users/signOut',
     async()=>{

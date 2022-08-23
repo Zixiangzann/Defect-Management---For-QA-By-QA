@@ -17,6 +17,11 @@ export const addUser = async(body) => {
             throw new ApiError(httpStatus.BAD_REQUEST,'Sorry username taken');
         }
 
+        const regExp = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
+        if(!regExp.test(body.password)){
+            throw new ApiError(httpStatus.BAD_REQUEST,'did not meet password criteria');
+        }
+
         const user = new User({
             firstname:body.firstname,
             lastname:body.lastname,

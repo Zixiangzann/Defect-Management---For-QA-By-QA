@@ -34,7 +34,7 @@ const AdminUsers = () => {
     const [emailCheck, setEmailCheck] = useState(false);
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('user');
-    const [jobtitle,setJobTitle] = useState('');
+    const [jobtitle, setJobTitle] = useState('');
 
     const dispatch = useDispatch();
 
@@ -81,10 +81,15 @@ const AdminUsers = () => {
         let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(){}[]:";|/.,1234567890';
         let password = ''
         const passwordLength = Math.floor(Math.random() * (25 - 15 + 1) + 15)
+        //check password criteria
+        const regExp = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
 
-        for (let index = 0; index < passwordLength; index++) {
-            const randomIndex = Math.floor(Math.random() * (characters.length - 0 + 1) + 0)
-            password = password + characters.charAt(randomIndex)
+        while (regExp.test(password) !== true) {
+            password = ''
+            for (let index = 0; index < passwordLength; index++) {
+                const randomIndex = Math.floor(Math.random() * (characters.length - 0 + 1) + 0)
+                password = password + characters.charAt(randomIndex)
+            }
         }
         return password
     }
@@ -227,7 +232,7 @@ const AdminUsers = () => {
                         onChange={handleJobTitle}
                     />
                 </FormControl>
-                
+
                 <Divider></Divider>
 
                 <FormControl id="addUserRoleForm" sx={{ m: 1, flexBasis: '55%' }}>

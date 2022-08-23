@@ -97,7 +97,8 @@ const SideDrawer = ({ users }) => {
                                 </ListItemIcon>
                                 <ListItemText primary="Defect" />
                             </ListItem>
-                            <ListItem
+                            {/* not ready */}
+                            {/* <ListItem
                                 key="sideNavigation-Projects"
                                 button
                                 component={RouterLink}
@@ -108,8 +109,10 @@ const SideDrawer = ({ users }) => {
                                     <FilterVintageOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Projects" />
-                            </ListItem>
-                            <ListItem
+                            </ListItem> */}
+
+                            {/* not ready */}
+                            {/* <ListItem
                                 key="sideNavigation-Dashboards"
                                 button
                                 component={RouterLink}
@@ -120,7 +123,7 @@ const SideDrawer = ({ users }) => {
                                     <DashboardIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Dashboards" />
-                            </ListItem>
+                            </ListItem> */}
 
                             <ListItem
                                 key="sideNavigation-Reports"
