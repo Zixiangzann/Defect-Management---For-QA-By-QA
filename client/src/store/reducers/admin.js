@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getCommentByDefectIdPaginate} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getCommentByDefectIdPaginate, getUserByEmail} from '../actions/admin'
 import { showToast } from '../../utils/tools';
 
 export const adminSlice = createSlice({
@@ -9,7 +9,9 @@ export const adminSlice = createSlice({
         error:{
             emailTaken: null,
             usernameTaken:null,
-        }
+            userNotFound:null
+        },
+        userData:{},
     },reducers:{
 
     },
@@ -28,6 +30,12 @@ export const adminSlice = createSlice({
             } else {
                 state.error.usernameTaken = null
             }
+        })
+        .addCase(getUserByEmail.fulfilled,(state,action)=>{
+            state.userData = action.payload.data
+        })
+        .addCase(getUserByEmail.rejected,(state,action)=>{
+            state.error.userNotFound = "User not found"
         })
 
     }

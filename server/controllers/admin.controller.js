@@ -54,6 +54,15 @@ const adminController = {
             
     },
 
+    async getUserByEmail(req,res,next){
+        try{
+            const user = await adminService.getUserByEmail(req.body)
+            res.status(httpStatus.OK).json(user)
+        }catch(error){
+            next(error)
+        }
+    },
+
     async checkUsernameExist(req, res, next) {
         //if username already exist
         try {
@@ -64,6 +73,33 @@ const adminController = {
         }
 
 },
+
+    async updateUserFirstName(req,res,next){
+        try {
+            const updatedUser = await adminService.updateUserFirstName(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async updateUserLastName(req,res,next){
+        try {
+            const updatedUser = await adminService.updateUserLastName(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async updateUserUserName(req,res,next){
+        try {
+            const updatedUser = await adminService.updateUserUserName(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
 
     }
 

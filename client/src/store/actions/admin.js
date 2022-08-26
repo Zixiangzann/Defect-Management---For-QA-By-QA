@@ -56,4 +56,18 @@ export const checkUsernameExist = createAsyncThunk(
     } catch (error) {
         throw error;
     }}
-)   
+)
+
+export const getUserByEmail = createAsyncThunk(
+    'admin/getUserByEmail',
+    async({email}) => {
+        try{
+            const request = await axios.post('/api/admin/getuserbyemail',{
+                email
+            },getAuthHeader())
+            return {data:request.data}
+        }catch(error){
+            throw error;
+        }
+    }
+)

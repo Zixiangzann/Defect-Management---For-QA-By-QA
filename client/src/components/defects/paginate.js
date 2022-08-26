@@ -29,6 +29,11 @@ import Tooltip from '@mui/material/Tooltip'
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import MenuIcon from '@mui/icons-material/Menu';
+
 
 const PaginateComponent = ({
     defects,
@@ -57,7 +62,7 @@ const PaginateComponent = ({
     //Table sorting
 
     //For table header sorting state
-    const [orderActive, setOrderActive] = useState('asc');
+    const [orderActive, setOrderActive] = useState('desc');
     const [sortActive, setSortActive] = useState('defectid');
 
     //toggle order
@@ -100,12 +105,76 @@ const PaginateComponent = ({
         navigate(`/defect/view/${id}`)
     }
 
+//Defect Menu
+
+    const [defectItem, setDefectItem] = useState({})
+    const [showMenu, setShowMenu] = useState(false)
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const DefectMenu = ({
+        defect
+    }) => {
+        return (
+            <>
+                <Menu
+                    id="defect-menu"
+                    open={showMenu}
+                    onClose={() => setShowMenu(false)}
+                    anchorEl={anchorEl}
+                    >
+                    <MenuItem
+                    onClick={() => handleView(defect.defectid)}>
+                        <Tooltip title="View">
+                            <Button
+                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5,mr:1 }}
+                                
+                            >
+                                <OpenInNewIcon />
+                            </Button>
+                        </Tooltip>
+                        View</MenuItem>
+
+                    <MenuItem
+                    onClick={() => handleEdit(defect.defectid)}>
+                        <Tooltip title="Edit">
+                            <Button
+                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5, color: 'darkorange',mr:1  }}
+                                
+                            >
+                                <ModeEditIcon />
+                            </Button>
+                        </Tooltip>
+                        Edit
+                    </MenuItem>
+
+                    <MenuItem
+                    onClick={() => {
+                        setOpenModal(true)
+                        setToRemove(defect.defectid)
+                    }}>
+                        <Tooltip title="Delete">
+                            <Button
+                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5,mr:1  }}
+
+                            >
+                                <DeleteForeverIcon color='error' />
+                            </Button>
+                        </Tooltip>
+                        Delete
+                    </MenuItem>
+
+                </Menu>
+            </>
+        )
+
+    }
+
     const handleModalConfirm = (toRemove) => {
         dispatch(deleteDefect({ defectId: toRemove }))
         setToRemove(null)
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         switch (sortActive) {
             case "Defect ID":
                 dispatch(setSortBy('defectid'));
@@ -114,13 +183,13 @@ const PaginateComponent = ({
                 dispatch(setSortBy('date'));
                 break;
             default:
-                 dispatch(setSortBy(sortActive.toLocaleLowerCase()));
+                dispatch(setSortBy(sortActive.toLocaleLowerCase()));
                 break;
         }
 
         orderActive === 'asc' ? dispatch(setOrder(1)) : dispatch(setOrder(-1))
 
-    },[sortActive,orderActive])
+    }, [sortActive, orderActive])
 
 
     useEffect(() => {
@@ -147,137 +216,128 @@ const PaginateComponent = ({
                 search: filter.search
             }))
         }
-    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby,filter.search]);
+    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.search]);
 
 
 
     return (
         <>
             {defects && defects.docs ?
-                <Box sx={{ width: '100%' }}>
-                    <Paper sx={{ width: '100%', mb: 2,mt:2 }}>
-                        <TextField
-                            id="search-by-title"
-                            label="Search by title"
-                            type="search"
-                            variant="standard"
-                            onChange={(e)=>handleSearch(e)}
-                            sx={{float:'right',mb:3,mt:1,mr:1}}
-                        />
-                        <TableContainer sx={{ mt: 2 }}>
-                            <Table className='defect-table' size='small' sx={{ minWidth: 650 }}>
+                <Paper sx={{ width: '100%', mb: 2, mt: 2 }}>
+                    <TextField
+                        id="search-by-title"
+                        label="Search by title"
+                        type="search"
+                        variant="standard"
+                        onChange={(e) => handleSearch(e)}
+                        sx={{ float: 'right', mb: 3, mt: 1, mr: 1, overflow: 'hidden' }}
+                    />
+                    <TableContainer
+                        sx={{ mt: 2, minWidth: 650, maxHeight: 750 }}
 
-                                <TableHead sx={{ whiteSpace: 'nowrap' }}>
-                                    <TableRow key={'header'}>
-                                        {tableHeader.map((header) => (
-                                            <TableCell
-                                            key={`table-${header}`}>
-                                                <TableSortLabel
-                                                    active={sortActive === header}
-                                                    direction={sortActive === header ? orderActive : 'desc'}
-                                                    onClick={() => {
-                                                        handleOrder()
-                                                        handleSort(header)
-                                                    }}
-                                                >{header}
-                                                    {sortActive === header ? (
-                                                        <Box component="span" sx={visuallyHidden}>
-                                                            {orderActive === -1 ? 'sorted descending' : 'sorted ascending'}
-                                                        </Box>
-                                                    ) : null}
-                                                </TableSortLabel>
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-
-                                <TableBody
-                                >
-                                    {defects.docs.map((item,index) => (
-                                        <TableRow key={item._id}
-                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                        >
-                                            <TableCell key={`${item.defectid}-${index}`} sx={{ maxWidth: '50px', textAlign: 'center' }}>{item.defectid}</TableCell>
-
-                                            <TableCell key={`${item.title}-${index}`} sx={{ maxWidth: '150px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
-
-                                            <TableCell key={`${item.project}-${index}`} sx={{ maxWidth: '150px' }}>{item.project}</TableCell>
-                                            <TableCell key={`${item.components}-${index}`} sx={{ maxWidth: '150px', textAlign: 'center' }}>{item.components}</TableCell>
-                                            <TableCell key={`${item.severity}-${index}`} sx={{ maxWidth: '150px' }}>{item.severity}</TableCell>
-                                            <TableCell key={`${item.status}-${index}`} sx={{ maxWidth: '50px' }}>{item.status}</TableCell>
-                                            <TableCell key={`${item.server}-${index}`} sx={{ maxWidth: '50px' }}>{item.server}</TableCell>
-                                            <TableCell key={`${item.reporter}-${index}`} sx={{ maxWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
-                                            <TableCell key={`${item.date}-${index}`} sx={{ maxWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
-                                            <TableCell key={'menu'} sx={{ maxWidth: '150px' }}>
-                                                <Tooltip title="View">
-                                                    <Button
-                                                        sx={{ minHeight: 0, minWidth: 0, padding: 2 }}
-                                                        onClick={() => handleView(item.defectid)}
-                                                    >
-                                                        <OpenInNewIcon />
-                                                    </Button>
-                                                </Tooltip>
-                                                <Tooltip title="Edit">
-                                                    <Button
-                                                        sx={{ minHeight: 0, minWidth: 0, padding: 2, color: 'darkorange' }}
-                                                        onClick={() => handleEdit(item.defectid)}
-                                                    >
-                                                        <ModeEditIcon />
-                                                    </Button>
-                                                </Tooltip>
-                                                <Tooltip title="Delete">
-                                                    <Button
-                                                        onClick={() => {
-                                                            setOpenModal(true)
-                                                            setToRemove(item.defectid)
-                                                        }}
-                                                        sx={{ minHeight: 0, minWidth: 0, padding: 2 }}
-
-                                                    >
-                                                        <DeleteForeverIcon color='error' />
-                                                    </Button>
-                                                </Tooltip>
-                                            </TableCell>
-                                        </TableRow>
-
-                                    ))}
-                                    <TableRow key={'tablePagination'}>
-                                        <TablePagination
-                                            rowsPerPageOptions={[10, 15, 25]}
-                                            rowsPerPage={rowsPerPage}
-                                            colSpan={3}
-                                            count={defects.totalDocs}
-                                            page={page}
-                                            onPageChange={handleChangePage}
-                                            onRowsPerPageChange={handleChangeRowsPerPage}
-                                        />
-                                    </TableRow>
-                                </TableBody>
-
-
-
-                            </Table>
-                        </TableContainer>
-
-
-                        <ModalComponent
-                            open={openModal}
-                            setOpenModal={setOpenModal}
-                            title="Warning"
-                            description={`You are about to permanently delete Defect ID: ${toRemove}`}
-                            warn={"Are you sure you want to continue?"}
-                            handleModalConfirm={() => handleModalConfirm(toRemove)}
-                            button1="Confirm"
-                            button2="Cancel"
-                            titleColor="darkred"
+                    >
+                        <Table
+                            className='defect-table'
+                            size='small'
+                            stickyHeader
                         >
-                        </ModalComponent>
 
-                    </Paper>
-                </Box>
+                            <TableHead sx={{ whiteSpace: 'nowrap' }}>
+                                <TableRow key={'header'}>
+                                    <TableCell>Menu</TableCell>
+                                    {tableHeader.map((header) => (
+                                        <TableCell
+                                            key={`table-${header}`}
+                                            
+                                            >
+                                            <TableSortLabel
+                                                active={sortActive === header}
+                                                direction={sortActive === header ? orderActive : 'desc'}
+                                                onClick={() => {
+                                                    handleOrder()
+                                                    handleSort(header)
+                                                }}
+                                            >{header}
+                                                {sortActive === header ? (
+                                                    <Box component="span" sx={visuallyHidden}>
+                                                        {orderActive === -1 ? 'sorted descending' : 'sorted ascending'}
+                                                    </Box>
+                                                ) : null}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+
+                            <TableBody
+                            >
+                                {defects.docs.map((item, index) => (
+                                    <TableRow key={item._id}
+                                    >
+                                        
+                                        <TableCell 
+                                        key={`menu-${index}`} 
+                                        sx={{textAlign:'center',cursor: 'pointer'}}
+                                        onClick={(e)=>{
+                                            setDefectItem(item)
+                                            setShowMenu(true)
+                                            setAnchorEl(e.currentTarget)
+                                        }}
+                                        >
+                                        <MenuIcon color='secondary'/></TableCell>
+                                      
+                                        <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px',textAlign:'center'}}>{item.defectid}</TableCell>
+                                        <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
+                                        <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px' }}>{item.project}</TableCell>
+                                        <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px'}}>{item.components}</TableCell>
+                                        <TableCell key={`${item.severity}-${index}`} sx={{ minWidth: '150px' }}>{item.severity}</TableCell>
+                                        <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>{item.status}</TableCell>
+                                        <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
+                                        <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                        <TableCell key={`${item.date}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
+                                    </TableRow>
+
+                                ))}
+                            </TableBody>
+
+
+
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[10, 15, 25]}
+                        component="div"
+                        rowsPerPage={rowsPerPage}
+                        colSpan={3}
+                        count={defects.totalDocs}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+
+                </Paper>
                 :
                 null
             }
+            <ModalComponent
+                open={openModal}
+                setOpenModal={setOpenModal}
+                title="Warning"
+                description={`You are about to permanently delete Defect ID: ${toRemove}`}
+                warn={"Are you sure you want to continue?"}
+                handleModalConfirm={() => handleModalConfirm(toRemove)}
+                button1="Confirm"
+                button2="Cancel"
+                titleColor="darkred"
+            >
+            </ModalComponent>
+
+            <DefectMenu
+                defect={defectItem}
+            >
+            </DefectMenu>
+
+
         </>
     )
 }

@@ -3,6 +3,7 @@ import { ApiError } from "../middleware/apiError.js";
 import httpStatus from "http-status";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { userService } from "./index.js";
 
 export const addUser = async(body) => {
     try{
@@ -53,6 +54,19 @@ export const checkEmailExist = async(body)=>{
         
 }
 
+export const getUserByEmail = async(body)=>{
+    try {
+        const user = await User.find({email:body.email})
+        if(user.length === 0) throw new ApiError(httpStatus.BAD_REQUEST,'User does not exist');
+
+        return user
+        
+
+    } catch (error) {
+        throw error
+    }
+}
+
 export const checkUsernameExist = async(body)=>{
 
     try {
@@ -63,9 +77,87 @@ export const checkUsernameExist = async(body)=>{
     } catch (error) {
         throw error
     }
+}
+
+export const updateUserFirstName = async(req)=>{
+    const adminEmail = req.user.email
+    const adminPassword = req.body.adminPassword
+    //user details
+    const userEmail = req.body.userEmail
+    const userFirstName = req.body.userNewFirstName
+    
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+    }
+
+    //check if user email is found
+    const user = await User.findOne({email:userEmail})
+    if(!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
+
+    const updateUser = User.findOneAndUpdate({email:userEmail},{firstname:userFirstName},{new:true});
+    return updateUser;
 
 }
 
+export const updateUserLastName = async(req)=>{
+    const adminEmail = req.user.email
+    const adminPassword = req.body.adminPassword
+    //user details
+    const userEmail = req.body.userEmail
+    const userLastName = req.body.userNewLastName
+    
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+    }
+
+    //check if user email is found
+    const user = await User.findOne({email:userEmail})
+    if(!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
+
+    const updateUser = User.findOneAndUpdate({email:userEmail},{lastname:userLastName},{new:true});
+    return updateUser;
+
+}
+
+export const updateUserUserName = async(req)=>{
+    const adminEmail = req.user.email
+    const adminPassword = req.body.adminPassword
+    //user details
+    const userEmail = req.body.userEmail
+    const userUserName = req.body.userNewUserName
+    
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+    }
+
+    //check if user email is found
+    const user = await User.findOne({email:userEmail})
+    if(!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
+
+    const updateUser = User.findOneAndUpdate({email:userEmail},{username:userUserName},{new:true});
+    return updateUser;
+
+}
+
+//TODO
+//update email, need to also update in Project assignee
+//update job title
+//reset user password
+//update role 
+//Delete user
+
+
+
+
+
+
+//might remove
 export const getAllUsers = async()=>{
     try{
         const users = User.find({}).select('-password')

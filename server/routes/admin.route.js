@@ -16,4 +16,12 @@ router.patch('/changerole',auth('updateAny','admin'),adminController.changeRole)
 router.post('/checkemailexist',auth('readAny','admin'),adminController.checkEmailExist)
 router.post('/checkusernameexist',auth('readAny','admin'),adminController.checkUsernameExist)
 
+//get user
+router.post('/getuserbyemail',auth('readAny','admin'),adminController.getUserByEmail)
+
+//update user details
+router.patch('/updateuser/firstname',auth('updateAny','admin'),adminController.updateUserFirstName)
+router.patch('/updateuser/lastname',auth('updateAny','admin'),adminController.updateUserLastName)
+router.patch('/updateuser/username',auth('updateAny','admin'),adminController.updateUserUserName)
+
 export default router;
