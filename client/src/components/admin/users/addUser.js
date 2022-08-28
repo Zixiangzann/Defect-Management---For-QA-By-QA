@@ -1,5 +1,5 @@
 //comp
-import { useState } from 'react';
+import { useState, setState } from 'react';
 
 //lib
 import ModalComponent from '../../../utils/modal/modal';
@@ -21,7 +21,8 @@ import FormLabel from '@mui/material/FormLabel';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Typography from '@mui/material/Typography';
-
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
 
 const AddUser = () => {
 
@@ -33,6 +34,37 @@ const AddUser = () => {
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('user');
     const [jobtitle, setJobTitle] = useState('');
+
+    //Permission state
+
+    const [permission, setPermission] = useState({
+        addDefect: false,
+        editDefect: false,
+        addComment: false,
+        deleteComment: false,
+        viewAllDefects: false,
+        deleteDefect: false,
+        addUser: false,
+        disableUser: false,
+        changeUserDetails: false,
+        resetUserPassword: false,
+        addProject: false,
+        assignProject: false,
+        deleteProject: false,
+        addComponent: false,
+        deleteComponent: false
+    })
+
+    const handlePermission = (event) => {
+        const value = event.target.checked;
+        setPermission({
+            ...permission,
+            [event.target.name]: value
+        });
+
+        console.log(permission)
+    }
+
 
     const dispatch = useDispatch();
 
@@ -74,6 +106,7 @@ const AddUser = () => {
     }
 
     const admin = useSelector(state => state.admin)
+    const users = useSelector(state => state.users)
 
     const createPassword = () => {
         let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(){}[]:";|/.,1234567890';
@@ -114,11 +147,11 @@ const AddUser = () => {
     }
 
     return (
-        <Box mt={5} >
+        <Box mt={5} overflow={'auto'} maxHeight={'650px'} >
 
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
 
-                <Typography variant='h5' mb={5} flexBasis='60%'>Add User</Typography>
+                <Typography variant='h4' mb={5} flexBasis='60%'>Account Details</Typography>
 
                 <FormControl
                     id='addUserFirstNameForm'
@@ -197,6 +230,23 @@ const AddUser = () => {
 
                 <br></br>
 
+
+                <FormControl id='addUserJobTitleForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor="jobtitle"
+                    >Job Title</InputLabel>
+                    <OutlinedInput
+                        id="jobtitle"
+                        type='text'
+                        value={jobtitle}
+                        label="Job Title"
+                        fullWidth
+                        onChange={handleJobTitle}
+                    />
+                </FormControl>
+
+                <Box flexBasis={'50%'}></Box>
+
+
                 <FormControl id='addUserPasswordForm' sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor="password"
                     >Password</InputLabel>
@@ -217,23 +267,9 @@ const AddUser = () => {
                 // variant='outlined'
                 >Generate Password</Button>
 
-
-                <FormControl id='jobTitleForm' sx={{ m: 1, flexBasis: '45%' }}>
-                    <InputLabel htmlFor="jobtitle"
-                    >Job Title</InputLabel>
-                    <OutlinedInput
-                        id="jobtitle"
-                        type='text'
-                        value={jobtitle}
-                        label="Job Title"
-                        fullWidth
-                        onChange={handleJobTitle}
-                    />
-                </FormControl>
-
                 <Divider></Divider>
 
-                <FormControl id="addUserRoleForm" sx={{ m: 1, flexBasis: '55%' }}>
+                <FormControl id="addUserRoleForm" sx={{ m: 2, flexBasis: '55%' }}>
                     <FormLabel>Role:</FormLabel>
                     <RadioGroup
                         row
@@ -246,16 +282,62 @@ const AddUser = () => {
 
                         <FormControlLabel
                             value='admin'
-                            control={<Radio />}
+                            control={<Radio disabled={users.data.role === 'owner' ? false : true} />}
                             label='Admin'
                             onChange={handleChangeRole}
-
                         />
+                        {users.data.role === 'owner' ? null : <FormHelperText>Only Super Admin can create "Admin" account</FormHelperText>}
+
                     </RadioGroup>
                 </FormControl>
 
 
-                <Divider sx={{ flexBasis: '100%' }}></Divider>
+                <Divider sx={{ flexBasis: '100%', borderBottomColor: 'black', mt: 5 }}></Divider>
+
+                <Typography variant='h4' sx={{ flexBasis: '100%', mt: 2 }}>Account Permission</Typography>
+
+                {/* Standard user control */}
+
+                <Typography sx={{ flexBasis: '100%', mt: 2, mb: 2, fontSize: '1.2rem', fontWeight: '600' }}>Standard User</Typography>
+
+                <FormControlLabel name='addDefect' control={<Checkbox defaultChecked />} label="Add defect" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='editDefect' control={<Checkbox defaultChecked />} label="Edit defect" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='addComment' control={<Checkbox defaultChecked />} label="Add comment" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='deleteComment' control={<Checkbox defaultChecked />} label="Delete comment" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+
+                <Divider sx={{ flexBasis: '100%', borderBottomColor: 'black', mt: 5 }}></Divider>
+
+                {/* sensitive admin control, only some admin or owner should have these control */}
+                {users.data.role === 'owner' && role === 'admin' ?
+                    <>
+                        <Typography sx={{ flexBasis: '100%', mt: 2, fontSize: '1.2rem', fontWeight: '600' }}>Admin</Typography>
+
+
+                        <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Defect management</Typography>
+                        <FormControlLabel name='viewAllDefects' control={<Checkbox />} label="View all defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteDefect' control={<Checkbox />} label="Delete defect" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+
+                        <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>User management</Typography>
+                        <FormControlLabel name='addUser' control={<Checkbox />} label="Add user" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='disableUser' control={<Checkbox />} label="Disable user" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='changeUserDetails' control={<Checkbox />} label="Change user details" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='resetUserPassword' control={<Checkbox />} label="Reset user password" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+
+
+                        <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Project management</Typography>
+                        <FormControlLabel name='addProject' control={<Checkbox />} label="Add project" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='assignProject' control={<Checkbox />} label="Assign project" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteProject' control={<Checkbox />} label="Delete project" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='addComponent' control={<Checkbox />} label="Add component" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteComponent' control={<Checkbox />} label="Delete component" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+
+                    </>
+                    :
+                    null
+                }
+
+
+
 
                 <Button
                     id='addUserBtn'

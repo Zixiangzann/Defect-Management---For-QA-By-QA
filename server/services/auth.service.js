@@ -57,7 +57,8 @@ export const firstLoginValidation = async (req) => {
                 "$set": {
                     password: await encrytedPassword(newPassword),
                     verified: true,
-                    firstlogin: false
+                    firstlogin: false,
+                    passwordresetted: false
                 }
             },
             { new: true }

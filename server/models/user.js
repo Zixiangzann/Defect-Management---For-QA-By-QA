@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema({
     role:{
         type:String,
         required: true,
-        enum:['user','admin'],
+        enum:['user','admin','owner'],
         default: 'user' 
     },
     project:{
@@ -52,9 +52,85 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: true
     },
+    passwordresetted:{
+        type: Boolean,
+        default: false
+    },
     jobtitle:{
         type: String,
         maxLength: 100
+    },
+    permission:{
+        type:[{
+            addDefect:{
+                type: Boolean,
+                default:false
+            },
+            deleteDefect:{
+                type: Boolean,
+                default:false
+            },
+            editDefect:{
+                type: Boolean,
+                default:false
+            },
+            viewAllDefects:{
+                type: Boolean,
+                default:false
+            },
+            addComment:{
+                type: Boolean,
+                default:false
+            },
+            deleteComment:{
+                type: Boolean,
+                default:false
+            },
+            changeUserDetails:{
+                type: Boolean,
+                default:false
+            },
+            resetUserPassword:{
+                type: Boolean,
+                default:false
+            },
+            addUser:{
+                type: Boolean,
+                default:false
+            },
+            disableUser:{
+                type: Boolean,
+                default:false
+            },
+            deleteUser:{
+                type: Boolean,
+                default:false
+            },
+            assignProject:{
+                type: Boolean,
+                default:false
+            },
+            addProject:{
+                type: Boolean,
+                default:false
+            },
+            deleteProject:{
+                type: Boolean,
+                default:false
+            },
+            addComponent:{
+                type: Boolean,
+                default:false
+            },
+            deleteComponent:{
+                type: Boolean,
+                default:false
+            }
+        }]
+    },
+    disabled:{
+        type: Boolean,
+        default:false
     },
     date: {
         type: Date,

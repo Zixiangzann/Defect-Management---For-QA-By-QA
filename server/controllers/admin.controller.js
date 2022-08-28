@@ -3,6 +3,7 @@ import { ApiError } from '../middleware/apiError.js';
 import { adminService } from '../services/index.js';
 import { emailService } from '../services/index.js';
 import User from '../models/user.js';
+import { updateUserJobTitle } from '../services/admin.service.js';
 
 const adminController = {
     async getAllUsers(req, res, next) {
@@ -30,7 +31,7 @@ const adminController = {
     //User manangement. Add team members/users.
     async addUser(req, res, next) {
         try {
-            const createdAccount = await adminService.addUser(req.body);
+            const createdAccount = await adminService.addUser(req);
 
             // send verification email
             //TODO, member will receive a email when the admin created the account.
@@ -51,14 +52,14 @@ const adminController = {
         } catch (error) {
             next(error)
         }
-            
+
     },
 
-    async getUserByEmail(req,res,next){
-        try{
+    async getUserByEmail(req, res, next) {
+        try {
             const user = await adminService.getUserByEmail(req.body)
             res.status(httpStatus.OK).json(user)
-        }catch(error){
+        } catch (error) {
             next(error)
         }
     },
@@ -72,9 +73,9 @@ const adminController = {
             next(error)
         }
 
-},
+    },
 
-    async updateUserFirstName(req,res,next){
+    async updateUserFirstName(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserFirstName(req)
             res.status(httpStatus.OK).json(updatedUser)
@@ -83,7 +84,7 @@ const adminController = {
         }
     },
 
-    async updateUserLastName(req,res,next){
+    async updateUserLastName(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserLastName(req)
             res.status(httpStatus.OK).json(updatedUser)
@@ -92,7 +93,7 @@ const adminController = {
         }
     },
 
-    async updateUserUserName(req,res,next){
+    async updateUserUserName(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserUserName(req)
             res.status(httpStatus.OK).json(updatedUser)
@@ -101,7 +102,43 @@ const adminController = {
         }
     },
 
+    async updateUserEmail(req, res, next) {
+        try {
+            const updatedUser = await adminService.updateUserEmail(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async updateUserJobTitle(req,res,next){
+        try {
+            const updatedUser = await adminService.updateUserJobTitle(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async resetUserPassword(req,res,next){
+        try {
+            const updatedUser = await adminService.resetUserPassword(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async updateUserRole(req,res,next){
+        try {
+            const updatedUser = await adminService.changeUserRole(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
     }
+
+}
 
 
 

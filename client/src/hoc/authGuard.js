@@ -10,7 +10,7 @@ export const LoginGuard = (props) => {
         return <Navigate to ="/auth" state={{from:location}} replace/>
     }
 
-    if(users.data.firstlogin && users.auth){
+    if((users.data.firstlogin || users.data.passwordresetted) && users.auth){
         setTimeout(()=>{
             navigate('/firstlogin')
         },100)   
@@ -18,16 +18,15 @@ export const LoginGuard = (props) => {
 
     return props.children
 }
-
+ 
 export const FirstLoginGuard = (props) =>{
     const users = useSelector(state=>state.users);
     let location = useLocation();
     const navigate = useNavigate();
 
-    if(!users.data.firstlogin){
+    if(!users.data.firstlogin && !users.data.passwordresetted){
         return <Navigate to ="/" state={{from:location}} replace/>
     }
-
     return props.children
 }
 
@@ -35,7 +34,7 @@ export const AdminGuard = (props) => {
     const users = useSelector(state=>state.users);
     let location = useLocation();
 
-    if(users.data.role !== 'admin'){
+    if(users.data.role !== 'admin' && users.data.role !== 'owner'){
         return <Navigate to ="/" state={{from:location}} replace/>
     }
 

@@ -15,10 +15,13 @@ const verify = (req,res,resolve,reject,rights) => async(err,user) => {
         firstname: user.firstname,
         lastname: user.lastname,
         username: user.username,
+        jobtitle: user.jobtitle,
         project:user.project,
         role:user.role,
         verified:user.verified,
-        firstlogin:user.firstlogin
+        firstlogin:user.firstlogin,
+        passwordresetted: user.passwordresetted,
+        permission: user.permission,
     }
 
     if(rights.length){

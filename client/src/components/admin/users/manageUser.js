@@ -32,6 +32,7 @@ const ManageUser = () => {
 
     const dispatch = useDispatch();
     const admin = useSelector(state => state.admin)
+    const users = useSelector(state => state.users)
     const userData = useSelector(state => state.admin.userData[0])
 
     const handleSearchUserField = (event) =>{
@@ -178,7 +179,7 @@ const ManageUser = () => {
         onChange={handleFirstName}
         fullWidth
         disabled
-        endAdornment={
+        endAdornment={ users.data.permission[0].changeUserDetails ?
             <InputAdornment position='end'>
                 <IconButton
                 aria-label="edit-firstname"
@@ -187,6 +188,8 @@ const ManageUser = () => {
                     {<EditIcon/>}
                 </IconButton>
             </InputAdornment>
+            :
+            null
         }
     />
 </FormControl>
@@ -205,7 +208,7 @@ const ManageUser = () => {
         onChange={handleLastName}
         fullWidth
         disabled
-        endAdornment={
+        endAdornment={ users.data.permission[0].changeUserDetails ?
             <InputAdornment position='end'>
                 <IconButton
                 aria-label="edit-firstname"
@@ -214,6 +217,8 @@ const ManageUser = () => {
                     {<EditIcon/>}
                 </IconButton>
             </InputAdornment>
+            :
+            null
         }
     />
 </FormControl>
@@ -232,7 +237,7 @@ const ManageUser = () => {
         onChange={handleUserName}
         fullWidth
         disabled
-        endAdornment={
+        endAdornment={users.data.permission[0].changeUserDetails ?
             <InputAdornment position='end'>
                 <IconButton
                 aria-label="edit-firstname"
@@ -241,6 +246,8 @@ const ManageUser = () => {
                     {<EditIcon/>}
                 </IconButton>
             </InputAdornment>
+            :
+            null
         }
         onBlur={(e) => {
             dispatch(checkUsernameExist({ username }))
@@ -268,6 +275,7 @@ const ManageUser = () => {
         fullWidth
         disabled
         endAdornment={
+            users.data.permission[0].changeUserDetails ?
             <InputAdornment position='end'>
                 <IconButton
                 aria-label="edit-firstname"
@@ -276,6 +284,8 @@ const ManageUser = () => {
                     {<EditIcon/>}
                 </IconButton>
             </InputAdornment>
+            :
+            null
         }
     />
     <FormHelperText error>{emailCheck ? "Invalid email" : null}</FormHelperText>
@@ -297,7 +307,7 @@ const ManageUser = () => {
         fullWidth
         onChange={handleJobTitle}
         disabled
-        endAdornment={
+        endAdornment={ users.data.permission[0].changeUserDetails ?
             <InputAdornment position='end'>
                 <IconButton
                 aria-label="edit-firstname"
@@ -306,7 +316,11 @@ const ManageUser = () => {
                     {<EditIcon/>}
                 </IconButton>
             </InputAdornment>
+            :
+            null
         }
+
+
     />
 </FormControl>
 
@@ -315,15 +329,21 @@ const ManageUser = () => {
 <Box flexBasis='100%'></Box>
 
 <Box sx={{display:'flex',flexBasis:'100%',justifyContent:'flex-end'}}>
+
+{users.data.permission[0].resetUserPassword ?    
 <Button
     id="resetPasword"
     // onClick={handleGeneratePassword}
     sx={{ flexBasis: '30%',mt:1,backgroundColor:'lightblue',color:'black'}}
     variant='contained'
 >Reset User Password</Button>
+:
+null
+}
 
 </Box>
 
+{users.data.role === 'owner' ?
 <Box sx={{display:'flex',flexBasis:'100%',justifyContent:'flex-end'}}>
 <Button
     id="changeUserRole"
@@ -332,7 +352,9 @@ const ManageUser = () => {
 >Change User Role
 </Button>
 </Box>
-
+:
+null
+}
 
                 </form>
                 </Box>

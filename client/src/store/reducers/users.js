@@ -12,9 +12,11 @@ let DEFAULT_USER_STATE ={
         firstname:null,
         lastname:null,
         project:null,
+        jobtitle:null,
         role:null,
         verified:null,
         firstlogin:null,
+        passwordresetted:null, 
     },
     auth:null
 }

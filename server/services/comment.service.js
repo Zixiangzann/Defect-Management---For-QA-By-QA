@@ -9,7 +9,7 @@ export const addComment = async (defectid, body, user) => {
     try {
         //If it is a "user" account, account must be assigned to the project to comment on the defect.
         const defectProject = (await Defect.find({ defectid: defectid }).select('project -_id').exec())[0].project;
-        if (user.role !== 'admin' && !user.project.includes(defectProject)) {
+        if ((user.role !== 'admin' || user.role !=='owner') && !user.project.includes(defectProject)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to add comment');
         }
 
@@ -48,7 +48,7 @@ export const paginateComment = async (defectid,body, user) => {
     try {
         // //If it is a "user" account, account must be assigned to the project view the comment.
         const defectProject = (await Defect.find({ defectid: defectid }).select('project -_id').exec())[0].project;
-        if (user.role !== 'admin' && !user.project.includes(defectProject)) {
+        if ((user.role !== 'admin' || user.role !== 'owner') && !user.project.includes(defectProject)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view comment');
         }
 

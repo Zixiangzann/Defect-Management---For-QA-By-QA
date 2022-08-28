@@ -144,7 +144,7 @@ const SideDrawer = ({ users }) => {
                                 <ListItemText primary="Generate reports" />
                             </ListItem>
 
-                            {users.data.role === 'admin' ?
+                            {users.data.role === 'admin' || users.data.role === 'owner'?
                                 <ListItem
                                     key="sideNavigation-UserManagement"
                                     button

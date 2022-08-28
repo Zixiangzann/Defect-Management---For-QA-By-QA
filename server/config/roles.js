@@ -9,6 +9,14 @@ const allRights = {
 }
 
 let grantsObject = {
+    owner:{
+        profile:allRights,
+        defects:allRights,
+        admin: allRights,
+        assignee:allRights,
+        projects:allRights,
+        comments:allRights,
+    },
     admin: {
         profile:allRights,
         defects:allRights,

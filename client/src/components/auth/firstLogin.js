@@ -11,7 +11,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
-import { Tooltip } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import { firstLoginValidation } from "../../store/actions/users";
 
 
@@ -79,11 +79,16 @@ const FirstLogin = () => {
         <Box mt={5} >
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
                 {/* change welcome message to company name */}
+                {users.data.passwordresetted ?
+                <Typography variant="h3">An admin have recently resetted your password</Typography>
+                :
                 <Typography variant="h3">Welcome to Defect Management! (ForQAByQA)</Typography>
+            }
+                <Typography sx={{ ml: 1, mt: 5, mb: 1, flexBasis: '100%' }}>Please check your details and change password to proceed</Typography>
+                <Typography sx={{ ml: 1, mt: 1, mb: 1, flexBasis: '100%' }}>You may choose to generate a new password or create your own password</Typography>
+                <Typography sx={{ ml: 1, mt: 1, mb: 5, flexBasis: '100%', color: 'red' }}>Inform your admin immediately if any of the details are incorrect</Typography>
 
-                <Typography sx={{ ml: 1, mt: 5, mb: 1, flexBasis: '60%' }}>Please check your details and change password to proceed</Typography>
-                <Typography sx={{ ml: 1, mt: 1, mb: 1, flexBasis: '60%' }}>You may choose to generate a new password or create your own password</Typography>
-                <Typography sx={{ ml: 1, mt: 1, mb: 5, flexBasis: '60%', color: 'red' }}>Inform your admin immediately if any of the details is incorrect</Typography>
+                <Typography flexBasis={'100%'} mb={2} ml={2}>Check your account details</Typography>
 
                 <FormControl
                     id='addUserFirstNameForm'
@@ -134,6 +139,23 @@ const FirstLogin = () => {
                     />
                 </FormControl>
 
+                <FormControl
+                    id='addUserJobTitleForm'
+                    sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor='jobtitle'
+                    >Job Title</InputLabel>
+                    <OutlinedInput
+                        required
+                        id="jobtitle"
+                        text="text"
+                        value={users.data.jobtitle}
+                        label="Job Title"
+                        fullWidth
+                        disabled
+                    />
+                </FormControl>
+                
+
                 <FormControl id='addUserEmailForm' sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor="email"
                     >Email</InputLabel>
@@ -148,8 +170,28 @@ const FirstLogin = () => {
                     />
                 </FormControl>
 
-                <FormControl id='addUserEmailForm' sx={{ m: 1, flexBasis: '45%' }}>
-                    <InputLabel htmlFor="email"
+                <Box flexBasis={'100%'} borderBottom={'1px solid black'} mt={2}></Box>
+                <Typography mt={3} ml={2} mb={2} mr={2}>Reset your password</Typography> 
+                <Tooltip title=
+                    {
+                    <div>
+                    Password must consist of: <br></br>
+                    - At least one upper case letter <br></br>
+                    - At least one lower case letter <br></br>
+                    - At least one digit <br></br>
+                    - At least one special character <br></br>
+                    - Minimum eight in length 
+                    </div>}
+                    placement="left"
+                    sx={{mt:3}}
+                    >
+                <InfoIcon/>
+                </Tooltip>
+
+                <Box flexBasis={'100%'}></Box>
+
+                <FormControl id='addUserOldPasswordForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <InputLabel htmlFor="oldPassword"
                     >Old Password</InputLabel>
                     <OutlinedInput
                         required
@@ -183,21 +225,7 @@ const FirstLogin = () => {
                     />
                     <FormHelperText error>{newPasswordCheck ? "Password did not meet criteria" : null}</FormHelperText>
                 </FormControl>
-                <Tooltip title=
-                    {
-                    <div>
-                    Password must consist of: <br></br>
-                    - At least one upper case letter <br></br>
-                    - At least one lower case letter <br></br>
-                    - At least one digit <br></br>
-                    - At least one special character <br></br>
-                    - Minimum eight in length 
-                    </div>}
-                    placement="left"
-                    sx={{mt:3}}
-                    >
-                <InfoIcon/>
-                </Tooltip>
+                
 
                 <Button
                     id="addUserGeneratePasswordBtn"

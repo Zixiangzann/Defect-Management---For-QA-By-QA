@@ -68,10 +68,19 @@
     #addUserUserNameForm{
         flex-basis: 100%;
     }
+
+    #addUserJobTitleForm{
+        flex-basis: 100%;
+    }
+
     #addUserEmailForm{
         flex-basis: 100%;
     }
     #addUserPasswordForm{
+        flex-basis: 100%;
+    }
+
+    #addUserOldPasswordForm{
         flex-basis: 100%;
     }
 
