@@ -19,118 +19,135 @@ const userSchema = mongoose.Schema({
         }
     },
     username: {
-      type:String,
-      required:true  
+        type: String,
+        required: true
     },
     password: {
         type: String,
         required: true,
         minlength: 8
     },
-    role:{
-        type:String,
+    role: {
+        type: String,
         required: true,
-        enum:['user','admin','owner'],
-        default: 'user' 
+        enum: ['user', 'admin', 'owner'],
+        default: 'user'
     },
-    project:{
-        type:[]
+    project: {
+        type: []
     },
-    firstname:{
-        type:String,
-        maxLength: 100
-    },
-    lastname:{
-        type:String,
-        maxLength: 100
-    },
-    verified:{
-        type: Boolean,
-        default: false
-    },
-    firstlogin:{
-        type: Boolean,
-        default: true
-    },
-    passwordresetted:{
-        type: Boolean,
-        default: false
-    },
-    jobtitle:{
+    firstname: {
         type: String,
         maxLength: 100
     },
-    permission:{
-        type:[{
-            addDefect:{
+    lastname: {
+        type: String,
+        maxLength: 100
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
+    firstlogin: {
+        type: Boolean,
+        default: true
+    },
+    passwordresetted: {
+        type: Boolean,
+        default: false
+    },
+    jobtitle: {
+        type: String,
+        maxLength: 100
+    },
+    permission: {
+        type: [{
+            addDefect: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            deleteDefect:{
+            editOwnDefect: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            editDefect:{
+            addComment: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            viewAllDefects:{
+            editOwnComment: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            addComment:{
+            deleteOwnComment: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            deleteComment:{
+            viewAllDefect: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            changeUserDetails:{
+            editAllDefect: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            resetUserPassword:{
+            deleteAllDefect: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            addUser:{
+            editAllComment: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            disableUser:{
+            deleteAllComment: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            deleteUser:{
+            addUser: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            assignProject:{
+            disableUser: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            addProject:{
+            deleteUser: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            deleteProject:{
+            changeUserDetails: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            addComponent:{
+            resetUserPassword: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            deleteComponent:{
+            addProject: {
                 type: Boolean,
-                default:false
-            }
+                default: false
+            },
+            assignProject: {
+                type: Boolean,
+                default: false
+            },
+            deleteProject: {
+                type: Boolean,
+                default: false
+            },
+            addComponent: {
+                type: Boolean,
+                default: false
+            },
+            deleteComponent: {
+                type: Boolean,
+                default: false
+            },
+
         }]
     },
-    disabled:{
+    disabled: {
         type: Boolean,
-        default:false
+        default: false
     },
     date: {
         type: Date,
@@ -138,45 +155,45 @@ const userSchema = mongoose.Schema({
     }
 })
 
-userSchema.pre('save',async function(next){
+userSchema.pre('save', async function (next) {
     let user = this;
 
-    if(user.isModified('password')){
+    if (user.isModified('password')) {
         const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(user.password,salt);
+        const hash = await bcrypt.hash(user.password, salt);
         user.password = hash;
     }
     next();
 
 })
 
-userSchema.statics.emailTaken = async function(email){
-    const user = await this.findOne({email});
+userSchema.statics.emailTaken = async function (email) {
+    const user = await this.findOne({ email });
     return !!user;
 }
 
-userSchema.statics.usernameTaken = async function(username){
-    const user = await this.findOne({"username":username.toLowerCase()})
+userSchema.statics.usernameTaken = async function (username) {
+    const user = await this.findOne({ "username": username.toLowerCase() })
     return !!user;
 }
 
-userSchema.methods.generateAuthToken = function(){
+userSchema.methods.generateAuthToken = function () {
     let user = this;
-    const userObj = { sub: user._id.toHexString(),email: user.email};
-    const token = jwt.sign(userObj,process.env.DB_SECRET,{ expiresIn:'1d'})
+    const userObj = { sub: user._id.toHexString(), email: user.email };
+    const token = jwt.sign(userObj, process.env.DB_SECRET, { expiresIn: '1d' })
     return token;
 }
 
-userSchema.methods.comparePassword = async function(candidatePassword){
+userSchema.methods.comparePassword = async function (candidatePassword) {
     let user = this;
-    const match = await bcrypt.compare(candidatePassword,user.password);
+    const match = await bcrypt.compare(candidatePassword, user.password);
     return match;
 }
 
-userSchema.methods.generateRegisterToken = function(){
+userSchema.methods.generateRegisterToken = function () {
     let user = this;
-    const userObj = { sub: user._id.toHexString()};
-    const token = jwt.sign(userObj,process.env.DB_SECRET,{ expiresIn:'1d'})
+    const userObj = { sub: user._id.toHexString() };
+    const token = jwt.sign(userObj, process.env.DB_SECRET, { expiresIn: '1d' })
     return token;
 }
 

@@ -1,7 +1,7 @@
 //lib
 import Moment from 'react-moment'
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 //comp
@@ -41,6 +41,7 @@ const PaginateComponent = ({
     sort
 }) => {
 
+    const users = useSelector(state => state.users)
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [toRemove, setToRemove] = useState(null);
 
@@ -105,6 +106,52 @@ const PaginateComponent = ({
         navigate(`/defect/view/${id}`)
     }
 
+    const EditMenuComponent = ({defect}) => {
+
+
+        if((users.data.permission[0].editOwnDefect && defect.reporter === users.data.email) || users.data.permission[0].editAllDefect){
+            return(
+                <MenuItem
+                onClick={() => handleEdit(defect.defectid)}>
+                    <Tooltip title="Edit">
+                        <Button
+                            sx={{ minHeight: 0, minWidth: 0, padding: 0.5, color: 'darkorange',mr:1  }}
+                            
+                        >
+                            <ModeEditIcon />
+                        </Button>
+                    </Tooltip>
+                    Edit
+                </MenuItem>
+            )
+        }
+ 
+        return null
+    }
+
+    const DeleteMenuComponent = ({defect}) =>{
+        if(users.data.permission[0].deleteAllDefect){
+            return(
+            <MenuItem
+            onClick={() => {
+                setOpenModal(true)
+                setToRemove(defect.defectid)
+            }}>
+                <Tooltip title="Delete">
+                    <Button
+                        sx={{ minHeight: 0, minWidth: 0, padding: 0.5,mr:1  }}
+
+                    >
+                        <DeleteForeverIcon color='error' />
+                    </Button>
+                </Tooltip>
+                Delete
+            </MenuItem>
+            )
+        }
+        return null
+    }
+
 //Defect Menu
 
     const [defectItem, setDefectItem] = useState({})
@@ -134,34 +181,13 @@ const PaginateComponent = ({
                         </Tooltip>
                         View</MenuItem>
 
-                    <MenuItem
-                    onClick={() => handleEdit(defect.defectid)}>
-                        <Tooltip title="Edit">
-                            <Button
-                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5, color: 'darkorange',mr:1  }}
-                                
-                            >
-                                <ModeEditIcon />
-                            </Button>
-                        </Tooltip>
-                        Edit
-                    </MenuItem>
+                        <EditMenuComponent 
+                        defect={defect}
+                        />
 
-                    <MenuItem
-                    onClick={() => {
-                        setOpenModal(true)
-                        setToRemove(defect.defectid)
-                    }}>
-                        <Tooltip title="Delete">
-                            <Button
-                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5,mr:1  }}
-
-                            >
-                                <DeleteForeverIcon color='error' />
-                            </Button>
-                        </Tooltip>
-                        Delete
-                    </MenuItem>
+                        <DeleteMenuComponent
+                        defect={defect}
+                        />
 
                 </Menu>
             </>

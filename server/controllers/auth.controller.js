@@ -22,7 +22,8 @@ const authController = {
                     jobtitle:user.jobtitle,
                     verified:user.verified,
                     firstlogin:user.firstlogin,
-                    passwordresetted: user.passwordresetted
+                    passwordresetted: user.passwordresetted,
+                    permission: user.permission
                 }
                 ,token:token })
         } catch (error) {
@@ -49,7 +50,8 @@ const authController = {
                     jobtitle:validatedUser.jobtitle,
                     verified:validatedUser.verified,
                     firstlogin:validatedUser.firstlogin,
-                    passwordresetted: validatedUser.passwordresetted
+                    passwordresetted: validatedUser.passwordresetted,
+                    permission:validatedUser.permission
                 }
                 ,token:token })
                 

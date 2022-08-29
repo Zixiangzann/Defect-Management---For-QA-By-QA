@@ -42,7 +42,7 @@ const defectController ={
     async deleteDefectById(req,res,next){
         try {
             const defectId = req.params.defectId;
-            await defectService.deleteDefectById(defectId);
+            await defectService.deleteDefectById(defectId,req.user);
             res.status(httpStatus.OK).json({[defectId]:'deleted'});
         } catch (error) {
             next(error);

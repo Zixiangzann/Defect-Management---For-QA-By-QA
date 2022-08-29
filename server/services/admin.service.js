@@ -6,6 +6,7 @@ import 'dotenv/config';
 import { userService } from "./index.js";
 import Project from "../models/project.js";
 import bcrypt from 'bcrypt'
+import Defect from "../models/defect.js";
 
 export const addUser = async (req) => {
     try {
@@ -16,34 +17,53 @@ export const addUser = async (req) => {
         }
 
         // only owner allowed to add admin account
-        if (req.user.role !== 'owner') {
+        if (req.user.role !== 'owner' && req.body.userDetails.role === 'admin') {
             throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
         }
 
+        //non owner account cannot create account with these permission
+        if (req.user.role !== 'owner' || (
+            req.body.permission.viewAllDefects ||
+            req.body.permission.deleteAllDefect ||
+            req.body.permission.editAllComment ||
+            req.body.permission.deleteAllComment ||
+            req.body.permission.addUser ||
+            req.body.permission.disableUser ||
+            req.body.permission.deleteUser ||
+            req.body.permission.changeUserDetails ||
+            req.body.permission.resetUserPassword ||
+            req.body.permission.addProject ||
+            req.body.permission.assignProject ||
+            req.body.permission.deleteProject ||
+            req.body.permission.addComponent ||
+            req.body.permission.deleteComponent)) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to assign these permission');
+        }
 
         //if email already exist
-        if (await User.emailTaken(req.body.email.toLowerCase())) {
+        if (await User.emailTaken(req.body.userDetails.email.toLowerCase())) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry email taken');
         }
 
         //if username already exist
-        if (await User.usernameTaken(req.body.username.toLowerCase())) {
+        if (await User.usernameTaken(req.body.userDetails.username.toLowerCase())) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry username taken');
         }
 
         const regExp = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
-        if (!regExp.test(req.body.password)) {
+        if (!regExp.test(req.body.userDetails.password)) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'did not meet password criteria');
         }
 
         const user = new User({
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            username: req.body.username,
-            email: req.body.email,
-            password: req.body.password,
-            role: req.body.role,
-            jobtitle: req.body.jobtitle
+            firstname: req.body.userDetails.firstname,
+            lastname: req.body.userDetails.lastname,
+            username: req.body.userDetails.username,
+            email: req.body.userDetails.email,
+            password: req.body.userDetails.password,
+            role: req.body.userDetails.role,
+            jobtitle: req.body.userDetails.jobtitle,
+            permission: req.body.permission
         });
 
         await user.save();
@@ -108,7 +128,7 @@ export const updateUserFirstName = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found
@@ -136,7 +156,7 @@ export const updateUserLastName = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found
@@ -155,7 +175,6 @@ export const updateUserUserName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-
     const adminEmail = req.user.email
     const adminPassword = req.body.adminPassword
     //user details
@@ -165,7 +184,7 @@ export const updateUserUserName = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found
@@ -197,20 +216,23 @@ export const updateUserEmail = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
+    //need to update in User(email),Project(assignee),Defects(Reporter)
     const updatedUser = User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
     const updatedUserProject = Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
+    const updatedUserDefect = Defect.updateMany({"reporter": userEmail},{$set:{reporter: userUpdatedEmail}})
 
-    // join both json and return as response
+    // join the json and return as response
     const result = new Array();
     result.push(await updatedUser)
     result.push(await updatedUserProject)
+    result.push(await updatedUserDefect)
 
     return result;
 
@@ -232,7 +254,7 @@ export const updateUserJobTitle = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found
@@ -260,7 +282,7 @@ export const resetUserPassword = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found
@@ -312,7 +334,7 @@ export const changeUserRole = async (req) => {
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password, changes will not be made');
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
     //check if user email is found

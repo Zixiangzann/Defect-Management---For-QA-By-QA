@@ -26,6 +26,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 const Defect = () => {
     const defects = useSelector(state => state.defects)
+    const users = useSelector(state => state.users)
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -44,14 +45,18 @@ const Defect = () => {
             <Box display={'flex'} justifyContent={'flex-end'} flexDirection={'row'} flexWrap={'wrap'}>
 
 
+
                 <Button
                     variant="contained"
                     onClick={() => navigate('/defect/create')}
                     sx={{ backgroundColor: 'darkslateblue', color: 'cornsilk', marginBottom: '5px' }}
+                    disabled={!users.data.permission[0].addDefect}
                 >
                     Create New Defect
                 </Button>
                 <div className='break' style={{ flexBasis: '100%' }}></div>
+
+
 
                 <Button
                     variant='outlined'

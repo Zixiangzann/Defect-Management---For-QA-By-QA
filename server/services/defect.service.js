@@ -8,6 +8,10 @@ import DefectCount from "../models/count.js";
 export const createDefect = async (body,user) => {
         try {
 
+            if (!user.permission[0].addDefect) {
+                throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to perform action');
+            }
+
             const checkIfExist = await DefectCount.findOne({}).exec()
 
             if(checkIfExist === null){
@@ -59,7 +63,7 @@ export const updateAttachment= async (defectId,user,body) => {
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
 
         const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
-        if (!user.permission[0].viewAllDefects && !user.project.includes(defectProject)) {
+        if (!user.permission[0].viewAllDefect && !user.project.includes(defectProject)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
         }
 
@@ -84,9 +88,9 @@ export const getDefectById = async (defectId, user) => {
         const defect = await Defect.findOne({ defectid: defectId }).exec();
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
 
-        //If it is a "user" account, the account need to be assigned to the project in order to view the defect.
+        //If account does not have "viewAllDefect" permission, the account need to be assigned to the project in order to view the defect.
         const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
-        if (!user.permission[0].viewAllDefects && !user.project.includes(defectProject)) {
+        if (!user.permission[0].viewAllDefect && !user.project.includes(defectProject)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view defect');
         }
         return defect;
@@ -101,7 +105,16 @@ export const updateDefectById = async (defectId, user, body) => {
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
 
         const defectProject = (await Defect.find({defectid:defectId }).select('project -_id').exec())[0].project;
-        if (!user.permission[0].viewAllDefects && !user.project.includes(defectProject)) {
+
+        if (!user.permission[0].editOwnDefect && !user.permission[0].editAllDefect){
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
+        }
+
+        if (!user.permission[0].viewAllDefect && !user.project.includes(defectProject)) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view defect');
+        }
+
+        if (user.permission[0].editOwnDefect && defect.reporter !== user.email) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
         }
 
@@ -127,11 +140,20 @@ export const updateDefectById = async (defectId, user, body) => {
     }
 }
 
-export const deleteDefectById = async (defectId) => {
+export const deleteDefectById = async (defectId,user) => {
     try {
+
+        if (!user.permission[0].deleteAllDefect) {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to delete defect');
+        }
+
         const defect = await Defect.findOne({ defectid: defectId }).exec();
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
         Defect.findOneAndDelete({ defectid: defectId }).exec();
+
+
+        //need to also delete attachment in firebase
+
         return defect;
     } catch (error) {
         throw error
@@ -147,7 +169,7 @@ export const getMoreDefects = async (req, user) => {
     const project = req.body.project || 'all';
     const skip = req.body.skip || 0;
 
-    if (!req.user.permission[0].viewAllDefects && !user.project.includes(project)) {
+    if (!req.user.permission[0].viewAllDefect && !user.project.includes(project)) {
         throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
     }
 
@@ -193,7 +215,7 @@ export const paginateDefectList = async (req) => {
     let aggQuery;
 
     try {
-        if (!req.user.permission[0].viewAllDefects) {
+        if (!req.user.permission[0].viewAllDefect) {
             aggQuery = Defect.aggregate(
                 [{$match:{project:{$in:await userProject},title:{$regex: search, $options: 'i'}}},
                     {$sort:{[sortby]:order}}
@@ -201,7 +223,7 @@ export const paginateDefectList = async (req) => {
                 )
         }
 
-        if(req.user.permission[0].viewAllDefects){
+        if(req.user.permission[0].viewAllDefect){
             aggQuery = Defect.aggregate(
                 [{$match:{title:{$regex: search,$options:'i'}}},
                     {$sort:{[sortby]:order}}
@@ -232,16 +254,16 @@ export const getAllAssignee = async (title) => {
 }
 //Get details for creating defects
 //To get available projects.
-//Only account with viewAllDefects can see all projects defects.
+//Only account with viewAllDefect can see all projects defects.
 //user or any other role can only see project that is assigned to them.
 export const getAllProjects = async (user) => {
     try {
-        if (!user.permission[0].viewAllDefects) {
+        if (!user.permission[0].viewAllDefect) {
             const project = Project.find({ assignee: user.email }).sort([['title', 'desc']])
             return project
         }
 
-        if (user.permission[0].viewAllDefects) {
+        if (user.permission[0].viewAllDefect) {
             const project = Project.find({}).sort([['title', 'desc']])
             return project
         }
@@ -276,7 +298,7 @@ export const filterDefectList = async (req, user) => {
         const server = req.body.server || '';
         const search = req.body.search || '(.*?)';
 
-        if (!user.permission[0].viewAllDefects && !user.project.includes(project)) {
+        if (!user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 
@@ -323,7 +345,7 @@ export const countSeverity = async (req, user) => {
     const project = req.body.project || ''
 
     try {
-        if (!req.user.permission[0].viewAllDefects && !user.project.includes(project)) {
+        if (!req.user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 
@@ -347,7 +369,7 @@ export const countStatus = async (req, user) => {
     const project = req.body.project || ''
 
     try {
-        if (!user.permission[0].viewAllDefects && !user.project.includes(project)) {
+        if (!user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 
@@ -370,7 +392,7 @@ export const countServer = async (req, user) => {
     const project = req.body.project || ''
 
     try {
-        if (!user.permission[0].viewAllDefects && !user.project.includes(project)) {
+        if (!user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 
@@ -394,7 +416,7 @@ export const countIssueType = async (req, user) => {
     const project = req.body.project || ''
 
     try {
-        if (!req.user.permission[0].viewAllDefects && !user.project.includes(project)) {
+        if (!req.user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 
@@ -417,7 +439,7 @@ export const countComponents = async (req, user) => {
     const project = req.body.project || ''
 
     try {
-        if (!req.user.permission[0].viewAllDefects && !user.project.includes(project)) {
+        if (!req.user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 

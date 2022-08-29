@@ -16,7 +16,8 @@ let DEFAULT_USER_STATE ={
         role:null,
         verified:null,
         firstlogin:null,
-        passwordresetted:null, 
+        passwordresetted:null,
+        permission:[{}], 
     },
     auth:null
 }

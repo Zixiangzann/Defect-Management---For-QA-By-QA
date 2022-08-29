@@ -1,5 +1,5 @@
 //comp
-import { useState, setState } from 'react';
+import { useState,useEffect } from 'react';
 
 //lib
 import ModalComponent from '../../../utils/modal/modal';
@@ -26,33 +26,48 @@ import FormGroup from '@mui/material/FormGroup';
 
 const AddUser = () => {
 
-    const [firstname, setFirstName] = useState('')
-    const [lastname, setLastName] = useState('')
-    const [username, setUserName] = useState('')
-    const [email, setEmail] = useState('');
     const [emailCheck, setEmailCheck] = useState(false);
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('user');
-    const [jobtitle, setJobTitle] = useState('');
+
+    const [userDetails, setUserDetails] = useState({
+        firstname:'',
+        lastname:'',
+        username:'',
+        email:'',
+        password:'',
+        role:'user',
+        jobtitle:''
+    })
+
+    const handleUserDetails = (event) =>{
+        const value = event.target.value
+        setUserDetails({
+            ...userDetails,
+            [event.target.name]: value
+        })
+    }
 
     //Permission state
-
     const [permission, setPermission] = useState({
-        addDefect: false,
-        editDefect: false,
-        addComment: false,
-        deleteComment: false,
-        viewAllDefects: false,
-        deleteDefect: false,
-        addUser: false,
-        disableUser: false,
-        changeUserDetails: false,
-        resetUserPassword: false,
-        addProject: false,
-        assignProject: false,
-        deleteProject: false,
-        addComponent: false,
-        deleteComponent: false
+        addDefect:true,
+        editOwnDefect:true,
+        addComment:true,
+        editOwnComment:true,
+        deleteOwnComment:true,
+        viewAllDefect:false,
+        editAllDefect:false,
+        deleteAllDefect:false,
+        editAllComment:false,
+        deleteAllComment:false,
+        addUser:false,
+        disableUser:false,
+        deleteUser:false,
+        changeUserDetails:false,
+        resetUserPassword:false,
+        addProject:false,
+        assignProject:false,
+        deleteProject:false,
+        addComponent:false,
+        deleteComponent:false
     })
 
     const handlePermission = (event) => {
@@ -62,9 +77,7 @@ const AddUser = () => {
             [event.target.name]: value
         });
 
-        console.log(permission)
     }
-
 
     const dispatch = useDispatch();
 
@@ -72,37 +85,17 @@ const AddUser = () => {
     const [open, setOpen] = useState(false);
     const [openModal, setOpenModal] = useState(false);
 
-    const handleFirstName = (event) => {
-        setFirstName(event.target.value)
-    }
-
-    const handleLastName = (event) => {
-        setLastName(event.target.value)
-    }
-
-    const handleUserName = (event) => {
-        setUserName(event.target.value)
-    }
-
-
-    const handleEmail = (event) => {
-        setEmail(event.target.value);
-    }
 
     const handleGeneratePassword = () => {
-        setPassword(createPassword());
+        const password = createPassword();
+        setUserDetails({
+            ...userDetails,    
+            password
+        })
     }
 
-    const handleEmailCheck = (event) => {
-        setEmailCheck(!validator.isEmail(email));
-    }
-
-    const handleChangeRole = (event) => {
-        setRole(event.target.value);
-    }
-
-    const handleJobTitle = (event) => {
-        setJobTitle(event.target.value)
+    const handleEmailCheck = () => {
+        setEmailCheck(!validator.isEmail(userDetails.email));
     }
 
     const admin = useSelector(state => state.admin)
@@ -126,20 +119,15 @@ const AddUser = () => {
     }
 
     const handleModalConfirm = () => {
-        navigator.clipboard.writeText(`Email: ${email} \n Password: ${password}`)
+        navigator.clipboard.writeText(`Email: ${userDetails.email} \n Password: ${userDetails.password}`)
         showToast('SUCCESS', 'Copied')
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
         dispatch(addUser({
-            username,
-            firstname,
-            lastname,
-            email,
-            password,
-            role,
-            jobtitle
+            userDetails,
+            permission
         }))
             .unwrap()
             .then(() => setOpenModal(true))
@@ -160,11 +148,12 @@ const AddUser = () => {
                     >First Name</InputLabel>
                     <OutlinedInput
                         required
+                        name="firstname"
                         id="firstname"
                         text="text"
-                        value={firstname}
+                        value={userDetails.firstname}
                         label="First Name"
-                        onChange={handleFirstName}
+                        onChange={handleUserDetails}
                         fullWidth
                     />
                 </FormControl>
@@ -176,11 +165,12 @@ const AddUser = () => {
                     >Last Name</InputLabel>
                     <OutlinedInput
                         required
+                        name="lastname"
                         id="lastname"
                         text="text"
-                        value={lastname}
+                        value={userDetails.lastname}
                         label="Last Name"
-                        onChange={handleLastName}
+                        onChange={handleUserDetails}
                         fullWidth
                     />
                 </FormControl>
@@ -192,14 +182,15 @@ const AddUser = () => {
                     >Username</InputLabel>
                     <OutlinedInput
                         required
+                        name="username"
                         id="username"
                         text="text"
-                        value={username}
+                        value={userDetails.username}
                         label="Username"
-                        onChange={handleUserName}
+                        onChange={handleUserDetails}
                         fullWidth
                         onBlur={(e) => {
-                            dispatch(checkUsernameExist({ username }))
+                            dispatch(checkUsernameExist({ username:userDetails.username }))
                         }}
                     />
                     <FormHelperText error>{admin.error.usernameTaken ? admin.error.usernameTaken : null}</FormHelperText>
@@ -211,15 +202,16 @@ const AddUser = () => {
                     >Email</InputLabel>
                     <OutlinedInput
                         required
+                        name="email"
                         id="email"
                         type='text'
                         error={emailCheck}
-                        value={email}
+                        value={userDetails.email}
                         label="Email"
-                        onChange={(e) => handleEmail(e)}
+                        onChange={handleUserDetails}
                         onBlur={(e) => {
                             handleEmailCheck(e)
-                            dispatch(checkEmailExist({ email }))
+                            dispatch(checkEmailExist({ email:userDetails.email }))
                         }}
                         fullWidth
                     />
@@ -235,12 +227,13 @@ const AddUser = () => {
                     <InputLabel htmlFor="jobtitle"
                     >Job Title</InputLabel>
                     <OutlinedInput
+                        name="jobtitle"
                         id="jobtitle"
                         type='text'
-                        value={jobtitle}
+                        value={userDetails.jobtitle}
                         label="Job Title"
                         fullWidth
-                        onChange={handleJobTitle}
+                        onChange={handleUserDetails}
                     />
                 </FormControl>
 
@@ -251,9 +244,10 @@ const AddUser = () => {
                     <InputLabel htmlFor="password"
                     >Password</InputLabel>
                     <OutlinedInput
+                        name="password"
                         id="password"
                         type='text'
-                        value={password}
+                        value={userDetails.password}
                         label="Password"
                         fullWidth
                         disabled
@@ -275,16 +269,18 @@ const AddUser = () => {
                         row
                         defaultValue="user">
                         <FormControlLabel
+                            name='role'
                             value='user'
                             control={<Radio />}
                             label='User'
-                            onChange={handleChangeRole} />
+                            onChange={handleUserDetails} />
 
                         <FormControlLabel
+                            name='role'
                             value='admin'
                             control={<Radio disabled={users.data.role === 'owner' ? false : true} />}
                             label='Admin'
-                            onChange={handleChangeRole}
+                            onChange={handleUserDetails}
                         />
                         {users.data.role === 'owner' ? null : <FormHelperText>Only Super Admin can create "Admin" account</FormHelperText>}
 
@@ -300,36 +296,47 @@ const AddUser = () => {
 
                 <Typography sx={{ flexBasis: '100%', mt: 2, mb: 2, fontSize: '1.2rem', fontWeight: '600' }}>Standard User</Typography>
 
-                <FormControlLabel name='addDefect' control={<Checkbox defaultChecked />} label="Add defect" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                <FormControlLabel name='editDefect' control={<Checkbox defaultChecked />} label="Edit defect" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                <FormControlLabel name='addComment' control={<Checkbox defaultChecked />} label="Add comment" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                <FormControlLabel name='deleteComment' control={<Checkbox defaultChecked />} label="Delete comment" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Defect management</Typography>
+                <FormControlLabel name='addDefect' control={<Checkbox defaultChecked />} label="Add Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='editOwnDefect' control={<Checkbox defaultChecked />} label="Edit Own Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='editAllDefect' control={<Checkbox defaultChecked/>} label="Edit All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Comment management</Typography>
+                <FormControlLabel name='addComment' control={<Checkbox defaultChecked />} label="Add Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='editOwnComment' control={<Checkbox defaultChecked />} label="Edit Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='deleteOwnComment' control={<Checkbox defaultChecked />} label="Delete Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
 
                 <Divider sx={{ flexBasis: '100%', borderBottomColor: 'black', mt: 5 }}></Divider>
 
                 {/* sensitive admin control, only some admin or owner should have these control */}
-                {users.data.role === 'owner' && role === 'admin' ?
+                {users.data.role === 'owner' && userDetails.role === 'admin' ?
                     <>
                         <Typography sx={{ flexBasis: '100%', mt: 2, fontSize: '1.2rem', fontWeight: '600' }}>Admin</Typography>
 
 
                         <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Defect management</Typography>
-                        <FormControlLabel name='viewAllDefects' control={<Checkbox />} label="View all defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='deleteDefect' control={<Checkbox />} label="Delete defect" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='viewAllDefect' control={<Checkbox />} label="View All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteAllDefect' control={<Checkbox />} label="Delete All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+
+                        <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Comment management</Typography>
+                        <FormControlLabel name='editAllComment' control={<Checkbox />} label="Edit All Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteAllComment' control={<Checkbox />} label="Delete All Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+
+
 
                         <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>User management</Typography>
-                        <FormControlLabel name='addUser' control={<Checkbox />} label="Add user" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='disableUser' control={<Checkbox />} label="Disable user" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='changeUserDetails' control={<Checkbox />} label="Change user details" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='resetUserPassword' control={<Checkbox />} label="Reset user password" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='addUser' control={<Checkbox />} label="Add Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='disableUser' control={<Checkbox />} label="Disable Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteUser' control={<Checkbox />} label="Delete Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='changeUserDetails' control={<Checkbox />} label="Change Users Details" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='resetUserPassword' control={<Checkbox />} label="Reset Users Password" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
 
 
                         <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Project management</Typography>
-                        <FormControlLabel name='addProject' control={<Checkbox />} label="Add project" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='assignProject' control={<Checkbox />} label="Assign project" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='deleteProject' control={<Checkbox />} label="Delete project" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='addComponent' control={<Checkbox />} label="Add component" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                        <FormControlLabel name='deleteComponent' control={<Checkbox />} label="Delete component" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='addProject' control={<Checkbox />} label="Add Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='assignProject' control={<Checkbox />} label="Assign Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteProject' control={<Checkbox />} label="Delete Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='addComponent' control={<Checkbox />} label="Add Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                        <FormControlLabel name='deleteComponent' control={<Checkbox />} label="Delete Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
 
                     </>
                     :
@@ -355,7 +362,7 @@ const AddUser = () => {
                 open={openModal}
                 setOpenModal={setOpenModal}
                 title="Account created"
-                description={`Email: ${email} \n Password: ${password} \n Role: ${role.toLocaleUpperCase()}`}
+                description={`Email: ${userDetails.email} \n Password: ${userDetails.password} \n Role: ${userDetails.role.toLocaleUpperCase()}`}
                 warn="Please copy and pass to the user, you will only see this password once"
                 handleModalConfirm={handleModalConfirm}
                 button1="Copy to Clipboard"

@@ -3,7 +3,7 @@ import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 import { storage } from '../../firebase';
-import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject } from "firebase/storage"
+import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject, listAll } from "firebase/storage"
 
 //Get details for creating defects
 //Get all available assignee of a project
@@ -221,6 +221,18 @@ export const deleteDefect = createAsyncThunk(
     async ({ defectId }, { dispatch }) => {
         try {
             const request = await axios.delete(`/api/defect/delete/${defectId}`, getAuthHeader());
+
+            const storageRef = ref(storage, `DefectID_${defectId}`)
+            const fileList = await listAll(storageRef)
+
+            for (let item of fileList.items) {
+                deleteObject(item).then(() => {
+                    console.log(`File deleted - ${item}`)
+                }).catch((error) => {
+                    console.log('Error deleting file')
+                })
+            }
+
             dispatch(successGlobal(<div>Defect deleted<br /> Defect ID: {defectId}</div>));
             return true
         } catch (error) {
