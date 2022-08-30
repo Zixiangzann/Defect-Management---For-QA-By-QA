@@ -9,6 +9,7 @@ import {auth} from '../middleware/auth.js'
 
 router.post('/adduser',auth('createAny','admin'), adminController.addUser)
 router.get('/allusers',auth('readAny','admin'),adminController.getAllUsers)
+router.get('/allusersemail',auth('readAny','admin'),adminController.getAllUsersEmail)
 router.patch('/changerole',auth('updateAny','admin'),adminController.changeRole)
 
 

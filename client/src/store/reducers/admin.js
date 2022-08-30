@@ -1,23 +1,40 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateUsername} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateUsername} from '../actions/admin'
 import { showToast } from '../../utils/tools';
+
+const initialState = () => ({
+    error:{
+        emailTaken: null,
+        usernameTaken:null,
+        userNotFound:null
+    },
+    userEmails:[],
+    userDetails:{},
+    userPermission:{}
+})
 
 export const adminSlice = createSlice({
     name:'admin',
-    initialState: {
-        error:{
-            emailTaken: null,
-            usernameTaken:null,
-            userNotFound:null
-        },
-        userDetails:{},
-        userPermission:{},
-    },reducers:{
-
+    initialState: initialState(),
+    reducers:{
+        resetState: (state, action) => {
+            state.userDetails = {}
+            state.permission = {}
+          },
+ 
     },
     extraReducers:(builder)=>{
         builder
+        .addCase(getAllUsersEmail.fulfilled,(state,action)=>{
+            const emails = [];
+            action.payload.data.map((e)=>{
+                emails.push(e.email)
+            })
+
+            state.userEmails = [...emails]
+
+        })
         .addCase(checkEmailExist.fulfilled,(state,action)=>{
             if(action.payload.message){
                 state.error.emailTaken = action.payload.message
@@ -80,4 +97,5 @@ export const adminSlice = createSlice({
     }
 })
 
+export const {resetState} = adminSlice.actions
 export default adminSlice.reducer;

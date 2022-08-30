@@ -3,6 +3,17 @@ import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 
+export const getAllUsersEmail = createAsyncThunk(
+    'admin/getAllUsersEmail',
+    async({})=> {
+        try {
+            const request = await axios.get('/api/admin/allusersemail',getAuthHeader())
+            return { data: request.data}
+        } catch (error) {
+            throw error;
+        }
+    })
+
 export const addUser = createAsyncThunk(
     'admin/addUser',
     async ({

@@ -8,8 +8,16 @@ import { updateUserJobTitle } from '../services/admin.service.js';
 const adminController = {
     async getAllUsers(req, res, next) {
         try {
-            const allUsers = await adminService.getAllUsers(req, req.user);
+            const allUsers = await adminService.getAllUsers(req);
             res.json(allUsers);
+        } catch (error) {
+            next(error);
+        }
+    },
+    async getAllUsersEmail(req,res,next){
+        try {
+            const allUsersEmail = await adminService.getAllUsersEmail(req);
+            res.json(allUsersEmail);
         } catch (error) {
             next(error);
         }

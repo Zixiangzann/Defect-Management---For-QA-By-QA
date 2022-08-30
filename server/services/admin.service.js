@@ -112,6 +112,7 @@ export const checkUsernameExist = async (body) => {
     }
 }
 
+
 export const updateUserFirstName = async (req) => {
 
     //check account permission
@@ -226,7 +227,7 @@ export const updateUserEmail = async (req) => {
     //need to update in User(email),Project(assignee),Defects(Reporter)
     const updatedUser = User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
     const updatedUserProject = Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
-    const updatedUserDefect = Defect.updateMany({"reporter": userEmail},{$set:{reporter: userUpdatedEmail}})
+    const updatedUserDefect = Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
 
     // join the json and return as response
     const result = new Array();
@@ -351,15 +352,33 @@ export const changeUserRole = async (req) => {
 
 }
 
-
-
+//TODO
 // disable user account
 // delete user account
+// update user permission
+// Assign user to project
 
+export const getAllUsersEmail = async (req) => {
+
+    // only system owner allowed to perform this action
+    if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+    }
+
+    try{
+        const users = User.find({},{"email":1,"_id":0})
+        if(!users){
+            throw new ApiError(httpStatus.NOT_FOUND, 'Unable to fetch users')
+        }
+        return users;
+    }catch (error) {
+        throw error
+    }
+}
 
 
 //might remove
-export const getAllUsers = async () => {
+export const getAllUsers = async (req) => {
 
     // only system owner allowed to perform this action
     if (req.user.role !== 'owner') {
