@@ -28,6 +28,7 @@ router.patch('/updateuser/email',auth('updateAny','admin'),adminController.updat
 router.patch('/updateuser/jobtitle',auth('updateAny','admin'),adminController.updateUserJobTitle)
 router.patch('/updateuser/resetpassword',auth('updateAny','admin'),adminController.resetUserPassword)
 router.patch('/updateuser/role',auth('updateAny','admin'),adminController.updateUserRole)
+router.patch('/updateuser/permission',auth('updateAny','admin'),adminController.updateUserPermission)
 
 
 

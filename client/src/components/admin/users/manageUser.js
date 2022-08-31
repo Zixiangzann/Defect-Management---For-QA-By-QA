@@ -15,7 +15,8 @@ import {
     updateEmail, 
     updateJobtitle, 
     resetUserPassword,
-    getAllUsersEmail } from '../../../store/actions/admin';
+    getAllUsersEmail, 
+    updateUserPermission} from '../../../store/actions/admin';
 import ManageUserResetPW from './manageUserResetPW';
 
 //MUI
@@ -215,6 +216,17 @@ const ManageUser = () => {
                         handleEditState("editJobtitle", false)
                     })
                 break;
+            case "confirmUpdatePermission":
+            dispatch(updateUserPermission({
+                adminPassword: modalInput,
+                userEmail: searchUser,
+                userNewPermission: permission
+            }))
+            .unwrap()
+            .then(()=>{
+                handleEditState("editPermission",false)
+            })    
+            break;    
             case "resetPassword":
                 //generate a new password
                 const adminPassword = modalInput
@@ -313,7 +325,9 @@ const ManageUser = () => {
                 setModalDescription(`You are about to change user's Job title\n\n From: "${userDetails.jobtitle}" \n To: "${jobtitle}"`)
                 setEditingField(fieldName);
                 break;
-
+            case "confirmPermission":
+                setModalDescription(`You are about to change user's Permission`)
+                setEditingField("confirmUpdatePermission");   
             default:
                 break;
         }
@@ -426,6 +440,8 @@ const ManageUser = () => {
                     users={users}
                     userPermission={userPermission}
                     handlePermission={handlePermission}
+                    handleEditState={handleEditState}
+                    handleEditConfirm={handleEditConfirm}
                 >
 
                 </ManageUserPermission>

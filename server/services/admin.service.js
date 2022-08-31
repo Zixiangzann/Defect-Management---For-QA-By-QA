@@ -23,7 +23,7 @@ export const addUser = async (req) => {
 
         //non owner account cannot create account with these permission
         if (req.user.role !== 'owner' || (
-            req.body.permission.viewAllDefects ||
+            req.body.permission.viewAllDefect ||
             req.body.permission.deleteAllDefect ||
             req.body.permission.editAllComment ||
             req.body.permission.deleteAllComment ||
@@ -38,6 +38,21 @@ export const addUser = async (req) => {
             req.body.permission.addComponent ||
             req.body.permission.deleteComponent)) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to assign these permission');
+        }
+
+
+        //Only owner account can give all type of permission 
+        if (req.user.role === 'owner') {
+            userNewPermission = req.body.permission
+        } else if (req.user.role === 'admin') {
+            userNewPermission = [{
+                addDefect: req.body.permission[0].addDefect,
+                editOwnDefect: req.body.permission[0].editOwnDefect,
+                editAllDefect: req.body.permission[0].editAllDefect,
+                addComment: req.body.permission[0].addComment,
+                editOwnComment: req.body.permission[0].editOwnComment,
+                deleteOwnComment: req.body.permission[0].deleteOwnComment
+            }]
         }
 
         //if email already exist
@@ -356,6 +371,54 @@ export const changeUserRole = async (req) => {
 // disable user account
 // delete user account
 // update user permission
+
+export const updateUserPermission = async (req) => {
+
+
+    const adminEmail = req.user.email
+    const adminPassword = req.body.adminPassword
+    const userEmail = req.body.userEmail
+    let userNewPermission
+
+    // only owner and admin allowed to change permission
+    if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+    }
+
+    //Only owner account can give all type of permission 
+    if (req.user.role === 'owner') {
+        userNewPermission = req.body.userNewPermission
+    } else if (req.user.role === 'admin') {
+        userNewPermission = [{
+            addDefect: req.body.userNewPermission[0].addDefect,
+            editOwnDefect: req.body.userNewPermission[0].editOwnDefect,
+            editAllDefect: req.body.userNewPermission[0].editAllDefect,
+            addComment: req.body.userNewPermission[0].addComment,
+            editOwnComment: req.body.userNewPermission[0].editOwnComment,
+            deleteOwnComment: req.body.userNewPermission[0].deleteOwnComment
+        }]
+    }
+
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+        { email: userEmail },
+        {
+            "$set": {
+                permission: userNewPermission
+            }
+        },
+        { new: true }
+    )
+
+    return updatedUser;
+
+}
+
 // Assign user to project
 
 export const getAllUsersEmail = async (req) => {
@@ -365,13 +428,13 @@ export const getAllUsersEmail = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    try{
-        const users = User.find({},{"email":1,"_id":0})
-        if(!users){
+    try {
+        const users = User.find({}, { "email": 1, "_id": 0 })
+        if (!users) {
             throw new ApiError(httpStatus.NOT_FOUND, 'Unable to fetch users')
         }
         return users;
-    }catch (error) {
+    } catch (error) {
         throw error
     }
 }

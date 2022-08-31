@@ -9,12 +9,13 @@ const ManageUserPermission = ({
     userDetails,
     users,
     userPermission,
-    handlePermission
+    handlePermission,
+    handleEditConfirm
 }) => {
 return(
     <Box flexBasis={'100%'}>
          {/* Change Account role and permission */}
-         {userDetails && users.data.role === 'owner' ?
+         {userDetails && (users.data.role === 'owner' || users.data.role === 'admin') ?
                     <Box flexBasis='100%'>
 
                         {/* Standard user control */}
@@ -74,7 +75,9 @@ return(
                         <Box display={'flex'} justifyContent={'flex-end'} flexBasis={'100%'}>
                         <Button
                         variant='contained'
-                        sx={{m:3,flexBasis:'25%'}}>
+                        sx={{m:3,flexBasis:'25%'}}
+                        onClick={(e) => handleEditConfirm("confirmPermission")}
+                        >
                             Update Permission</Button>
                         </Box>
 

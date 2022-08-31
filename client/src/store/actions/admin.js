@@ -226,3 +226,28 @@ export const resetUserPassword = createAsyncThunk(
 
     })
 
+    export const updateUserPermission = createAsyncThunk(
+        'admin/updateUserPermission',
+        async({
+            adminPassword,
+            userEmail,
+            userNewPermission
+        },{rejectWithValue}) => {
+            try {
+                const request = await axios.patch('/api/admin/updateuser/permission', {
+                    adminPassword,
+                    userEmail,
+                    userNewPermission
+                }, getAuthHeader())
+
+                console.log(userNewPermission)
+                return { data: request.data }
+    
+            } catch (error) {
+                if(!error.response){
+                    throw error
+                }
+                return rejectWithValue(error.response)   
+            }
+        })
+

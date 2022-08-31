@@ -141,6 +141,15 @@ const adminController = {
         } catch (error) {
             next(error)
         }
+    },
+
+    async updateUserPermission(req,res,next){
+        try {
+            const updatedUser = await adminService.updateUserPermission(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
     }
 
 }
