@@ -59,7 +59,7 @@ const AdminLayout = (props) => {
 
                 <BottomNavigation
                     id='adminBottomNavigation'
-                    sx={{ position: 'absolute', top: 'auto', bottom: '0', right: '0', left: '0', bgcolor: 'lavender', display: 'flex', justifyContent: 'space-around' }}
+                    sx={{ position: 'absolute', top: 'auto', bottom: '0', right: '0', left: '0', bgcolor: 'lavender', display: 'flex', justifyContent: 'space-around',zIndex:'1' }}
                     showLabels
                     value={value}
                 >

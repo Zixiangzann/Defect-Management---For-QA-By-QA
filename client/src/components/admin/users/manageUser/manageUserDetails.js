@@ -309,7 +309,9 @@ const ManageUserDetails = ({
 
                     />
                 </FormControl>
+                <Box sx={{ flexBasis: '100%', borderBottom: '1px solid black', mt: 5 }}></Box>
 </Box>
+
 :
 null
 }

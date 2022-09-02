@@ -36,7 +36,7 @@ const SideDrawer = ({ users }) => {
         <>
             <DehazeIcon className='drawer_btn' onClick={() => setState(true)} />
             <Drawer anchor={"right"} open={state} onClose={() => setState(false)}>
-                <Box sx={{ width: 300 }}>
+                <Box sx={{ width: 300 ,zIndex:'999999'}}>
                     <List>
 
 {/* still deciding if there should be any homepage for user that not logged in. Likely not  */}

@@ -390,12 +390,12 @@ export const updateUserPermission = async (req) => {
         userNewPermission = req.body.userNewPermission
     } else if (req.user.role === 'admin') {
         userNewPermission = [{
-            addDefect: req.body.userNewPermission[0].addDefect,
-            editOwnDefect: req.body.userNewPermission[0].editOwnDefect,
-            editAllDefect: req.body.userNewPermission[0].editAllDefect,
-            addComment: req.body.userNewPermission[0].addComment,
-            editOwnComment: req.body.userNewPermission[0].editOwnComment,
-            deleteOwnComment: req.body.userNewPermission[0].deleteOwnComment
+            addDefect: req.body.userNewPermission.addDefect,
+            editOwnDefect: req.body.userNewPermission.editOwnDefect,
+            editAllDefect: req.body.userNewPermission.editAllDefect,
+            addComment: req.body.userNewPermission.addComment,
+            editOwnComment: req.body.userNewPermission.editOwnComment,
+            deleteOwnComment: req.body.userNewPermission.deleteOwnComment
         }]
     }
 

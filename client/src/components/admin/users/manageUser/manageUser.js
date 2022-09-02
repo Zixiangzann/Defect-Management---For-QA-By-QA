@@ -1,22 +1,26 @@
 //comp
 import { useState, useEffect } from 'react';
+import ManageUserDetails from './manageUserDetails';
+import ManageUserPermission from './manageUserPermission';
+import ManageUserRole from './manageUserRole';
 
 //lib
-import ModalComponent from '../../../utils/modal/modal';
+import ModalComponent from '../../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
+import {
     addUser,
-    checkEmailExist, 
-    checkUsernameExist, 
-    getUserByEmail, 
-    updateFirstname, 
-    updateLastname, 
-    updateUsername, 
-    updateEmail, 
-    updateJobtitle, 
+    checkEmailExist,
+    checkUsernameExist,
+    getUserByEmail,
+    updateFirstname,
+    updateLastname,
+    updateUsername,
+    updateEmail,
+    updateJobtitle,
     resetUserPassword,
-    getAllUsersEmail, 
-    updateUserPermission} from '../../../store/actions/admin';
+    getAllUsersEmail,
+    updateUserPermission
+} from '../../../../store/actions/admin';
 import ManageUserResetPW from './manageUserResetPW';
 
 //MUI
@@ -26,14 +30,11 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
-import { showToast } from '../../../utils/tools';
+import { showToast } from '../../../../utils/tools';
 import Typography from '@mui/material/Typography';
 import { IconButton, InputAdornment, Menu, MenuItem, Select } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import ManageUserDetails from './manageUserDetails';
-import ManageUserPermission from './manageUserPermission';
-import ManageUserRole from './manageUserRole';
-import { resetState } from '../../../store/reducers/admin';
+import { resetState } from '../../../../store/reducers/admin';
 
 const ManageUser = () => {
 
@@ -108,11 +109,14 @@ const ManageUser = () => {
         setSearchUser(event.target.value)
     }
 
-    useEffect(()=>{
-        dispatch(getUserByEmail({
-            email: searchUser
-        }))
-    },[searchUser])
+
+    useEffect(() => {
+        if (searchUser !== "") {
+            dispatch(getUserByEmail({
+                email: searchUser
+            }))
+        }
+    }, [searchUser])
 
     //User Field handle
     const handleFirstName = (event) => {
@@ -217,16 +221,16 @@ const ManageUser = () => {
                     })
                 break;
             case "confirmUpdatePermission":
-            dispatch(updateUserPermission({
-                adminPassword: modalInput,
-                userEmail: searchUser,
-                userNewPermission: permission
-            }))
-            .unwrap()
-            .then(()=>{
-                handleEditState("editPermission",false)
-            })    
-            break;    
+                dispatch(updateUserPermission({
+                    adminPassword: modalInput,
+                    userEmail: searchUser,
+                    userNewPermission: permission
+                }))
+                    .unwrap()
+                    .then(() => {
+                        handleEditState("editPermission", false)
+                    })
+                break;
             case "resetPassword":
                 //generate a new password
                 const adminPassword = modalInput
@@ -325,9 +329,13 @@ const ManageUser = () => {
                 setModalDescription(`You are about to change user's Job title\n\n From: "${userDetails.jobtitle}" \n To: "${jobtitle}"`)
                 setEditingField(fieldName);
                 break;
+            case "confirmRole":
+                setModalDescription(`You are about to change user's Role \n\n From: "${userDetails.role}" \n To: "${role}"`)
+                setEditingField(fieldName);
+                break;
             case "confirmPermission":
                 setModalDescription(`You are about to change user's Permission`)
-                setEditingField("confirmUpdatePermission");   
+                setEditingField("confirmUpdatePermission");
             default:
                 break;
         }
@@ -375,21 +383,21 @@ const ManageUser = () => {
                     <Typography variant='h6' flexBasis={'100%'} mb={3}>Select User to begin</Typography>
                     :
                     null}
-                
+
                 <FormControl
                     id='searchUser'
                     sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor='searchUser'
                     >Select User</InputLabel>
                     <Select
-                    id="selectuser"
-                    value={searchUser}
-                    label="usersEmails"
-                    onChange={handleSelectUsers}
+                        id="selectuser"
+                        value={searchUser}
+                        label="usersEmails"
+                        onChange={handleSelectUsers}
                     >
-                    {admin.userEmails.map((email) => (
-                        <MenuItem key={email} value={email}>{email}</MenuItem>
-                    ))}    
+                        {admin.userEmails.map((email) => (
+                            <MenuItem key={email} value={email}>{email}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
 
@@ -424,12 +432,14 @@ const ManageUser = () => {
                     users={users}
                     handleResetPassword={handleResetPassword}
                 >
-
                 </ManageUserResetPW>
+
 
                 <ManageUserRole
                     userDetails={userDetails}
                     users={users}
+                    handleChangeRole={handleChangeRole}
+                    handleEditConfirm={handleEditConfirm}
                 >
 
                 </ManageUserRole>

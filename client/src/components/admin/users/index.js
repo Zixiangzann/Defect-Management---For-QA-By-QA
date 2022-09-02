@@ -1,9 +1,10 @@
 //comp
 import AddUser from './addUser';
-import ManageUser from './manageUser';
+import ManageUser from './manageUser/manageUser';
 
 //lib
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 //mui
 import Box from '@mui/material/Box';
@@ -23,11 +24,12 @@ import Button from '@mui/material/Button';
 const AdminUsersManagement = () => {
 
 const [activeTab, setActiveTab] = useState('User Management')
+const users = useSelector(state => state.users)
 
 return (
 
-    <Box sx={{ mt: '4rem', width: '100%' }}>
-        <nav style={{ backgroundColor: 'aliceblue' }}>
+    <Box sx={{ mt: '4rem', width: '100%'}}>
+        <nav style={{ backgroundColor: 'aliceblue'}}>
             <List sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <ListItem disablePadding>
                     <ListItemButton
@@ -52,6 +54,7 @@ return (
                 
                 <ListItem disablePadding>
                     <ListItemButton
+                        disabled={!users.data.permission[0].addUser}
                         onClick={() => setActiveTab('Add User')}>
                         <ListItemText
                             sx={{
