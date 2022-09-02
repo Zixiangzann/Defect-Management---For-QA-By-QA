@@ -19,7 +19,8 @@ import {
     updateJobtitle,
     resetUserPassword,
     getAllUsersEmail,
-    updateUserPermission
+    updateUserPermission,
+    updateRole
 } from '../../../../store/actions/admin';
 import ManageUserResetPW from './manageUserResetPW';
 
@@ -45,7 +46,7 @@ const ManageUser = () => {
     const dispatch = useDispatch();
     const admin = useSelector(state => state.admin)
     const users = useSelector(state => state.users)
-    const userDetails = useSelector(state => state.admin.userDetails[0])
+    const userDetails = useSelector(state => state.admin.userDetails)
     const userPermission = useSelector(state => state.admin.userPermission[0])
 
     //User Field state
@@ -70,12 +71,16 @@ const ManageUser = () => {
 
     //editing state
     const [editingField, setEditingField] = useState('')
-    const [editEnabled, setEditEnabled] = useState({
+
+    const defaultEditState = {
         editEmail: false,
         editFirstname: false,
         editJobtitle: false,
         editLastname: false,
         editUsername: false
+    }
+    const [editEnabled, setEditEnabled] = useState({
+        defaultEditState
     })
 
     //Permission state
@@ -86,7 +91,7 @@ const ManageUser = () => {
         editOwnComment: true,
         deleteOwnComment: true,
         viewAllDefect: false,
-        editAllDefect: false,
+        editAllDefect: true,
         deleteAllDefect: false,
         editAllComment: false,
         deleteAllComment: false,
@@ -117,6 +122,25 @@ const ManageUser = () => {
             }))
         }
     }, [searchUser])
+
+    useEffect(() => {
+        if (userDetails.email && userDetails !== 'User not found'){
+            setPermission({
+                ...permission
+            })
+
+            //set at inital state and after changes.
+            //set field back to default(before change) when click on other edit state
+            setFirstName(userDetails.firstname)
+            setLastName(userDetails.lastname)
+            setUserName(userDetails.username)
+            setEmail(userDetails.email)
+            setJobTitle(userDetails.jobtitle)
+            setRole(userDetails.role)
+        }
+
+
+    }, [userDetails,editEnabled])
 
     //User Field handle
     const handleFirstName = (event) => {
@@ -220,6 +244,18 @@ const ManageUser = () => {
                         handleEditState("editJobtitle", false)
                     })
                 break;
+            case "confirmRole":
+                dispatch(updateRole({
+                    adminPassword: modalInput,
+                    userEmail: searchUser,
+                    userNewRole: role
+                }))
+                    .unwrap()
+                    .then(() => {
+                        handleEditState("editRole", false)
+                    })
+                break;
+
             case "confirmUpdatePermission":
                 dispatch(updateUserPermission({
                     adminPassword: modalInput,
@@ -255,7 +291,6 @@ const ManageUser = () => {
 
         }
         setModalInput('')
-
     }
 
     const handleModalInput = (event) => {
@@ -297,12 +332,8 @@ const ManageUser = () => {
 
     //Edit handle
     const handleEditState = (fieldName, enabled) => {
-
-        setEditEnabled({
-            ...editEnabled,
-            [fieldName]: enabled
-        })
-
+        //only set 1 to edit state at a time
+        setEditEnabled({[fieldName]: enabled})
     }
 
     const handleEditConfirm = (fieldName) => {
@@ -330,7 +361,10 @@ const ManageUser = () => {
                 setEditingField(fieldName);
                 break;
             case "confirmRole":
-                setModalDescription(`You are about to change user's Role \n\n From: "${userDetails.role}" \n To: "${role}"`)
+                setModalDescription(`You are about to change user's Role \n\n From: "${userDetails.role.charAt(0).toUpperCase() + userDetails.role.slice(1)}" 
+                To: "${role.charAt(0).toUpperCase() + role.slice(1)}"
+                ${role === 'user' && (userDetails.role === 'owner' || userDetails.role === 'admin') ? "Note: Account will lose all Admin permission" : ""}
+                `)
                 setEditingField(fieldName);
                 break;
             case "confirmPermission":
@@ -349,11 +383,24 @@ const ManageUser = () => {
             [event.target.name]: value
         });
 
-        console.log(permission)
+    }
 
+    const [permissionChanged, setPermissionChanged] = useState()
+
+    const permissionChangedCheck = () => {
+        const userPrevious = userPermission
+        const userCurrent = permission
+        return JSON.stringify(userPrevious) === JSON.stringify(userCurrent)
     }
 
     //use effect
+
+    useEffect(() => {
+
+        if (userDetails) setPermissionChanged(permissionChangedCheck)
+
+    }, [permission])
+
 
     useEffect(() => {
         dispatch(resetState())
@@ -361,17 +408,17 @@ const ManageUser = () => {
     }, [])
 
 
-    useEffect(() => {
-        if (userDetails && userDetails !== 'User not found') {
-            setFirstName(userDetails.firstname)
-            setLastName(userDetails.lastname)
-            setUserName(userDetails.username)
-            setEmail(userDetails.email)
-            setPassword("xxxxxxxxxxxxxxxxxx")
-            setJobTitle(userDetails.jobtitle)
-            setRole(userDetails.role)
-        }
-    }, [userDetails]);
+    // useEffect(() => {
+    //     if (userDetails.email && userDetails !== 'User not found') {
+    //         setFirstName(userDetails.firstname)
+    //         setLastName(userDetails.lastname)
+    //         setUserName(userDetails.username)
+    //         setEmail(userDetails.email)
+    //         setPassword("xxxxxxxxxxxxxxxxxx")
+    //         setJobTitle(userDetails.jobtitle)
+    //         setRole(userDetails.role)
+    //     }
+    // }, [searchUser]);
 
 
     return (
@@ -379,7 +426,7 @@ const ManageUser = () => {
 
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
 
-                {!userDetails ?
+                {!userDetails.email ?
                     <Typography variant='h6' flexBasis={'100%'} mb={3}>Select User to begin</Typography>
                     :
                     null}
@@ -400,6 +447,8 @@ const ManageUser = () => {
                         ))}
                     </Select>
                 </FormControl>
+
+                
 
                 <ManageUserDetails
                     userDetails={userDetails}
@@ -438,6 +487,7 @@ const ManageUser = () => {
                 <ManageUserRole
                     userDetails={userDetails}
                     users={users}
+                    role={role}
                     handleChangeRole={handleChangeRole}
                     handleEditConfirm={handleEditConfirm}
                 >
@@ -448,6 +498,10 @@ const ManageUser = () => {
                 <ManageUserPermission
                     userDetails={userDetails}
                     users={users}
+                    role={role}
+                    permission={permission}
+                    permissionChanged={permissionChanged}
+                    permissionChangedCheck={permissionChangedCheck}
                     userPermission={userPermission}
                     handlePermission={handlePermission}
                     handleEditState={handleEditState}

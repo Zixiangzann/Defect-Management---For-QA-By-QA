@@ -8,14 +8,21 @@ import Divider from '@mui/material/Divider';
 const ManageUserPermission = ({
     userDetails,
     users,
+    role,
+    permission,
+    permissionChanged,
     userPermission,
+    permissionChangedCheck,
     handlePermission,
     handleEditConfirm
 }) => {
+
+
+
 return(
     <Box flexBasis={'100%'}>
          {/* Change Account role and permission */}
-         {userDetails && (users.data.role === 'owner' || users.data.role === 'admin') ?
+         {userDetails.email  && (users.data.role === 'owner' || users.data.role === 'admin') ?
                     <Box flexBasis='100%'>
 
                         {/* Standard user control */}
@@ -37,7 +44,7 @@ return(
                         <Divider sx={{ flexBasis: '100%', borderBottomColor: 'black', mt: 5 }}></Divider>
 
                         {/* sensitive admin control, only some admin or owner should have these control */}
-                        {users.data.role === 'owner' && userDetails.role === 'admin' ?
+                        {users.data.role === 'owner' && (role === 'admin' || role === 'owner') ?
                             <>
                                 <Typography sx={{ flexBasis: '100%', mt: 2, fontSize: '1.2rem', fontWeight: '600' }}>Admin</Typography>
 
@@ -67,15 +74,17 @@ return(
                                     <FormControlLabel name='addComponent' control={<Checkbox defaultChecked={userPermission.addComponent} />} label="Add Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                                     <FormControlLabel name='deleteComponent' control={<Checkbox defaultChecked={userPermission.deleteComponent} />} label="Delete Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                                 </Box>
+                                
                             </>
                             :
                             null
                         }
 
-                        <Box display={'flex'} justifyContent={'flex-end'} flexBasis={'100%'}>
+                        <Box display={'flex'} justifyContent={'flex-start'} flexBasis={'100%'}>
                         <Button
                         variant='contained'
-                        sx={{m:3,flexBasis:'25%'}}
+                        sx={{ flexBasis: '30%', mt: 1, backgroundColor: 'lightblue', color: 'black' ,mt:5}}
+                        disabled={permissionChanged}
                         onClick={(e) => handleEditConfirm("confirmPermission")}
                         >
                             Update Permission</Button>

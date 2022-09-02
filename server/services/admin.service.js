@@ -335,8 +335,7 @@ export const resetUserPassword = async (req) => {
 }
 
 //update role 
-export const changeUserRole = async (req) => {
-
+export const updateUserRole = async (req) => {
     // only owner allowed to change account role
     if (req.user.role !== 'owner') {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
@@ -358,10 +357,42 @@ export const changeUserRole = async (req) => {
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
 
-    if (userNewRole === 'admin' || userNewRole === 'user') {
+    if (userNewRole === 'admin' || userNewRole === 'owner') {
         const updatedUser = User.findOneAndUpdate({ email: userEmail }, { role: userNewRole }, { new: true });
         return updatedUser;
-    } else {
+    }//changing role to user will remove all admin permission 
+    else if(userNewRole === 'user'){
+        const removedAllAdminPermission = [{
+            addDefect: user.permission[0].addDefect,
+            editOwnDefect: user.permission[0].editOwnDefect,
+            editAllDefect: user.permission[0].editAllDefect,
+            addComment: user.permission[0].addComment,
+            editOwnComment: user.permission[0].editOwnComment,
+            deleteOwnComment: user.permission[0].deleteOwnComment,
+            viewAllDefects: false,
+            deleteAllDefect: false,
+            editAllComment: false,
+            deleteAllComment: false,
+            addUser: false,
+            disableUser: false,
+            deleteUser: false,
+            changeUserDetails: false,
+            resetUserPassword: false,
+            addProject: false,
+            assignProject: false,
+            deleteProject: false,
+            addComponent: false,
+            deleteComponent: false,
+        }]
+
+        const updatedUser = User.findOneAndUpdate({ email: userEmail }, { "$set": {
+            role: userNewRole,
+            permission: removedAllAdminPermission
+        }}, { new: true });
+        return updatedUser;
+    }
+    
+    else {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid role');
     }
 

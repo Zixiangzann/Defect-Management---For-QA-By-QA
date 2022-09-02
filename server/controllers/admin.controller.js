@@ -3,7 +3,6 @@ import { ApiError } from '../middleware/apiError.js';
 import { adminService } from '../services/index.js';
 import { emailService } from '../services/index.js';
 import User from '../models/user.js';
-import { updateUserJobTitle } from '../services/admin.service.js';
 
 const adminController = {
     async getAllUsers(req, res, next) {
@@ -136,7 +135,7 @@ const adminController = {
 
     async updateUserRole(req,res,next){
         try {
-            const updatedUser = await adminService.changeUserRole(req)
+            const updatedUser = await adminService.updateUserRole(req)
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)

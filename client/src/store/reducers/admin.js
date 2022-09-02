@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateUsername, updateUserPermission} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission} from '../actions/admin'
 import { showToast } from '../../utils/tools';
 
 const initialState = () => ({
@@ -10,8 +10,14 @@ const initialState = () => ({
         userNotFound:null
     },
     userEmails:[],
-    userDetails:{},
-    userPermission:{}
+    userDetails:{
+        firstname:null,
+        lastname:null,
+        username:null,
+        email:null,
+        jobtitle:null
+    },
+    userPermission:{},
 })
 
 export const adminSlice = createSlice({
@@ -50,7 +56,14 @@ export const adminSlice = createSlice({
             }
         })
         .addCase(getUserByEmail.fulfilled,(state,action)=>{
-            state.userDetails = action.payload.data
+            // state.userDetails = action.payload.data            
+            state.userDetails.firstname = action.payload.data[0].firstname
+            state.userDetails.lastname = action.payload.data[0].lastname
+            state.userDetails.username = action.payload.data[0].username
+            state.userDetails.email = action.payload.data[0].email
+            state.userDetails.jobtitle = action.payload.data[0].jobtitle
+            state.userDetails.role = action.payload.data[0].role
+
             state.userPermission = action.payload.data[0].permission
             state.error.userNotFound = null;
         })
@@ -85,6 +98,13 @@ export const adminSlice = createSlice({
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateJobtitle.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(updateRole.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Successfully Updated")
+            state.userDetails.role = action.payload.data.role
+        })
+        .addCase(updateRole.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(resetUserPassword.fulfilled,(state,action)=>{

@@ -10,12 +10,13 @@ import FormLabel from '@mui/material/FormLabel';
 const ManageUserRole = ({
     userDetails,
     users,
+    role,
     handleChangeRole,
     handleEditConfirm
 }) => {
     return(
         <Box flexBasis='100%'>
-        {userDetails && users.data.role === 'owner' ?
+        {userDetails.email  && users.data.role === 'owner' || users.data.role === 'admin'  ?
 
         
         <Box flexBasis='100%'>
@@ -25,21 +26,22 @@ const ManageUserRole = ({
             <FormControl>
             <FormLabel id="roleForm">Role:</FormLabel>
             <RadioGroup
-                value={userDetails.role}
+                value={role}
                 onChange={handleChangeRole}
                 name="radio-buttons-group"
             >
-                <FormControlLabel value="User" control={<Radio />} label="User" />
-                <FormControlLabel value="admin" control={<Radio />} label="Admin" />
-                <FormControlLabel value="owner" control={<Radio />} label="Owner" />
+                <FormControlLabel value="user" control={<Radio />} label="User" />
+                <FormControlLabel value="admin" control={<Radio />} label="Admin" disabled={users.data.role === 'admin' || users.data.role === 'user'}/>
+                <FormControlLabel value="owner" control={<Radio />} label="Owner" disabled={users.data.role === 'admin' || users.data.role === 'user'}/>
             </RadioGroup>
             </FormControl>
 
                         
 
-                        <Box sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-start' }}>
+                        <Box sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'start' }}>
                             <Button
                                 variant='contained'
+                                // disabled={userDetails.role === role}
                                 sx={{ flexBasis: '30%', mt: 2, backgroundColor: 'lightblue', color: 'black' }}
                                 onClick={()=> handleEditConfirm("confirmRole")}
                             >Change User Role</Button>

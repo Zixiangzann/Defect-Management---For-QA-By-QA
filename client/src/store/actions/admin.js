@@ -200,6 +200,27 @@ export const updateJobtitle = createAsyncThunk(
 
     })
 
+ export const updateRole = createAsyncThunk(
+    'admin/updateRole',
+    async({
+        adminPassword,
+        userEmail,
+        userNewRole },{rejectWithValue}) => {
+            try {
+                const request = await axios.patch('/api/admin/updateuser/role', {
+                    adminPassword,
+                    userEmail,
+                    userNewRole
+                }, getAuthHeader())
+                return { data: request.data }
+            } catch (error) {
+                if(!error.response){
+                    throw error
+                }
+                return rejectWithValue(error.response)
+            }
+    })   
+
 export const resetUserPassword = createAsyncThunk(
     'admin/resetUserPassword',
     async({
