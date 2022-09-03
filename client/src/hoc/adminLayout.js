@@ -34,62 +34,62 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
 const AdminLayout = (props) => {
 
-    const [value, setValue] = useState(0);
+    // const [value, setValue] = useState(0);
 
-    useEffect(() => {
-        if(window.location.href.includes('users')){
-            setValue(0);
-        }
+    // useEffect(() => {
+    //     if(window.location.href.includes('users')){
+    //         setValue(0);
+    //     }
 
-        if(window.location.href.includes('projects')){
-            setValue(1);
-        }
+    //     if(window.location.href.includes('projects')){
+    //         setValue(1);
+    //     }
 
-        if(window.location.href.includes('assign')){
-            setValue(2);
-        }
+    //     if(window.location.href.includes('assign')){
+    //         setValue(2);
+    //     }
         
-    }, [window.location.href]);
+    // }, [window.location.href]);
 
-    return (
+    // return (
 
-        <Container className={`adminContainer`}>
-            <Box>
-                <CssBaseline />
+    //     <Container className={`adminContainer`}>
+    //         <Box>
+    //             <CssBaseline />
 
-                <BottomNavigation
-                    id='adminBottomNavigation'
-                    sx={{ position: 'absolute', top: 'auto', bottom: '0', right: '0', left: '0', bgcolor: 'lavender', display: 'flex', justifyContent: 'space-around',zIndex:'1' }}
-                    showLabels
-                    value={value}
-                >
-                    <BottomNavigationAction
-                        label="User"
-                        icon={<PersonAddAltIcon />}
-                        component={RouterLink}
-                        to="/usermanagement/users"
-                    />
-                    <BottomNavigationAction
-                        label="Project/Component"
-                        icon={<FilterVintageOutlinedIcon />}
-                        component={RouterLink}
-                        to="/usermanagement/projects"
-                    />
+    //             <BottomNavigation
+    //                 id='adminBottomNavigation'
+    //                 sx={{ position: 'absolute', top: 'auto', bottom: '0', right: '0', left: '0', bgcolor: 'lavender', display: 'flex', justifyContent: 'space-around',zIndex:'1' }}
+    //                 showLabels
+    //                 value={value}
+    //             >
+    //                 <BottomNavigationAction
+    //                     label="User"
+    //                     icon={<PersonAddAltIcon />}
+    //                     component={RouterLink}
+    //                     to="/usermanagement/users"
+    //                 />
+    //                 <BottomNavigationAction
+    //                     label="Project/Component"
+    //                     icon={<FilterVintageOutlinedIcon />}
+    //                     component={RouterLink}
+    //                     to="/usermanagement/projects"
+    //                 />
 
-                    <BottomNavigationAction
-                        label="Assign project"
-                        icon={<AssignmentIndIcon />}
-                        component={RouterLink}
-                        to="/usermanagement/assign"
-                    />
-                </BottomNavigation>
+    //                 <BottomNavigationAction
+    //                     label="Assign project"
+    //                     icon={<AssignmentIndIcon />}
+    //                     component={RouterLink}
+    //                     to="/usermanagement/assign"
+    //                 />
+    //             </BottomNavigation>
 
 
-            </Box>
-            {props.children}
-            <ToastContainer />
-        </Container>
-    )
+    //         </Box>
+    //         {props.children}
+    //         <ToastContainer />
+    //     </Container>
+    // )
 }
 
 export default AdminLayout;

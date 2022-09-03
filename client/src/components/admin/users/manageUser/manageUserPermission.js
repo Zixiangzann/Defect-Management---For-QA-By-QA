@@ -31,13 +31,13 @@ return(
 
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Defect management</Typography>
-                            <FormControlLabel name='addDefect' control={<Checkbox defaultChecked={userPermission.addDefect} />} label="Add Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                            <FormControlLabel name='editOwnDefect' control={<Checkbox defaultChecked={userPermission.editOwnDefect} />} label="Edit Own Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                            <FormControlLabel name='editAllDefect' control={<Checkbox defaultChecked={userPermission.editAllDefect} />} label="Edit All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                            <FormControlLabel name='addDefect' control={<Checkbox checked={permission.addDefect} />} label="Add Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                            <FormControlLabel name='editOwnDefect' control={<Checkbox checked={permission.editOwnDefect} />} label="Edit Own Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                            <FormControlLabel name='editAllDefect' control={<Checkbox checked={permission.editAllDefect} />} label="Edit All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                             <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Comment management</Typography>
-                            <FormControlLabel name='addComment' control={<Checkbox defaultChecked={userPermission.addComment} />} label="Add Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                            <FormControlLabel name='editOwnComment' control={<Checkbox defaultChecked={userPermission.editOwnComment} />} label="Edit Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                            <FormControlLabel name='deleteOwnComment' control={<Checkbox defaultChecked={userPermission.deleteOwnComment} />} label="Delete Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                            <FormControlLabel name='addComment' control={<Checkbox checked={permission.addComment} />} label="Add Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                            <FormControlLabel name='editOwnComment' control={<Checkbox checked={permission.editOwnComment} />} label="Edit Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                            <FormControlLabel name='deleteOwnComment' control={<Checkbox checked={permission.deleteOwnComment} />} label="Delete Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                         </Box>
 
 
@@ -50,29 +50,26 @@ return(
 
                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Defect management</Typography>
-                                    <FormControlLabel name='viewAllDefect' control={<Checkbox defaultChecked={userPermission.viewAllDefect} />} label="View All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='deleteAllDefect' control={<Checkbox defaultChecked={userPermission.deleteAllDefect} />} label="Delete All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='viewAllDefect' control={<Checkbox checked={permission.viewAllDefect} />} label="View All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='deleteAllDefect' control={<Checkbox checked={permission.deleteAllDefect} />} label="Delete All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
 
                                     <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Comment management</Typography>
-                                    <FormControlLabel name='editAllComment' control={<Checkbox defaultChecked={userPermission.editAllComment} />} label="Edit All Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='deleteAllComment' control={<Checkbox defaultChecked={userPermission.deleteAllComment} />} label="Delete All Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-
-
+                                    <FormControlLabel name='editAllComment' control={<Checkbox checked={permission.editAllComment} />} label="Edit All Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='deleteAllComment' control={<Checkbox checked={permission.deleteAllComment} />} label="Delete All Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
 
                                     <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>User management</Typography>
-                                    <FormControlLabel name='addUser' control={<Checkbox defaultChecked={userPermission.addUser} />} label="Add Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='disableUser' control={<Checkbox defaultChecked={userPermission.disableUser} />} label="Disable Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='deleteUser' control={<Checkbox defaultChecked={userPermission.deleteUser} />} label="Delete Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='changeUserDetails' control={<Checkbox defaultChecked={userPermission.changeUserDetails} />} label="Change Users Details" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='resetUserPassword' control={<Checkbox defaultChecked={userPermission.resetUserPassword} />} label="Reset Users Password" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-
+                                    <FormControlLabel name='addUser' control={<Checkbox checked={permission.addUser} />} label="Add Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='disableUser' control={<Checkbox checked={permission.disableUser} />} label="Disable Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='deleteUser' control={<Checkbox checked={permission.deleteUser} />} label="Delete Users" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='changeUserDetails' control={<Checkbox checked={permission.changeUserDetails} />} label="Change Users Details" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='resetUserPassword' control={<Checkbox checked={permission.resetUserPassword} />} label="Reset Users Password" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
 
                                     <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Project management</Typography>
-                                    <FormControlLabel name='addProject' control={<Checkbox defaultChecked={userPermission.addProject} />} label="Add Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='assignProject' control={<Checkbox defaultChecked={userPermission.assignProject} />} label="Assign Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='deleteProject' control={<Checkbox defaultChecked={userPermission.deleteProject} />} label="Delete Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='addComponent' control={<Checkbox defaultChecked={userPermission.addComponent} />} label="Add Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                                    <FormControlLabel name='deleteComponent' control={<Checkbox defaultChecked={userPermission.deleteComponent} />} label="Delete Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='addProject' control={<Checkbox checked={permission.addProject} />} label="Add Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='assignProject' control={<Checkbox checked={permission.assignProject} />} label="Assign Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='deleteProject' control={<Checkbox checked={permission.deleteProject} />} label="Delete Projects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='addComponent' control={<Checkbox checked={permission.addComponent} />} label="Add Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                                    <FormControlLabel name='deleteComponent' control={<Checkbox checked={permission.deleteComponent} />} label="Delete Components" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                                 </Box>
                                 
                             </>
@@ -83,8 +80,9 @@ return(
                         <Box display={'flex'} justifyContent={'flex-start'} flexBasis={'100%'}>
                         <Button
                         variant='contained'
-                        sx={{ flexBasis: '30%', mt: 1, backgroundColor: 'lightblue', color: 'black' ,mt:5}}
-                        disabled={permissionChanged}
+                        color='primary'
+                        sx={{ flexBasis: '30%', mt: 1 ,mt:5}}
+                        // disabled={permissionChanged}
                         onClick={(e) => handleEditConfirm("confirmPermission")}
                         >
                             Update Permission</Button>

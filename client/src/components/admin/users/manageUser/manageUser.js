@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import ManageUserDetails from './manageUserDetails';
 import ManageUserPermission from './manageUserPermission';
 import ManageUserRole from './manageUserRole';
+import { resetState } from '../../../../store/reducers/admin';
 
 //lib
 import ModalComponent from '../../../../utils/modal/modal';
@@ -33,13 +34,21 @@ import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import { showToast } from '../../../../utils/tools';
 import Typography from '@mui/material/Typography';
-import { IconButton, InputAdornment, Menu, MenuItem, Select } from '@mui/material';
+import { IconButton, InputAdornment, ListItem, Menu, MenuItem, Select } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { resetState } from '../../../../store/reducers/admin';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import List from '@mui/material/List';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
+import { isAuth } from '../../../../store/actions/users';
 
 const ManageUser = () => {
 
     //State
+    //Nav tab
+    const [tab, setTab] = useState(0);
+
     //Search User state
     const [searchUser, setSearchUser] = useState('')
 
@@ -109,6 +118,12 @@ const ManageUser = () => {
 
 
     //Handle
+
+    //Nav tab
+    const handleNavTab = (event, newValue) => {
+        setTab(newValue)
+    }
+
     //Select User
     const handleSelectUsers = (event) => {
         setSearchUser(event.target.value)
@@ -124,9 +139,9 @@ const ManageUser = () => {
     }, [searchUser])
 
     useEffect(() => {
-        if (userDetails.email && userDetails !== 'User not found'){
+        if (userDetails.email && userDetails !== 'User not found') {
             setPermission({
-                ...permission
+                ...userPermission
             })
 
             //set at inital state and after changes.
@@ -140,7 +155,7 @@ const ManageUser = () => {
         }
 
 
-    }, [userDetails,editEnabled])
+    }, [userDetails,userPermission, editEnabled])
 
     //User Field handle
     const handleFirstName = (event) => {
@@ -183,7 +198,7 @@ const ManageUser = () => {
 
 
     //Modal handle
-    const handleModalConfirm = () => {
+    const handleModalConfirm = async () => {
 
         switch (editingField) {
             case "confirmFirstname":
@@ -196,6 +211,10 @@ const ManageUser = () => {
                     .then(() => {
                         handleEditState("editFirstname", false)
                     })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
+                    })
                 break;
             case "confirmLastname":
                 dispatch(updateLastname({
@@ -206,6 +225,10 @@ const ManageUser = () => {
                     .unwrap()
                     .then(() => {
                         handleEditState("editLastname", false)
+                    })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
                     })
                 break;
             case "confirmUsername":
@@ -218,6 +241,10 @@ const ManageUser = () => {
                     .then(() => {
                         handleEditState("editUsername", false)
                     })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
+                    })
                 break;
             case "confirmEmail":
                 dispatch(updateEmail({
@@ -229,7 +256,12 @@ const ManageUser = () => {
                     .then(() => {
                         handleEditState("editEmail", false)
                         setSearchUser(email);
-                    }).catch(() => {
+                    })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
+                    })
+                    .catch(() => {
                         setSearchUser(userDetails.email);
                     })
                 break;
@@ -243,6 +275,10 @@ const ManageUser = () => {
                     .then(() => {
                         handleEditState("editJobtitle", false)
                     })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
+                    })
                 break;
             case "confirmRole":
                 dispatch(updateRole({
@@ -253,6 +289,10 @@ const ManageUser = () => {
                     .unwrap()
                     .then(() => {
                         handleEditState("editRole", false)
+                    })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
                     })
                 break;
 
@@ -265,6 +305,10 @@ const ManageUser = () => {
                     .unwrap()
                     .then(() => {
                         handleEditState("editPermission", false)
+                    })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
                     })
                 break;
             case "resetPassword":
@@ -284,14 +328,18 @@ const ManageUser = () => {
                     .then(() => {
                         setCopyPasswordModalOpen(true)
                     })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(isAuth())
+                    })
 
                 break;
             default:
                 break;
-
         }
         setModalInput('')
     }
+
 
     const handleModalInput = (event) => {
         setModalInput(event.target.value);
@@ -333,7 +381,7 @@ const ManageUser = () => {
     //Edit handle
     const handleEditState = (fieldName, enabled) => {
         //only set 1 to edit state at a time
-        setEditEnabled({[fieldName]: enabled})
+        setEditEnabled({ [fieldName]: enabled })
     }
 
     const handleEditConfirm = (fieldName) => {
@@ -382,7 +430,6 @@ const ManageUser = () => {
             ...permission,
             [event.target.name]: value
         });
-
     }
 
     const [permissionChanged, setPermissionChanged] = useState()
@@ -406,19 +453,6 @@ const ManageUser = () => {
         dispatch(resetState())
         dispatch(getAllUsersEmail({}))
     }, [])
-
-
-    // useEffect(() => {
-    //     if (userDetails.email && userDetails !== 'User not found') {
-    //         setFirstName(userDetails.firstname)
-    //         setLastName(userDetails.lastname)
-    //         setUserName(userDetails.username)
-    //         setEmail(userDetails.email)
-    //         setPassword("xxxxxxxxxxxxxxxxxx")
-    //         setJobTitle(userDetails.jobtitle)
-    //         setRole(userDetails.role)
-    //     }
-    // }, [searchUser]);
 
 
     return (
@@ -448,67 +482,177 @@ const ManageUser = () => {
                     </Select>
                 </FormControl>
 
-                
+                <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }}>
 
-                <ManageUserDetails
-                    userDetails={userDetails}
-                    firstname={firstname}
-                    lastname={lastname}
-                    username={username}
-                    jobtitle={jobtitle}
-                    email={email}
-                    emailCheck={emailCheck}
-                    admin={admin}
-                    handleFirstName={handleFirstName}
-                    handleLastName={handleLastName}
-                    handleUserName={handleUserName}
-                    handleJobTitle={handleJobTitle}
-                    handleEmail={handleEmail}
-                    handleEmailCheck={handleEmailCheck}
-                    editEnabled={editEnabled}
-                    users={users}
-                    handleEditConfirm={handleEditConfirm}
-                    handleEditState={handleEditState}
-                    dispatch={dispatch}
-                    checkUsernameExist={checkUsernameExist}
-                    checkEmailExist={checkEmailExist}
-                >
+                    <List sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start' , whiteSpace:'nowrap'}}>
+                        {userDetails.email ?
+                            <ListItem className='tab-userdetails'
+                                sx={{}}>
+                                <ListItemButton
+                                    sx={{
+                                        color: (tab === 0 ? '#a534eb' : 'black'),
+                                        borderBottom: (tab === 0 ? '2px solid purple' : '')
+                                    }}
+                                    onClick={() => setTab(0)}
+                                >
+                                    <ListItemText
+                                        primary="User Details"
 
-                </ManageUserDetails>
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                            : null}
 
-                <ManageUserResetPW
-                    userDetails={userDetails}
-                    users={users}
-                    handleResetPassword={handleResetPassword}
-                >
-                </ManageUserResetPW>
+                        {userDetails.email && users.data.permission[0].resetUserPassword ?
+                            <ListItem className='tab-resetpassword'
+                                sx={{}}>
+                                <ListItemButton
+                                    sx={{
+                                        color: (tab === 1 ? '#a534eb' : 'black'),
+                                        borderBottom: (tab === 1 ? '2px solid purple' : '')
+                                    }}
+                                    onClick={() => setTab(1)}
+                                >
+                                    <ListItemText
+                                        primary="Reset User Password"
 
-
-                <ManageUserRole
-                    userDetails={userDetails}
-                    users={users}
-                    role={role}
-                    handleChangeRole={handleChangeRole}
-                    handleEditConfirm={handleEditConfirm}
-                >
-
-                </ManageUserRole>
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                            : null}
 
 
-                <ManageUserPermission
-                    userDetails={userDetails}
-                    users={users}
-                    role={role}
-                    permission={permission}
-                    permissionChanged={permissionChanged}
-                    permissionChangedCheck={permissionChangedCheck}
-                    userPermission={userPermission}
-                    handlePermission={handlePermission}
-                    handleEditState={handleEditState}
-                    handleEditConfirm={handleEditConfirm}
-                >
+                        {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
+                            <ListItem className='tab-managerole'>
+                                <ListItemButton
+                                    sx={{
+                                        color: (tab === 2 ? '#a534eb' : 'black'),
+                                        borderBottom: (tab === 2 ? '2px solid purple' : '')
+                                    }}
+                                    onClick={() => setTab(2)}
+                                >
+                                    <ListItemText
+                                        primary="Manage Role"
 
-                </ManageUserPermission>
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                            : null}
+
+                        {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
+                            <ListItem className='tab-managepermission'>
+                                <ListItemButton
+                                    sx={{
+                                        color: (tab === 3 ? '#a534eb' : 'black'),
+                                        borderBottom: (tab === 3 ? '2px solid purple' : '')
+                                    }}
+                                    onClick={() => setTab(3)}
+                                >
+                                    <ListItemText
+                                        primary="Manage Permission"
+
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                            : null}
+
+                        {userDetails.email && users.data.permission[0].assignProject ?
+                            <ListItem className='tab-assignproject'>
+                                <ListItemButton
+                                    sx={{
+                                        color: (tab === 4 ? '#a534eb' : 'black'),
+                                        borderBottom: (tab === 4 ? '2px solid purple' : '')
+                                    }}
+                                    onClick={() => setTab(4)}
+                                >
+                                    <ListItemText
+                                        primary="Assign Project"
+
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                            : null}
+
+                    </List>
+                </Box>
+
+                {tab === 0 ?
+                    <ManageUserDetails
+                        userDetails={userDetails}
+                        firstname={firstname}
+                        lastname={lastname}
+                        username={username}
+                        jobtitle={jobtitle}
+                        email={email}
+                        emailCheck={emailCheck}
+                        admin={admin}
+                        handleFirstName={handleFirstName}
+                        handleLastName={handleLastName}
+                        handleUserName={handleUserName}
+                        handleJobTitle={handleJobTitle}
+                        handleEmail={handleEmail}
+                        handleEmailCheck={handleEmailCheck}
+                        editEnabled={editEnabled}
+                        users={users}
+                        handleEditConfirm={handleEditConfirm}
+                        handleEditState={handleEditState}
+                        dispatch={dispatch}
+                        checkUsernameExist={checkUsernameExist}
+                        checkEmailExist={checkEmailExist}
+                    >
+                    </ManageUserDetails>
+                    :
+                    null
+                }
+
+                {tab === 1 ?
+                    <ManageUserResetPW
+                        userDetails={userDetails}
+                        users={users}
+                        handleResetPassword={handleResetPassword}
+                    >
+                    </ManageUserResetPW>
+                    :
+                    null
+                }
+
+                {tab === 2 ?
+                    <ManageUserRole
+                        userDetails={userDetails}
+                        users={users}
+                        role={role}
+                        handleChangeRole={handleChangeRole}
+                        handleEditConfirm={handleEditConfirm}
+                    >
+                    </ManageUserRole>
+                    :
+                    null
+                }
+
+                {tab === 3 ?
+                    <ManageUserPermission
+                        userDetails={userDetails}
+                        users={users}
+                        role={role}
+                        permission={permission}
+                        permissionChanged={permissionChanged}
+                        permissionChangedCheck={permissionChangedCheck}
+                        userPermission={userPermission}
+                        handlePermission={handlePermission}
+                        handleEditState={handleEditState}
+                        handleEditConfirm={handleEditConfirm}
+                    >
+                    </ManageUserPermission>
+                    :
+                    null}
+
+
+                {tab === 4 ?
+                    <>
+                        Assign Project
+                    </>
+                    :
+                    null}
 
 
                 <ModalComponent

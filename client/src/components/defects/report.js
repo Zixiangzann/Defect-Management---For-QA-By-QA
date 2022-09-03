@@ -139,6 +139,8 @@ const Report = () => {
     useEffect(() => {
         //default show "bar chart" with "status" selection
         //get total defect
+
+        if(project !== ""){
         let total = 0;
         dispatch(getCountStatus(project))
             .unwrap()
@@ -149,6 +151,8 @@ const Report = () => {
             }
             )
         dispatch(getDefectId({ project }));
+    }
+
     }, [project]);
 
     const tableBodyCell = () => {

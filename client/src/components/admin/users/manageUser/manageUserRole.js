@@ -16,23 +16,28 @@ const ManageUserRole = ({
 }) => {
     return(
         <Box flexBasis='100%'>
+            {/* owner(super admin) account can manage role , admin can see the account role but cannot change the role*/}
         {userDetails.email  && users.data.role === 'owner' || users.data.role === 'admin'  ?
 
         
         <Box flexBasis='100%'>
 
         <Typography variant='h5' mb={3} mt={5} flexBasis='60%'>Change Role</Typography>
+        {users.data.role === 'owner' ? null : <Typography mb={3}>Only Super Admin can manage account Role</Typography>}
 
             <FormControl>
-            <FormLabel id="roleForm">Role:</FormLabel>
+            <FormLabel 
+            id="roleForm"
+            sx={{mb:3}}
+            >Role:</FormLabel>
             <RadioGroup
                 value={role}
                 onChange={handleChangeRole}
                 name="radio-buttons-group"
             >
-                <FormControlLabel value="user" control={<Radio />} label="User" />
-                <FormControlLabel value="admin" control={<Radio />} label="Admin" disabled={users.data.role === 'admin' || users.data.role === 'user'}/>
-                <FormControlLabel value="owner" control={<Radio />} label="Owner" disabled={users.data.role === 'admin' || users.data.role === 'user'}/>
+                <FormControlLabel value="user" control={<Radio />} label="User"   disabled={users.data.role !== 'owner'}/>
+                <FormControlLabel value="admin" control={<Radio />} label="Admin" disabled={users.data.role !== 'owner'}/>
+                <FormControlLabel value="owner" control={<Radio />} label="Owner" disabled={users.data.role !== 'owner'}/>
             </RadioGroup>
             </FormControl>
 
@@ -41,13 +46,14 @@ const ManageUserRole = ({
                         <Box sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'start' }}>
                             <Button
                                 variant='contained'
+                                color='primary'
                                 // disabled={userDetails.role === role}
-                                sx={{ flexBasis: '30%', mt: 2, backgroundColor: 'lightblue', color: 'black' }}
+                                sx={{ flexBasis: '30%', mt: 2}}
                                 onClick={()=> handleEditConfirm("confirmRole")}
                             >Change User Role</Button>
                         </Box>
 
-                        <Box flexBasis='100%' borderBottom={'1px solid black'} mt={5} mb={5}></Box>
+                       
         </Box>
         :
         null

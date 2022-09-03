@@ -19,7 +19,8 @@ const ManageUserResetPW = ({
                             <Button
                                 id="resetPasword"
                                 onClick={handleResetPassword}
-                                sx={{ flexBasis: '30%', mt: 1, backgroundColor: 'lightblue', color: 'black' }}
+                                color='primary'
+                                sx={{ flexBasis: '30%', mt: 1}}
                                 variant='contained'
                             >Reset User Password</Button>
 
@@ -27,7 +28,7 @@ const ManageUserResetPW = ({
                         </Box>
                        
                     </Box>
-                    <Box sx={{ flexBasis: '100%', borderBottom: '1px solid black', mt: 5 }}></Box>
+
                 </Box>
                 :
                 null

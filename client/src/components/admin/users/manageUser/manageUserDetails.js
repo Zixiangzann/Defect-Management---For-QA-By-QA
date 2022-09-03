@@ -40,14 +40,18 @@ const ManageUserDetails = ({
                 <Box>
 
                     <Typography variant='h5' mb={5} mt={5} flexBasis='60%'>User Details</Typography>
+                    
+                    {users.data.permission[0].changeUserDetails ?
                     <Typography variant='h7' mb={5} mt={5} flexBasis='100%'>Click on <EditIcon  sx={{ color: 'blue' }}/> 
                      to edit field and click on <CheckCircleIcon sx={{ color: 'green' }}/> to confirm changes, unconfirmed changes will not be saved</Typography>
+                    :
+                    null}
 
                      <Box flexBasis={100} mb={5}></Box>
 
                     <FormControl
                         id='addUserFirstNameForm'
-                        sx={{ m: 1, flexBasis: '45%' }}>
+                        sx={{ m: 1, width:'80%' }}>
                         <InputLabel htmlFor='firstname'
                         >First Name</InputLabel>
                         <OutlinedInput
@@ -99,7 +103,7 @@ const ManageUserDetails = ({
 
                     <FormControl
                         id='addUserLastNameForm'
-                        sx={{ m: 1, flexBasis: '45%' }}>
+                        sx={{ m: 1, width:'80%' }}>
                         <InputLabel htmlFor='lastname'
                         >Last Name</InputLabel>
                         <OutlinedInput
@@ -149,7 +153,7 @@ const ManageUserDetails = ({
 
                     <FormControl
                         id='addUserUserNameForm'
-                        sx={{ m: 1, flexBasis: '45%' }}>
+                        sx={{ m: 1, width:'80%' }}>
                         <InputLabel htmlFor='username'
                         >Username</InputLabel>
                         <OutlinedInput
@@ -203,7 +207,7 @@ const ManageUserDetails = ({
                     </FormControl>
 
 
-                    <FormControl id='addUserEmailForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <FormControl id='addUserEmailForm' sx={{ m: 1, width:'80%' }}>
                         <InputLabel htmlFor="email"
                         >Email</InputLabel>
                         <OutlinedInput
@@ -263,7 +267,7 @@ const ManageUserDetails = ({
                     </FormControl>
 
 
-                    <FormControl id='jobTitleForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <FormControl id='jobTitleForm' sx={{ m: 1, width:'80%' }}>
                         <InputLabel htmlFor="jobtitle"
                         >Job Title</InputLabel>
                         <OutlinedInput
@@ -313,9 +317,6 @@ const ManageUserDetails = ({
 
                         />
                     </FormControl>
-
-
-                    <Box sx={{ flexBasis: '100%', borderBottom: '1px solid black', mt: 5 }}></Box>
                 </Box>
 
                 :
