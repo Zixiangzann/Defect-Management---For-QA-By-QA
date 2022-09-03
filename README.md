@@ -6,16 +6,17 @@ Motivation:
 As a QA I always wanted to create my own defect management system.
 
 Functionality:
-• Defect Tracking 
-• Generate Project Report
-• Project Management 
-• Account Management
+- Defect Tracking 
+- Generate Project Report
+- Project Management 
+- Account Management
 
 Defect Tracking
-Purpose: track defects
-can:
+- Purpose: track defects
+- can:
 Create Defect with details 
 (Title, Description, Project, Components, Issue type, Severity, Server, Assignee, File attachment)
+
 Edit Defect details 
 (Change Title, Description, Project,Status,Components, Issue type, Severity, Server, Assignee, File attachment)
 
@@ -27,9 +28,11 @@ View Defect details
 
 
 Generate Reports 
+
 Purpose: Generate project report for easy viewing on project defects
 
 Can: 
+
 Generate project reports on filter such as
 - Project 
 - Defect Status
@@ -38,11 +41,13 @@ Generate project reports on filter such as
 - Issue Type 
 - Server
 
-And download it as PDF
+Report can be download as PDF
+
 Supported chart type: Pie,Bar,Table
 
 
 User Management 
+
 *only owner, admin account can access*
 Purpose: View and manage user account 
 can: 
@@ -56,6 +61,7 @@ can:
 Actions in User Management require permissions/account role depending on the type of action (example to change account role, the account that you are using must be a *owner* account and to reset password, you must have *resetPassword* permissions , refer to Permissions section for more details.
 
 Project Management (Not done)
+
 can:
 - Create project with details 
 (Title, Description, Components, Assignee)
