@@ -15,8 +15,8 @@ const projectController = {
 
     async getProjectByTitle(req, res, next) {
         try {
-            const projectTitle = req.query.title
-            const project = await projectService.getProjectByTitle(projectTitle);
+            const title = req.params.title
+            const project = await projectService.getProjectByTitle(title);
             res.json(project);
         } catch (error) {
             next(error);

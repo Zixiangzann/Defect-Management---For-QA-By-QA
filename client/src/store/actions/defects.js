@@ -4,6 +4,7 @@ import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 import { storage } from '../../firebase';
 import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject, listAll } from "firebase/storage"
+import { async } from '@firebase/util';
 
 //Get details for creating defects
 //Get all available assignee of a project
@@ -37,13 +38,25 @@ export const getAllComponents = createAsyncThunk(
 )
 
 //Use for getting available projects.
-//Only admin can see all projects.
-//user or any other role can only see project that is assigned to them.
+//Only account with viewAllDefect permission can view all project
+//else can only see project that is assigned to them.
 export const getAllProjects = createAsyncThunk(
     'defects/getAllProjects',
     async () => {
         try {
             const request = await axios.post('/api/defect/projects', {}, getAuthHeader())
+            return { project: request.data }
+        } catch (error) {
+            throw error;
+        }
+    }
+)
+
+export const getProjectByTitle = createAsyncThunk(
+    'defects/getProjectByTitle',
+    async({projectTitle})=>{
+        try {
+            const request = await axios.get(`/api/project/${projectTitle}`, getAuthHeader())
             return { project: request.data }
         } catch (error) {
             throw error;

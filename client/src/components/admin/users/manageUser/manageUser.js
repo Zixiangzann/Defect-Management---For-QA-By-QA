@@ -4,10 +4,15 @@ import ManageUserDetails from './manageUserDetails';
 import ManageUserPermission from './manageUserPermission';
 import ManageUserRole from './manageUserRole';
 import { resetState } from '../../../../store/reducers/admin';
+import { isAuth } from '../../../../store/actions/users';
+import ManageUserProject from './manageUserProject';
+import ModalComponent from '../../../../utils/modal/modal';
+import ManageUserResetPW from './manageUserResetPW';
+
 
 //lib
-import ModalComponent from '../../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import {
     addUser,
     checkEmailExist,
@@ -21,9 +26,10 @@ import {
     resetUserPassword,
     getAllUsersEmail,
     updateUserPermission,
-    updateRole
+    updateRole,
+    getAllProjects
 } from '../../../../store/actions/admin';
-import ManageUserResetPW from './manageUserResetPW';
+
 
 //MUI
 import Box from '@mui/material/Box'
@@ -41,7 +47,8 @@ import Tab from '@mui/material/Tab';
 import List from '@mui/material/List';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-import { isAuth } from '../../../../store/actions/users';
+import { getProjectByTitle } from '../../../../store/actions/defects';
+
 
 const ManageUser = () => {
 
@@ -57,6 +64,7 @@ const ManageUser = () => {
     const users = useSelector(state => state.users)
     const userDetails = useSelector(state => state.admin.userDetails)
     const userPermission = useSelector(state => state.admin.userPermission[0])
+    const userProject = useSelector(state => state.admin.userProject)
 
     //User Field state
     const [firstname, setFirstName] = useState('')
@@ -116,6 +124,10 @@ const ManageUser = () => {
         deleteComponent: false
     })
 
+    // project
+    const [project,setProject] = useState('');
+    const [selectProject,setSelectProject] = useState('');
+
 
     //Handle
 
@@ -137,6 +149,15 @@ const ManageUser = () => {
             }))
         }
     }, [searchUser])
+
+    const { projectTitle } = useParams();
+    useEffect(()=>{
+        if(selectProject !== ""){
+            dispatch(getProjectByTitle({
+                projectTitle:selectProject
+            }))
+        }
+    },[selectProject])
 
     useEffect(() => {
         if (userDetails.email && userDetails !== 'User not found') {
@@ -440,6 +461,17 @@ const ManageUser = () => {
         return JSON.stringify(userPrevious) === JSON.stringify(userCurrent)
     }
 
+    //Project handle
+    const handleProjectDelete = () => {
+
+    }
+
+    const handleSelectProject = (event) => {
+        setSelectProject(event.target.value)
+        console.log(selectProject)
+
+    }
+
     //use effect
 
     useEffect(() => {
@@ -452,6 +484,7 @@ const ManageUser = () => {
     useEffect(() => {
         dispatch(resetState())
         dispatch(getAllUsersEmail({}))
+        dispatch(getAllProjects({}))
     }, [])
 
 
@@ -566,7 +599,7 @@ const ManageUser = () => {
                                     onClick={() => setTab(4)}
                                 >
                                     <ListItemText
-                                        primary="Assign Project"
+                                        primary="Project"
 
                                     />
                                 </ListItemButton>
@@ -648,9 +681,14 @@ const ManageUser = () => {
 
 
                 {tab === 4 ?
-                    <>
-                        Assign Project
-                    </>
+                   <ManageUserProject
+                   admin={admin}
+                   userProject={userProject}
+                   selectProject={selectProject}
+                   handleSelectProject={handleSelectProject}
+                   handleProjectDelete={handleProjectDelete}
+                   >
+                   </ManageUserProject>
                     :
                     null}
 

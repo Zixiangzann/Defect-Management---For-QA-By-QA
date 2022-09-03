@@ -254,8 +254,8 @@ export const getAllAssignee = async (title) => {
 }
 //Get details for creating defects
 //To get available projects.
-//Only account with viewAllDefect can see all projects defects.
-//user or any other role can only see project that is assigned to them.
+//Only account with viewAllDefect permission can see all projects defects.
+//account without this permission can only see project that is assigned to them.
 export const getAllProjects = async (user) => {
     try {
         if (!user.permission[0].viewAllDefect) {

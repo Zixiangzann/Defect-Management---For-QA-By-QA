@@ -272,3 +272,15 @@ export const resetUserPassword = createAsyncThunk(
             }
         })
 
+        export const getAllProjects = createAsyncThunk(
+            'defects/getAllProjects',
+            async () => {
+                try {
+                    const request = await axios.post('/api/defect/projects', {}, getAuthHeader())
+                    return { project: request.data }
+                } catch (error) {
+                    throw error;
+                }
+            }
+        )
+

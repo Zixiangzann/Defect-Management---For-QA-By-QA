@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission} from '../actions/admin'
 import { showToast } from '../../utils/tools';
+import { getProjectByTitle } from '../actions/defects';
 
 const initialState = () => ({
     error:{
@@ -10,6 +11,8 @@ const initialState = () => ({
         userNotFound:null
     },
     userEmails:[],
+    projectList:[],
+    selectedProjectDetails:{},
     userDetails:{
         firstname:null,
         lastname:null,
@@ -18,6 +21,7 @@ const initialState = () => ({
         jobtitle:null
     },
     userPermission:{},
+    userProject:[]
 })
 
 export const adminSlice = createSlice({
@@ -27,6 +31,8 @@ export const adminSlice = createSlice({
         resetState: (state, action) => {
             state.userDetails = {}
             state.permission = {}
+            state.project = []
+            state.selectedProjectDetails = {}
           },
  
     },
@@ -63,12 +69,21 @@ export const adminSlice = createSlice({
             state.userDetails.email = action.payload.data[0].email
             state.userDetails.jobtitle = action.payload.data[0].jobtitle
             state.userDetails.role = action.payload.data[0].role
-
+            //permission
             state.userPermission = action.payload.data[0].permission
+            //project
+            state.userProject = action.payload.data[0].project
+
             state.error.userNotFound = null;
         })
         .addCase(getUserByEmail.rejected,(state,action)=>{
             state.error.userNotFound = "User not found"
+        })
+        .addCase(getAllProjects.fulfilled,(state,action)=>{
+            state.projectList = [...action.payload.project]
+        })
+        .addCase(getProjectByTitle.fulfilled,(state,action)=>{
+            state.selectedProjectDetails = action.payload.project
         })
         .addCase(updateFirstname.fulfilled,(state,action)=>{
             showToast('SUCCESS',"Successfully Updated")
@@ -102,7 +117,6 @@ export const adminSlice = createSlice({
         })
         .addCase(updateRole.fulfilled,(state,action)=>{
             showToast('SUCCESS',"Successfully Updated")
-            state.userDetails.role = action.payload.data.role
         })
         .addCase(updateRole.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)
