@@ -53,8 +53,16 @@ const projectController = {
 
     async assignProject(req, res, next) {
         try {
-            const projectTitle = req.query.title;
-            const project = await projectService.assignProject(projectTitle, req.body.email)
+            const project = await projectService.assignProject(req)
+            res.json(project);
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async removeAssigneeFromProject(req, res, next) {
+        try {
+            const project = await projectService.removeAssigneeFromProject(req)
             res.json(project);
         } catch (error) {
             next(error)

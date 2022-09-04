@@ -1,3 +1,7 @@
+//lib
+import Moment from 'react-moment';
+
+//MUI
 import { Divider, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip';
@@ -66,10 +70,10 @@ const ManageUserProject = ({
 
                 {selectProject !== "" ?
                 <Box flexBasis={'100%'}>
-                <Typography sx={{ flexBasis: '100%', mt: 2, mb: 2, fontSize: '1.2rem', fontWeight: '300' }}>Project Details</Typography> 
+                <Typography sx={{ flexBasis: '100%', mt: 3, mb: 2, fontSize: '1.2rem', fontWeight: '300' }}>Project Details</Typography> 
                 <Typography>Project Title: {admin.selectedProjectDetails.title}</Typography>
                 <Typography>Project Description: {admin.selectedProjectDetails.description}</Typography>
-                <Typography>Project Date: {admin.selectedProjectDetails.date}</Typography>
+                <Typography>Project Created Date: <Moment format="DD/MMM/YYYY HH:MMA">{admin.selectedProjectDetails.date}</Moment></Typography>
 
                 <Typography mt={1}>Current assignee: </Typography>
 
@@ -90,9 +94,12 @@ const ManageUserProject = ({
 
             </Box>
 
-
-            <Button variant='contained' sx={{mt:5}}>Assign project to user</Button>
-
+            <Box sx={{display:'flex',justifyContent:'flex-end'}}>
+            <Button 
+            variant='contained'
+            sx={{mt:5}}
+            >Assign project to user</Button>
+</Box>
 
                 </Box>
                 :
