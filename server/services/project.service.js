@@ -3,6 +3,7 @@ import httpStatus from 'http-status'
 import { ApiError } from '../middleware/apiError.js'
 import Defect from '../models/defect.js'
 import User from "../models/user.js"
+import { userService } from "./index.js";
 
 export const createProject = async (body) => {
     try {
@@ -85,11 +86,11 @@ export const assignProject = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -111,7 +112,12 @@ export const assignProject = async (req) => {
 
     const result = new Array();
     result.push(await updatedProject)
-    result.push("email:" + await updatedUser.email + "," + "project:" + await updatedUser.project)
+    result.push(
+        {
+            "email": await updatedUser.email,
+            "project": await updatedUser.project
+        }
+    )
 
     return result;
 
@@ -129,11 +135,11 @@ export const removeAssigneeFromProject = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -152,7 +158,10 @@ export const removeAssigneeFromProject = async (req) => {
 
     const result = new Array();
     result.push(await updatedProject)
-    result.push("email:" + await updatedUser.email + "," + "project:" + await updatedUser.project)
+    result.push({
+        "email": await updatedUser.email,
+        "project": await updatedUser.project
+    })
 
     return result;
 

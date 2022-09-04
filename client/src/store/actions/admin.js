@@ -284,3 +284,54 @@ export const resetUserPassword = createAsyncThunk(
             }
         )
 
+        export const assignProject = createAsyncThunk(
+            'defects/assignProject',
+            async ({
+                adminEmail,
+                adminPassword,
+                userEmail,
+                projectTitle
+            },{rejectWithValue}) =>{
+                try {
+                    const request = await axios.patch('/api/project/assign',{
+                        adminEmail,
+                        adminPassword,
+                        userEmail,
+                        projectTitle
+                    },getAuthHeader())
+
+                    return request
+                }  catch (error) {
+                    if(!error.response){
+                        throw error
+                    }
+                    return rejectWithValue(error.response)   
+                }
+            }
+        )
+
+        export const removeFromProject = createAsyncThunk(
+            'defects/removeFromProject',
+            async ({
+                adminEmail,
+                adminPassword,
+                userEmail,
+                projectTitle
+            },{rejectWithValue}) =>{
+                try {
+                    const request = await axios.patch('/api/project/removefromproject',{
+                        adminEmail,
+                        adminPassword,
+                        userEmail,
+                        projectTitle
+                    },getAuthHeader())
+                    return request
+                }  catch (error) {
+                    if(!error.response){
+                        throw error
+                    }
+                    return rejectWithValue(error.response)   
+                }
+            }
+        )
+

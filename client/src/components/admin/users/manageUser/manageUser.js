@@ -27,7 +27,8 @@ import {
     getAllUsersEmail,
     updateUserPermission,
     updateRole,
-    getAllProjects
+    getAllProjects,
+    removeFromProject
 } from '../../../../store/actions/admin';
 
 
@@ -127,6 +128,7 @@ const ManageUser = () => {
     // project
     const [project,setProject] = useState('');
     const [selectProject,setSelectProject] = useState('');
+    const [removeUserProject, setRemoveUserProject] = useState('')
 
 
     //Handle
@@ -221,11 +223,14 @@ const ManageUser = () => {
     //Modal handle
     const handleModalConfirm = async () => {
 
+        const adminPassword = modalInput
+        const userEmail = searchUser
+
         switch (editingField) {
             case "confirmFirstname":
                 dispatch(updateFirstname({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewFirstName: firstname
                 }))
                     .unwrap()
@@ -239,8 +244,8 @@ const ManageUser = () => {
                 break;
             case "confirmLastname":
                 dispatch(updateLastname({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewLastName: lastname
                 }))
                     .unwrap()
@@ -254,8 +259,8 @@ const ManageUser = () => {
                 break;
             case "confirmUsername":
                 dispatch(updateUsername({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewUsername: username
                 }))
                     .unwrap()
@@ -269,8 +274,8 @@ const ManageUser = () => {
                 break;
             case "confirmEmail":
                 dispatch(updateEmail({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewEmail: email
                 }))
                     .unwrap()
@@ -288,8 +293,8 @@ const ManageUser = () => {
                 break;
             case "confirmJobtitle":
                 dispatch(updateJobtitle({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewJobTitle: jobtitle
                 }))
                     .unwrap()
@@ -303,8 +308,8 @@ const ManageUser = () => {
                 break;
             case "confirmRole":
                 dispatch(updateRole({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewRole: role
                 }))
                     .unwrap()
@@ -319,8 +324,8 @@ const ManageUser = () => {
 
             case "confirmUpdatePermission":
                 dispatch(updateUserPermission({
-                    adminPassword: modalInput,
-                    userEmail: searchUser,
+                    adminPassword,
+                    userEmail,
                     userNewPermission: permission
                 }))
                     .unwrap()
@@ -334,8 +339,6 @@ const ManageUser = () => {
                 break;
             case "resetPassword":
                 //generate a new password
-                const adminPassword = modalInput
-                const userEmail = searchUser
                 const userNewPassword = createPassword()
                 setNewPassword(userNewPassword)
                 console.log(userNewPassword)
@@ -355,6 +358,19 @@ const ManageUser = () => {
                     })
 
                 break;
+
+            case "removeFromProject":
+            const projectTitle = removeUserProject
+            dispatch(removeFromProject({
+                adminPassword,
+                userEmail,
+                projectTitle
+            }))
+            .then(() => {
+                dispatch(getUserByEmail({ email: searchUser }))
+                dispatch(isAuth())
+            })
+            break;    
             default:
                 break;
         }
@@ -439,6 +455,7 @@ const ManageUser = () => {
             case "confirmPermission":
                 setModalDescription(`You are about to change user's Permission`)
                 setEditingField("confirmUpdatePermission");
+                break;
             default:
                 break;
         }
@@ -462,8 +479,12 @@ const ManageUser = () => {
     }
 
     //Project handle
-    const handleProjectDelete = () => {
-
+    const handleProjectDelete = (title) => {
+        setRemoveUserProject(title)
+        setEditingField('removeFromProject')
+        setOpenModal(true)
+        setModalDescription(`You are about to remove user from project: "${title}"`)
+        setModalInput('')
     }
 
     const handleSelectProject = (event) => {

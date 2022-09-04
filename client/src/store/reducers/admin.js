@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject} from '../actions/admin'
 import { showToast } from '../../utils/tools';
 import { getProjectByTitle } from '../actions/defects';
 
@@ -131,6 +131,18 @@ export const adminSlice = createSlice({
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateUserPermission.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(assignProject.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Successfully Updated")
+        })
+        .addCase(assignProject.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(removeFromProject.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Successfully Updated")
+        })
+        .addCase(removeFromProject.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)
         })
 

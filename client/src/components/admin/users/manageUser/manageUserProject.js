@@ -29,11 +29,15 @@ const ManageUserProject = ({
 
             <Box sx={{ mt: 3, mr: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 
-                {userProject.map((item, index) => (
+            {userProject.length === 0 ?
+            <Typography>There is no project is being assigned to this user</Typography>
+        :
+        null}
+                {userProject.map((title, index) => (
                     <Chip
-                        label={item}
-                        id={`${item}-${index}`}
-                        key={`${item}-${index}`}
+                        label={title}
+                        id={`${title}-${index}`}
+                        key={`${title}-${index}`}
                         variant="outlined"
                         color="info"
                         deleteIcon={
@@ -41,7 +45,7 @@ const ManageUserProject = ({
                                 <RemoveCircleOutlineIcon />
                             </Tooltip>
                         }
-                        onDelete={handleProjectDelete}
+                        onDelete={()=>handleProjectDelete(title)}
                         sx={{ mr: 3, mt: 1 }}
                     />
                 ))}
