@@ -101,7 +101,7 @@ export const assignProject = async (req) => {
     if (!project) throw new ApiError(httpStatus.BAD_REQUEST, 'Project not found');
 
     //check if user is already assigned to project
-    if (project.assignee.includes(userEmail)) throw new ApiError(httpStatus.BAD_REQUEST, 'User is already assigned');
+    if (project.assignee.includes(userEmail)) throw new ApiError(httpStatus.BAD_REQUEST, 'User is already assigned to this project');
 
     //update in Project collection
     const updatedProject = await Project.findOneAndUpdate({ title: projectTitle }, { $push: { assignee: userEmail } }, { new: true })

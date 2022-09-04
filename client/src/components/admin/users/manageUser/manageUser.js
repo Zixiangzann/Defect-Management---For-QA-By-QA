@@ -28,7 +28,8 @@ import {
     updateUserPermission,
     updateRole,
     getAllProjects,
-    removeFromProject
+    removeFromProject,
+    assignProject
 } from '../../../../store/actions/admin';
 
 
@@ -41,7 +42,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import { showToast } from '../../../../utils/tools';
 import Typography from '@mui/material/Typography';
-import { IconButton, InputAdornment, ListItem, Menu, MenuItem, Select } from '@mui/material';
+import { Divider, IconButton, InputAdornment, ListItem, Menu, MenuItem, Select } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -126,9 +127,10 @@ const ManageUser = () => {
     })
 
     // project
-    const [project,setProject] = useState('');
-    const [selectProject,setSelectProject] = useState('');
+    const [project, setProject] = useState('');
+    const [selectProject, setSelectProject] = useState('');
     const [removeUserProject, setRemoveUserProject] = useState('')
+    const [assignUserProject, setAssignUserProject] = useState('')
 
 
     //Handle
@@ -153,13 +155,13 @@ const ManageUser = () => {
     }, [searchUser])
 
     const { projectTitle } = useParams();
-    useEffect(()=>{
-        if(selectProject !== ""){
+    useEffect(() => {
+        if (selectProject !== "") {
             dispatch(getProjectByTitle({
-                projectTitle:selectProject
+                projectTitle: selectProject
             }))
         }
-    },[selectProject])
+    }, [selectProject])
 
     useEffect(() => {
         if (userDetails.email && userDetails !== 'User not found') {
@@ -178,7 +180,7 @@ const ManageUser = () => {
         }
 
 
-    }, [userDetails,userPermission, editEnabled])
+    }, [userDetails, userPermission, editEnabled])
 
     //User Field handle
     const handleFirstName = (event) => {
@@ -239,7 +241,7 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
-                        dispatch(isAuth())
+                        // dispatch(isAuth())
                     })
                 break;
             case "confirmLastname":
@@ -254,7 +256,7 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
-                        dispatch(isAuth())
+                        // dispatch(isAuth())
                     })
                 break;
             case "confirmUsername":
@@ -269,7 +271,7 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
-                        dispatch(isAuth())
+                        // dispatch(isAuth())
                     })
                 break;
             case "confirmEmail":
@@ -285,7 +287,7 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
-                        dispatch(isAuth())
+                        // dispatch(isAuth())
                     })
                     .catch(() => {
                         setSearchUser(userDetails.email);
@@ -303,7 +305,7 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
-                        dispatch(isAuth())
+                        // dispatch(isAuth())
                     })
                 break;
             case "confirmRole":
@@ -318,6 +320,9 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
+                        //only changing role and updating permission require to do isauth again
+                        //to get using account details again, in case of scenario
+                        //of updating of own account. Like "owner" account changing its own permission to enable/disable some permission.
                         dispatch(isAuth())
                     })
                 break;
@@ -334,6 +339,9 @@ const ManageUser = () => {
                     })
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
+                        //only changing role and updating permission require to do isauth again
+                        //to get using account details again, in case of scenario 
+                        //of updating own account. Like "owner" account changing its own permission to enable/disable some permission.
                         dispatch(isAuth())
                     })
                 break;
@@ -360,17 +368,34 @@ const ManageUser = () => {
                 break;
 
             case "removeFromProject":
-            const projectTitle = removeUserProject
-            dispatch(removeFromProject({
-                adminPassword,
-                userEmail,
-                projectTitle
-            }))
-            .then(() => {
-                dispatch(getUserByEmail({ email: searchUser }))
-                dispatch(isAuth())
-            })
-            break;    
+                const projectTitle = removeUserProject
+                dispatch(removeFromProject({
+                    adminPassword,
+                    userEmail,
+                    projectTitle
+                }))
+                    .unwrap()
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(getProjectByTitle({ projectTitle: selectProject }))
+                        // dispatch(isAuth())
+                    })
+                break;
+            case "assignToProject":
+                //assign the selected project    
+                const toAssign = selectProject
+                dispatch(assignProject({
+                    adminPassword,
+                    userEmail,
+                    projectTitle: toAssign
+                }))
+                    .unwrap()
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                        dispatch(getProjectByTitle({ projectTitle: selectProject }))
+                        // dispatch(isAuth())
+                    })
+                break;
             default:
                 break;
         }
@@ -487,6 +512,14 @@ const ManageUser = () => {
         setModalInput('')
     }
 
+    const handleProjectAssign = () => {
+        setAssignUserProject(selectProject)
+        setEditingField('assignToProject')
+        setOpenModal(true)
+        setModalDescription(`You are about to assign user to "${selectProject}" project`)
+        setModalInput('')
+    }
+
     const handleSelectProject = (event) => {
         setSelectProject(event.target.value)
         console.log(selectProject)
@@ -523,7 +556,7 @@ const ManageUser = () => {
                     id='searchUser'
                     sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor='searchUser'
-                    >Select User</InputLabel>
+                    >{searchUser === "" ? "Select User" : "Selected User" }</InputLabel>
                     <Select
                         id="selectuser"
                         value={searchUser}
@@ -538,7 +571,7 @@ const ManageUser = () => {
 
                 <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }}>
 
-                    <List sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start' , whiteSpace:'nowrap'}}>
+                    <List sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
                         {userDetails.email ?
                             <ListItem className='tab-userdetails'
                                 sx={{}}>
@@ -628,6 +661,7 @@ const ManageUser = () => {
                             : null}
 
                     </List>
+                    <Divider></Divider>
                 </Box>
 
                 {tab === 0 ?
@@ -702,14 +736,15 @@ const ManageUser = () => {
 
 
                 {tab === 4 ?
-                   <ManageUserProject
-                   admin={admin}
-                   userProject={userProject}
-                   selectProject={selectProject}
-                   handleSelectProject={handleSelectProject}
-                   handleProjectDelete={handleProjectDelete}
-                   >
-                   </ManageUserProject>
+                    <ManageUserProject
+                        admin={admin}
+                        userProject={userProject}
+                        selectProject={selectProject}
+                        handleSelectProject={handleSelectProject}
+                        handleProjectDelete={handleProjectDelete}
+                        handleProjectAssign={handleProjectAssign}
+                    >
+                    </ManageUserProject>
                     :
                     null}
 

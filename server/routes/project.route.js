@@ -8,7 +8,7 @@ import {auth} from '../middleware/auth.js'
 
 
 router.get('/:title',auth('readAny','projects'),projectController.getProjectByTitle)
-router.get('/all',auth('readAny','projects'),projectController.getAllProjects)
+router.post('/all',auth('readAny','projects'),projectController.getAllProjects)
 router.post('/add',auth('createAny','projects'),projectController.createProject)
 router.patch('/update',auth('updateAny','projects'),projectController.updateProjectByTitle)
 router.delete('/delete',auth('deleteAny','projects'),projectController.deleteProjectByTitle)

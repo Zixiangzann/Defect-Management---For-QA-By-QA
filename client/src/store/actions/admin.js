@@ -273,10 +273,10 @@ export const resetUserPassword = createAsyncThunk(
         })
 
         export const getAllProjects = createAsyncThunk(
-            'defects/getAllProjects',
+            'project/getAllProjects',
             async () => {
                 try {
-                    const request = await axios.post('/api/defect/projects', {}, getAuthHeader())
+                    const request = await axios.post('/api/project/all', {}, getAuthHeader())
                     return { project: request.data }
                 } catch (error) {
                     throw error;
@@ -285,7 +285,7 @@ export const resetUserPassword = createAsyncThunk(
         )
 
         export const assignProject = createAsyncThunk(
-            'defects/assignProject',
+            'project/assignProject',
             async ({
                 adminEmail,
                 adminPassword,
@@ -311,7 +311,7 @@ export const resetUserPassword = createAsyncThunk(
         )
 
         export const removeFromProject = createAsyncThunk(
-            'defects/removeFromProject',
+            'project/removeFromProject',
             async ({
                 adminEmail,
                 adminPassword,

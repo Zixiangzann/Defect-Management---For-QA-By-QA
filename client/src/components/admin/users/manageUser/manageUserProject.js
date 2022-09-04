@@ -19,20 +19,23 @@ const ManageUserProject = ({
     userProject,
     handleProjectDelete,
     selectProject,
-    handleSelectProject
+    handleSelectProject,
+    handleProjectAssign
 }
 ) => {
     return (
         <Box flexBasis='100%'>
 
-            <Typography variant='h5' sx={{ flexBasis: '100%',mt:5}}>Project current assigned to user</Typography>
+            <Typography variant='h5' sx={{ flexBasis: '100%',mt:5}}>{userProject.length <= 1 ? "Project " : "Projects "} currently assigned to user</Typography>
+            <Typography mt={3}>Number of {userProject.length <= 1 ? "project: " : "projects: "} {userProject.length}</Typography>
+            
 
             <Box sx={{ mt: 3, mr: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 
             {userProject.length === 0 ?
-            <Typography>There is no project is being assigned to this user</Typography>
+            <Typography flexBasis={'100%'}>There is no project assigned to this user</Typography>
         :
-        null}
+        <Typography mr={5}>Project name: </Typography>}
                 {userProject.map((title, index) => (
                     <Chip
                         label={title}
@@ -102,6 +105,7 @@ const ManageUserProject = ({
             <Button 
             variant='contained'
             sx={{mt:5}}
+            onClick={()=>handleProjectAssign()}
             >Assign project to user</Button>
 </Box>
 
