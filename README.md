@@ -70,10 +70,58 @@ can:
 (Title, Description, Components, Assignee)
 - View Project details
 
+Account Permission
 
-To Do
-- Update proper documentation with screenshots and update permissions section.
+Standard User permission
+
+(Account role that can have these permission: User,Admin,Owner)
+
+- addDefect: (permission to create defect)  
+- editOwnDefect: (permission to edit own defect)
+- editAllDefect:(permission to edit all defects if the project is assigned to the account)
+- addComment: (permission to add comment)  
+- editOwnComment: (permission to edit own comment)
+- deleteOwnComment:  (permission to delete own comment)
+
+Owner/Admin permission 
+
+(Account role that can have these permission: Admin,Owner)
+
+Defect Management 
+
+- viewAllDefects: (permission to view all defects including project that are not assigned to the account)
+- deleteAllDefect: (permission to delete all defects including project that are not assigned to the account)
+- editAllComment: (permission to edit all comments)
+- deleteAllComment: (permission to delete all comments)
+
+Account Management 
+
+- addUser: (permission to add new account.)
+Admin/Owner account can only be created by Account role that is *Owner*)
+- disableUser: (permission to ban account from accessing)
+- deleteUser: (permission to delete a account)
+- changeUserDetails: (permission to change account details such as first name, last name, email, username, jobtitle)
+- resetUserPassword: (permission to reset user password)
+
+Project Management 
+
+- addProject: (permission to add new project)
+- assignProject: (permission to assign account to a project)
+- deleteProject: (permission to delete a project)
+- addComponent: (permission to add component to project)
+- deleteComponent: (permission to delete component from project)
+
+
+To Do List
+
+Functionality 
 - Project Management implementation 
 - Home Page( To be fill with User stats) 
+- Task implementation (like user story or project to do list)
+
+Non-function 
+- proper documentation. (including on how to host this project on your own)
+- Host this project on heroku and let people who are interested to try using this)
+- Find people who are interested to join me in implementing this system (Non-profit as this project is meant to be free to use)
 
 
