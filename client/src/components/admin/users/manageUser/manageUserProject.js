@@ -62,7 +62,7 @@ const ManageUserProject = ({
                 id='project-select'
                 sx={{ mt: 1, width: '100%' }}>
                 <InputLabel htmlFor='project-select'
-                >Select Project to assign</InputLabel>
+                >{selectProject === "" ? "Select Project to assign" : "Selected Project"}</InputLabel>
                 <Select
                     id="project-select"
                     value={selectProject}
@@ -77,7 +77,7 @@ const ManageUserProject = ({
 
                 {selectProject !== "" ?
                 <Box flexBasis={'100%'}>
-                <Typography sx={{ flexBasis: '100%', mt: 3, mb: 2, fontSize: '1.2rem', fontWeight: '300' }}>Project Details</Typography> 
+                <Typography sx={{ flexBasis: '100%', mt: 3, mb: 2, fontSize: '1.2rem', fontWeight: '300', textDecoration:'underline' }}>Project Details</Typography> 
                 <Typography>Project Title: {admin.selectedProjectDetails.title}</Typography>
                 <Typography>Project Description: {admin.selectedProjectDetails.description}</Typography>
                 <Typography>Project Created Date: <Moment format="DD/MMM/YYYY HH:MMA">{admin.selectedProjectDetails.date}</Moment></Typography>
