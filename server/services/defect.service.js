@@ -114,7 +114,7 @@ export const updateDefectById = async (defectId, user, body) => {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view defect');
         }
 
-        if (user.permission[0].editOwnDefect && defect.reporter !== user.email) {
+        if (!user.permission[0].editAllDefect && user.permission[0].editOwnDefect && defect.reporter !== user.email) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
         }
 
@@ -298,12 +298,25 @@ export const filterDefectList = async (req, user) => {
         const server = req.body.server || '';
         const search = req.body.search || '(.*?)';
 
-        if (!user.permission[0].viewAllDefect && !user.project.includes(project)) {
+        //if search by project but user is not assigned to the project and does not have viewAllDefect permission throw error
+        if(project !== '' && !user.permission[0].viewAllDefect && !user.project.includes(project)){
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
         }
 
-     const matchAll = new RegExp('(.*?)', 'gi')   
-     const filterProject = (project==='') ? { $regex: matchAll } : project   
+     const matchAll = new RegExp('(.*?)', 'gi')
+     //if not search by project and user does not have viewAllDefect permission
+     //the searched project will be whatever project that is assigned to the user
+     //else if user have viewAllDefect permission then search everything   
+     let filterProject = '' 
+     
+     if(project==='' && !user.permission[0].viewAllDefect){
+        filterProject = { $in: user.project }
+     }else if(project==='' && user.permission[0].viewAllDefect){
+        filterProject = { $regex: matchAll }
+     }else{
+        filterProject =  project
+     }
+     
      const filterComponents = (components==='') ? { $regex: matchAll } : components   
      const filterStatus = (status==='') ? { $regex: matchAll } : status
      const filterSeverity = (severity==='') ? { $regex: matchAll } : severity

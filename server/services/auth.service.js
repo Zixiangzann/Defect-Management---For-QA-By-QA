@@ -12,9 +12,8 @@ export const genAuthToken = (user) => {
 export const signInWithEmailAndPassword = async (email, password) => {
     try {
         const user = await userService.findUserByEmail(email);
-        //for testing purpose. TO BE REMOVE
         if (!(await user.comparePassword(password))) {
-            throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry BAD password');
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Please check your credentials');
         }
 
         return user;

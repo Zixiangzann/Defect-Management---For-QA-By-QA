@@ -15,7 +15,7 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 
 
-const AdminProjects = () => {
+const ProjectManagement = () => {
 
 
 
@@ -40,7 +40,11 @@ const AdminProjects = () => {
                             />
                         </ListItemButton>
                     </ListItem>
-                    <Divider />
+
+                    <Divider
+                        flexItem
+                        orientation="vertical"
+                        sx={{ borderRightWidth: 2, borderColor: 'black' }} />
 
                     <ListItem disablePadding>
                         <ListItemButton
@@ -60,9 +64,9 @@ const AdminProjects = () => {
             <Box>
                 {
                     (() => {
-                        if (activeTab===0)
+                        if (activeTab === 0)
                             return <span>One</span>
-                        if (activeTab===1)
+                        if (activeTab === 1)
                             return <span>Two</span>
                     })()
                 }
@@ -73,4 +77,4 @@ const AdminProjects = () => {
 
 }
 
-export default AdminProjects;
+export default ProjectManagement;

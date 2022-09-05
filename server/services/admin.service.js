@@ -8,8 +8,17 @@ import Project from "../models/project.js";
 import bcrypt from 'bcrypt'
 import Defect from "../models/defect.js";
 
+
+// import { getAuth } from 'firebase-admin/auth';
+import admin from 'firebase-admin';
+import { getAuth } from 'firebase-admin/auth'
+import serviceAccount from "../forqabyqa-firebase-adminsdk-2d6wj-bcbbdb857e.json" assert {type: 'json'};
+
+
 export const addUser = async (req) => {
     try {
+
+        let userNewPermission = ''
 
         //check account permission
         if (!req.user.permission[0].addUser) {
@@ -22,7 +31,7 @@ export const addUser = async (req) => {
         }
 
         //non owner account cannot create account with these permission
-        if (req.user.role !== 'owner' || (
+        if (req.user.role !== 'owner' && (
             req.body.permission.viewAllDefect ||
             req.body.permission.deleteAllDefect ||
             req.body.permission.editAllComment ||
@@ -230,8 +239,8 @@ export const updateUserEmail = async (req) => {
     const userUpdatedEmail = req.body.userNewEmail
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
+    const adminservice = await userService.findUserByEmail(adminEmail);
+    if (!(await adminservice.comparePassword(adminPassword))) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
@@ -243,6 +252,27 @@ export const updateUserEmail = async (req) => {
     const updatedUser = User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
     const updatedUserProject = Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
     const updatedUserDefect = Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
+
+    let app = admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+
+
+    console.log("test")
+
+//testing , to be replace with firebase uid
+    getAuth().updateUser(
+        "uRIyzYDrJTMRuCwB0v4jTipT6Qv1", {
+        email: userUpdatedEmail
+    }
+    ).then((userRecord) => {
+        // See the UserRecord reference doc for the contents of userRecord.
+        console.log('Successfully updated user', userRecord.toJSON());
+    })
+        .catch((error) => {
+            console.log('Error updating user:', error);
+        });
+
 
     // join the json and return as response
     const result = new Array();
@@ -361,7 +391,7 @@ export const updateUserRole = async (req) => {
         const updatedUser = User.findOneAndUpdate({ email: userEmail }, { role: userNewRole }, { new: true });
         return updatedUser;
     }//changing role to user will remove all admin permission 
-    else if(userNewRole === 'user'){
+    else if (userNewRole === 'user') {
         const removedAllAdminPermission = [{
             addDefect: user.permission[0].addDefect,
             editOwnDefect: user.permission[0].editOwnDefect,
@@ -385,13 +415,15 @@ export const updateUserRole = async (req) => {
             deleteComponent: false,
         }]
 
-        const updatedUser = User.findOneAndUpdate({ email: userEmail }, { "$set": {
-            role: userNewRole,
-            permission: removedAllAdminPermission
-        }}, { new: true });
+        const updatedUser = User.findOneAndUpdate({ email: userEmail }, {
+            "$set": {
+                role: userNewRole,
+                permission: removedAllAdminPermission
+            }
+        }, { new: true });
         return updatedUser;
     }
-    
+
     else {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid role');
     }

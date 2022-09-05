@@ -2,6 +2,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
+import { initializeApp } from "firebase/app";
+import { getAuth,createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 export const getAllUsersEmail = createAsyncThunk(
     'admin/getAllUsersEmail',
@@ -23,10 +25,18 @@ export const addUser = createAsyncThunk(
 
         try {
 
+            const auth = getAuth();
+
             const request = await axios.post('/api/admin/adduser', {
                 userDetails,
                 permission
             }, getAuthHeader());
+
+            createUserWithEmailAndPassword(auth,userDetails.email,userDetails.password)
+            .then((userCredential)=>{
+                console.log("created")
+            })
+
             return { data: request.data.user }
         } catch (error) {
             // dispatch(errorGlobal(error.response.data.message));
@@ -162,6 +172,7 @@ export const updateEmail = createAsyncThunk(
                 userEmail,
                 userNewEmail
             }, getAuthHeader())
+
             return { data: request.data }
 
         } catch (error) {

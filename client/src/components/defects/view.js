@@ -10,8 +10,12 @@ import { addComment, getCommentByDefectIdPaginate } from '../../store/actions/co
 import { getDefectById } from '../../store/actions/defects';
 import ModalComponent from '../../utils/modal/modal';
 
+
+
 //firebase
 import { getBlob, getDownloadURL, getStorage, ref } from "firebase/storage";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 
 //MUI
 import ArticleIcon from '@mui/icons-material/Article';
@@ -69,11 +73,17 @@ const ViewDefect = () => {
         overflow: 'auto'
     }
 
+    
+
+
     //paginate
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(3);
     const [commentTextArea, setCommentTextArea] = useState('')
     const [commented, setCommented] = useState(false)
+
+    //Firebase
+    const auth = getAuth();
 
     //Modal
     const [openModal, setOpenModal] = useState(false);
@@ -142,6 +152,8 @@ const ViewDefect = () => {
     const handlePreview = async (downloadURL, itemType) => {
         const storage = getStorage();
         const storageRef = ref(storage, downloadURL)
+        onAuthStateChanged(auth,(user)=>{
+        if(user){
         getDownloadURL(storageRef)
             .then((url) => {
                 const xhr = new XMLHttpRequest();
@@ -179,22 +191,16 @@ const ViewDefect = () => {
                                 setPreviewDocContent(event.target.result)
                                 setPreviewTitle(storageRef.name)
                                 setShowDoc(true)
-                                console.log(event.target.result)
-
                             }
                             reader.readAsText(new File([await blob], {
                                 type: "text/plain",
                             }))
-
-
-
                         default:
                             break;
                     }
                 };
                 xhr.open('GET', url);
                 xhr.send();
-
             })
             .then(() => {
                 //pdf type open in new tab
@@ -203,8 +209,9 @@ const ViewDefect = () => {
             .catch((error) => {
                 console.log(error)
             });
+        }
+    })}
 
-    }
 
     const attachmentIcon = (filetype) => {
         let icon = <InsertDriveFileIcon />

@@ -35,8 +35,13 @@ extraReducers:(builder)=>{
         state.loading = false;
         state.data = action.payload.data;
         state.auth = true;
+        showToast("SUCCESS",<div>Login success</div>)
     })
-    .addCase(signInUser.rejected,(state)=>{state.loading=false})
+    .addCase(signInUser.rejected,(state,action)=>{
+        state.loading=false
+        showToast("ERROR",<div>Login failed.<br /> {action.payload.data.message}</div>)
+    
+    })
      // IS AUTH
      .addCase(isAuth.pending,(state)=>{ state.loading = true })
      .addCase(isAuth.fulfilled,(state,action)=>{

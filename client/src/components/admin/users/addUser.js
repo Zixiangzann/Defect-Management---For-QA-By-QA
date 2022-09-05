@@ -1,5 +1,5 @@
 //comp
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 //lib
 import ModalComponent from '../../../utils/modal/modal';
@@ -29,16 +29,16 @@ const AddUser = () => {
     const [emailCheck, setEmailCheck] = useState(false);
 
     const [userDetails, setUserDetails] = useState({
-        firstname:'',
-        lastname:'',
-        username:'',
-        email:'',
-        password:'',
-        role:'user',
-        jobtitle:''
+        firstname: '',
+        lastname: '',
+        username: '',
+        email: '',
+        password: '',
+        role: 'user',
+        jobtitle: ''
     })
 
-    const handleUserDetails = (event) =>{
+    const handleUserDetails = (event) => {
         const value = event.target.value
         setUserDetails({
             ...userDetails,
@@ -48,26 +48,26 @@ const AddUser = () => {
 
     //Permission state
     const [permission, setPermission] = useState({
-        addDefect:true,
-        editOwnDefect:true,
-        addComment:true,
-        editOwnComment:true,
-        deleteOwnComment:true,
-        viewAllDefect:false,
-        editAllDefect:false,
-        deleteAllDefect:false,
-        editAllComment:false,
-        deleteAllComment:false,
-        addUser:false,
-        disableUser:false,
-        deleteUser:false,
-        changeUserDetails:false,
-        resetUserPassword:false,
-        addProject:false,
-        assignProject:false,
-        deleteProject:false,
-        addComponent:false,
-        deleteComponent:false
+        addDefect: true,
+        editOwnDefect: true,
+        addComment: true,
+        editOwnComment: true,
+        deleteOwnComment: true,
+        viewAllDefect: false,
+        editAllDefect: false,
+        deleteAllDefect: false,
+        editAllComment: false,
+        deleteAllComment: false,
+        addUser: false,
+        disableUser: false,
+        deleteUser: false,
+        changeUserDetails: false,
+        resetUserPassword: false,
+        addProject: false,
+        assignProject: false,
+        deleteProject: false,
+        addComponent: false,
+        deleteComponent: false
     })
 
     const handlePermission = (event) => {
@@ -89,7 +89,7 @@ const AddUser = () => {
     const handleGeneratePassword = () => {
         const password = createPassword();
         setUserDetails({
-            ...userDetails,    
+            ...userDetails,
             password
         })
     }
@@ -190,7 +190,7 @@ const AddUser = () => {
                         onChange={handleUserDetails}
                         fullWidth
                         onBlur={(e) => {
-                            dispatch(checkUsernameExist({ username:userDetails.username }))
+                            dispatch(checkUsernameExist({ username: userDetails.username }))
                         }}
                     />
                     <FormHelperText error>{admin.error.usernameTaken ? admin.error.usernameTaken : null}</FormHelperText>
@@ -211,7 +211,7 @@ const AddUser = () => {
                         onChange={handleUserDetails}
                         onBlur={(e) => {
                             handleEmailCheck(e)
-                            dispatch(checkEmailExist({ email:userDetails.email }))
+                            dispatch(checkEmailExist({ email: userDetails.email }))
                         }}
                         fullWidth
                     />
@@ -299,7 +299,7 @@ const AddUser = () => {
                 <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Defect management</Typography>
                 <FormControlLabel name='addDefect' control={<Checkbox defaultChecked />} label="Add Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                 <FormControlLabel name='editOwnDefect' control={<Checkbox defaultChecked />} label="Edit Own Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
-                <FormControlLabel name='editAllDefect' control={<Checkbox defaultChecked/>} label="Edit All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
+                <FormControlLabel name='editAllDefect' control={<Checkbox defaultChecked />} label="Edit All Defects" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                 <Typography sx={{ flexBasis: '100%', mt: 2, textDecoration: 'underline' }}>Comment management</Typography>
                 <FormControlLabel name='addComment' control={<Checkbox defaultChecked />} label="Add Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />
                 <FormControlLabel name='editOwnComment' control={<Checkbox defaultChecked />} label="Edit Own Comments" sx={{ flexBasis: '100%' }} onChange={handlePermission} />

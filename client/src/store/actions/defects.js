@@ -2,8 +2,11 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
+
+//firebase
 import { storage } from '../../firebase';
 import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject, listAll } from "firebase/storage"
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { async } from '@firebase/util';
 
 //Get details for creating defects
@@ -54,7 +57,7 @@ export const getAllProjects = createAsyncThunk(
 
 export const getProjectByTitle = createAsyncThunk(
     'defects/getProjectByTitle',
-    async({projectTitle})=>{
+    async ({ projectTitle }) => {
         try {
             const request = await axios.get(`/api/project/${projectTitle}`, getAuthHeader())
             return { project: request.data }
@@ -93,6 +96,7 @@ export const updateAttachment = createAsyncThunk(
         try {
 
             const uploadAndGetFileDetails = async () => {
+
                 const fileDetailsArray = []
 
                 const p1 = new Promise((resolve, reject) => {
@@ -162,9 +166,15 @@ export const updateAttachment = createAsyncThunk(
                     }
                         , 3000)
                 })
-            }
+            }     
+            //Firebase
+            const auth = getAuth();
 
-            uploadAndGetFileDetails();
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    uploadAndGetFileDetails();
+                }
+            })
 
         } catch (error) {
             console.log(error)
@@ -194,7 +204,7 @@ export const getAllDefectPaginate = createAsyncThunk(
         limit = 10,
         project = "",
         sortby = 'defectid',
-        order = 1,
+        order = -1,
         search
     }, { dispatch }) => {
         try {

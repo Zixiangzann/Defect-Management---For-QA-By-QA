@@ -10,7 +10,7 @@ export const findUserByEmail = async (email) => {
         const user = await User.findOne({email});
 
         if(!user){
-            throw new ApiError(httpStatus.BAD_REQUEST,'Account not found, please register');
+            throw new ApiError(httpStatus.BAD_REQUEST,'User not found');
         }
 
         return user;

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 //comp
 import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../store/actions/defects';
-import { setOrder, setSearch, setSortBy } from '../../store/reducers/defects';
+import { setOrder, setSearch, setSortBy,resetFilterState } from '../../store/reducers/defects';
 import ModalComponent from '../../utils/modal/modal';
 
 //MUI
@@ -135,6 +135,8 @@ const PaginateComponent = ({
             <MenuItem
             onClick={() => {
                 setOpenModal(true)
+                //close menu item
+                setShowMenu(false)
                 setToRemove(defect.defectid)
             }}>
                 <Tooltip title="Delete">
@@ -243,6 +245,11 @@ const PaginateComponent = ({
             }))
         }
     }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.search]);
+
+    useEffect(()=>{
+        //reset filter state on load
+        dispatch(resetFilterState())
+    },[])
 
 
 
