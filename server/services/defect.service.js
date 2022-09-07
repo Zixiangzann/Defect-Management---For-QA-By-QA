@@ -196,7 +196,7 @@ export const getMoreDefects = async (req, user) => {
 export const paginateDefectList = async (req) => {
 
     const sortby = req.body.sortby || "defectid";
-    const order = req.body.order || 1
+    const order = req.body.order || -1
     const limit = req.body.limit || 15;
     const skip = req.body.skip || 0;
     const search = req.body.search || '(.*?)';
