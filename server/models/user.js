@@ -18,6 +18,10 @@ const userSchema = mongoose.Schema({
             }
         }
     },
+    phone:{
+        type: String,
+        required: true
+    },
     username: {
         type: String,
         required: true
@@ -173,7 +177,12 @@ userSchema.statics.emailTaken = async function (email) {
 }
 
 userSchema.statics.usernameTaken = async function (username) {
-    const user = await this.findOne({ "username": username.toLowerCase() })
+    const user = await this.findOne({ "username": username.toLowerCase().trim() })
+    return !!user;
+}
+
+userSchema.statics.phoneTaken = async function (phone) {
+    const user = await this.findOne({ "phone": phone.trim() })
     return !!user;
 }
 

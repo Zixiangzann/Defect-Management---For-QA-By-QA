@@ -3,6 +3,7 @@ import { ApiError } from '../middleware/apiError.js';
 import { adminService } from '../services/index.js';
 import { emailService } from '../services/index.js';
 import User from '../models/user.js';
+import { checkPhoneExist } from '../services/admin.service.js';
 
 const adminController = {
     async getAllUsers(req, res, next) {
@@ -77,6 +78,17 @@ const adminController = {
             next(error)
         }
 
+    },
+
+    //might not be needed
+    async checkPhoneExist(req, res, next) {
+        //if phone already exist
+        try {
+            const phonecheck = await adminService.checkPhoneExist(req.body)
+            res.status(httpStatus.OK).json(phonecheck)
+        } catch (error) {
+            next(error)
+        }
     },
 
     async updateUserFirstName(req, res, next) {

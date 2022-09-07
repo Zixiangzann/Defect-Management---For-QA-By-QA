@@ -1,7 +1,9 @@
 import CirularProgress from '@mui/material/CircularProgress'
 import { toast} from 'react-toastify'
 import cookie from 'react-cookies'
-import { FormHelperText } from '@mui/material'
+import { FormHelperText, Typography } from '@mui/material'
+
+import Box from '@mui/material/Box'
 
 export const errorHelper = (formik, values) => ({
     error: formik.errors[values] && formik.touched[values] ? true : false,
@@ -17,11 +19,14 @@ export const errorHelperSelect = (formik,values) => (
         null
 )
 
-export const Loader = () => {
+export const Loader = ({
+    message
+}) => {
     return (
-        <div className='root_loader'>
+            <Box className="root_loader" sx={{display:'inline-flex' ,m:1}}>
             <CirularProgress />
-        </div>
+            <Typography ml={5} mt={2}>{message}</Typography>
+            </Box>
     )
 }
 

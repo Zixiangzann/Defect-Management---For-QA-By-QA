@@ -21,7 +21,7 @@ export const addUser = createAsyncThunk(
     async ({
         userDetails,
         permission
-    }, { dispatch }) => {
+    }, { dispatch,rejectWithValue}) => {
 
         try {
 
@@ -39,8 +39,12 @@ export const addUser = createAsyncThunk(
 
             return { data: request.data.user }
         } catch (error) {
-            // dispatch(errorGlobal(error.response.data.message));
-            throw error;
+            if(!error.response){
+                throw error
+            }
+
+            return rejectWithValue(error.response)
+            
         }
     })
 

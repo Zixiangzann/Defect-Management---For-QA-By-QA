@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import ModalComponent from '../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser, checkEmailExist, checkUsernameExist } from '../../../store/actions/admin';
+import { Loader } from '../../../utils/tools';
 
 //MUI
 import Button from '@mui/material/Button'
@@ -23,20 +24,28 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
+import InputAdornment from '@mui/material/InputAdornment';
+
+//React-phone-number-input
+import 'react-phone-input-2/lib/material.css'
+import PhoneInput from 'react-phone-input-2'
 
 const AddUser = () => {
 
     const [emailCheck, setEmailCheck] = useState(false);
+    const [phoneCheck, setPhoneCheck] = useState(0)
 
     const [userDetails, setUserDetails] = useState({
         firstname: '',
         lastname: '',
         username: '',
+        phone: '',
         email: '',
         password: '',
         role: 'user',
         jobtitle: ''
     })
+
 
     const handleUserDetails = (event) => {
         const value = event.target.value
@@ -44,6 +53,16 @@ const AddUser = () => {
             ...userDetails,
             [event.target.name]: value
         })
+    }
+
+    const handleTrimOnBlur = (event) => {
+        const value = event.target.value.trim()
+
+        setUserDetails({
+            ...userDetails,
+            [event.target.name]: value
+        })
+
     }
 
     //Permission state
@@ -125,13 +144,30 @@ const AddUser = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        dispatch(addUser({
-            userDetails,
-            permission
-        }))
-            .unwrap()
-            .then(() => setOpenModal(true))
-            .catch((error) => console.log(error))
+
+
+        //to find a better way for validation.
+        //Currently checking if the phone number is at least 8 characters including country code..
+        if (userDetails.phone.length >= 8) {
+            //if false mean ok, else throw error
+            setPhoneCheck(false)
+        } else {
+            setPhoneCheck(true)
+            showToast('ERROR', <div>Failed to create user <br></br> A valid phone number is required</div>)
+        }
+
+        if (emailCheck) showToast('ERROR', <div>Failed to create user <br></br>A valid email is required</div>)
+        if (admin.error.emailTaken) showToast('ERROR', <div>Failed to create user <br></br>Email have been taken</div>)
+        if (admin.error.usernameTaken) showToast('ERROR', <div>Failed to create user <br></br>Username have been taken</div>)
+
+        if (!phoneCheck && !emailCheck && !admin.error.emailTaken && !admin.error.usernameTaken) {
+            dispatch(addUser({
+                userDetails,
+                permission
+            }))
+                .unwrap()
+                .then(() => setOpenModal(true))
+        }
     }
 
     return (
@@ -154,6 +190,7 @@ const AddUser = () => {
                         value={userDetails.firstname}
                         label="First Name"
                         onChange={handleUserDetails}
+                        onBlur={handleTrimOnBlur}
                         fullWidth
                     />
                 </FormControl>
@@ -171,6 +208,7 @@ const AddUser = () => {
                         value={userDetails.lastname}
                         label="Last Name"
                         onChange={handleUserDetails}
+                        onBlur={handleTrimOnBlur}
                         fullWidth
                     />
                 </FormControl>
@@ -190,11 +228,34 @@ const AddUser = () => {
                         onChange={handleUserDetails}
                         fullWidth
                         onBlur={(e) => {
+                            handleTrimOnBlur(e)
                             dispatch(checkUsernameExist({ username: userDetails.username }))
                         }}
                     />
                     <FormHelperText error>{admin.error.usernameTaken ? admin.error.usernameTaken : null}</FormHelperText>
                 </FormControl>
+
+
+                <FormControl id='addPhoneNumberForm' sx={{ m: 1, flexBasis: '45%' }}>
+                    <PhoneInput
+                        inputProps={{
+                            id: "phone",
+                            name: 'phone',
+                            required: true,
+                        }}
+                        country={'sg'}
+                        placeholder='Enter phone number'
+                        value={userDetails.phone}
+                        onChange={phone => setUserDetails({ ...userDetails, phone })}
+                        inputStyle={{ width: 100 + '%' }}
+                        onBlur={() => {
+                            userDetails.phone.length >= 8 ? setPhoneCheck(false) : setPhoneCheck(true)
+                        }
+                        }
+                    ></PhoneInput>
+                    <FormHelperText error>{phoneCheck ? "Valid Phone number is required" : null}</FormHelperText>
+                </FormControl>
+
 
 
                 <FormControl id='addUserEmailForm' sx={{ m: 1, flexBasis: '45%' }}>
@@ -210,12 +271,13 @@ const AddUser = () => {
                         label="Email"
                         onChange={handleUserDetails}
                         onBlur={(e) => {
+                            handleTrimOnBlur(e)
                             handleEmailCheck(e)
                             dispatch(checkEmailExist({ email: userDetails.email }))
                         }}
                         fullWidth
                     />
-                    <FormHelperText error>{emailCheck ? "Invalid email" : null}</FormHelperText>
+                    <FormHelperText error>{!admin.error.emailTaken && emailCheck ? "Invalid email" : null}</FormHelperText>
                     <FormHelperText error>{admin.error.emailTaken ? admin.error.emailTaken : null}</FormHelperText>
 
                 </FormControl>
@@ -234,10 +296,11 @@ const AddUser = () => {
                         label="Job Title"
                         fullWidth
                         onChange={handleUserDetails}
+                        onBlur={handleTrimOnBlur}
                     />
                 </FormControl>
 
-                <Box flexBasis={'50%'}></Box>
+                <Box flexBasis={'100%'}></Box>
 
 
                 <FormControl id='addUserPasswordForm' sx={{ m: 1, flexBasis: '45%' }}>
@@ -282,7 +345,16 @@ const AddUser = () => {
                             label='Admin'
                             onChange={handleUserDetails}
                         />
-                        {users.data.role === 'owner' ? null : <FormHelperText>Only Super Admin can create "Admin" account</FormHelperText>}
+
+                        <FormControlLabel
+                            name='role'
+                            value='owner'
+                            control={<Radio disabled={users.data.role === 'owner' ? false : true} />}
+                            label='Owner'
+                            onChange={handleUserDetails}
+                        />
+
+                        {users.data.role === 'owner' ? null : <FormHelperText>Only Super Admin can create "Admin/Owner" account</FormHelperText>}
 
                     </RadioGroup>
                 </FormControl>
@@ -307,8 +379,8 @@ const AddUser = () => {
 
                 <Divider sx={{ flexBasis: '100%', borderBottomColor: 'black', mt: 5 }}></Divider>
 
-                {/* sensitive admin control, only some admin or owner should have these control */}
-                {users.data.role === 'owner' && userDetails.role === 'admin' ?
+                {/* sensitive admin control, only admin or owner account should hold these permission */}
+                {users.data.role === 'owner' && userDetails.role === 'admin' || userDetails.role === 'owner' ?
                     <>
                         <Typography sx={{ flexBasis: '100%', mt: 2, fontSize: '1.2rem', fontWeight: '600' }}>Admin</Typography>
 
@@ -345,13 +417,19 @@ const AddUser = () => {
 
 
 
+                {admin.loading ?
+                    <Loader
+                    message={"Creating account, please wait.."}
+                    ></Loader> :
+                    <Button
+                        id='addUserBtn'
+                        variant='contained'
+                        type='submit'
+                        sx={{ mt: 5, flexBasis: '25%' }}
+                    >Add user</Button>
 
-                <Button
-                    id='addUserBtn'
-                    variant='contained'
-                    type='submit'
-                    sx={{ mt: 5, flexBasis: '25%' }}
-                >Add user</Button>
+                }
+
 
 
 

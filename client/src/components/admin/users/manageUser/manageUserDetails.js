@@ -11,11 +11,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Tooltip from '@mui/material/Tooltip';
 
+//React-phone-number-input
+import 'react-phone-input-2/lib/material.css'
+import PhoneInput from 'react-phone-input-2'
+
+import { useState } from 'react';
+
 const ManageUserDetails = ({
     userDetails,
     firstname,
     lastname,
     username,
+    phone,
     jobtitle,
     email,
     emailCheck,
@@ -25,33 +32,73 @@ const ManageUserDetails = ({
     handleUserName,
     handleJobTitle,
     handleEmail,
+    handlePhone,
     handleEmailCheck,
     editEnabled,
     users,
+    setConfirmChanges,
     handleEditConfirm,
     handleEditState,
     dispatch,
     checkUsernameExist,
     checkEmailExist
 }) => {
+
+    const [phoneOnClick,setPhoneOnClick] = useState(false)
+
+    const phoneFormStyle = () => {
+
+
+        if(!editEnabled.editPhone){
+            return { m: 1, width: '80%',display:'inline-flex',flexDirection:'row' , border:'1px solid #bdbdbd', borderRadius: '4px'}
+        }else if(phoneOnClick){
+            return { m: 1, width: '80%',display:'inline-flex',flexDirection:'row' , border:'1px solid blue' , borderRadius: '4px'}
+        }else{
+            return { m: 1, width: '80%',display:'inline-flex',flexDirection:'row' , "&:hover":{border:'1px solid black'} ,border:'1px solid #bdbdbd' , borderRadius: '4px'}
+        }
+
+
+    }
+
+    const phoneInputStyle = () => {
+        if(!editEnabled.editPhone){
+            return { width: 100 + '%', color: 'grey', backgroundColor: 'white' ,cursor:'default',border:'none'}
+        }else{
+            return { width: 100 + '%', backgroundColor: 'white' ,cursor:'default',border:'none', boxShadow:'none'}
+        }
+    }
+
+    const phoneContainerStyle = () => {
+        if(!editEnabled.editPhone){
+            return { color: 'grey' ,border:'none'}
+        }else if(phoneOnClick){
+            return { color: 'blue'}
+        }
+        else{
+            return { color: 'black' ,border:'none'}
+        }
+    }
+
+
     return (
+        
         <Box flexBasis='100%'>
-            {userDetails.email  ?
+            {userDetails.email ?
                 <Box>
 
                     <Typography variant='h5' mb={5} mt={5} flexBasis='60%'>User Details</Typography>
-                    
-                    {users.data.permission[0].changeUserDetails ?
-                    <Typography variant='h7' mb={5} mt={5} flexBasis='100%'>Click on <EditIcon  sx={{ color: 'blue' }}/> 
-                     to edit field and click on <CheckCircleIcon sx={{ color: 'green' }}/> to confirm changes, unconfirmed changes will not be saved</Typography>
-                    :
-                    null}
 
-                     <Box flexBasis={100} mb={5}></Box>
+                    {users.data.permission[0].changeUserDetails ?
+                        <Typography variant='h7' mb={5} mt={5} flexBasis='100%'>Click on <EditIcon sx={{ color: 'blue' }} />
+                            to edit field and click on <CheckCircleIcon sx={{ color: 'green' }} /> to confirm changes, unconfirmed changes will not be saved</Typography>
+                        :
+                        null}
+
+                    <Box flexBasis={100} mb={5}></Box>
 
                     <FormControl
                         id='addUserFirstNameForm'
-                        sx={{ m: 1, width:'80%' }}>
+                        sx={{ m: 1, width: '80%' }}>
                         <InputLabel htmlFor='firstname'
                         >First Name</InputLabel>
                         <OutlinedInput
@@ -71,8 +118,10 @@ const ManageUserDetails = ({
                                             <IconButton
                                                 aria-label="confirmFirstname"
                                                 edge="end"
-                                                onClick={(e) => handleEditConfirm("confirmFirstname")}
-                                                disabled={editEnabled.editFirstname && userDetails.firstname !== firstname ? false : true}
+                                                onClick={(e) => {
+                                                    setConfirmChanges("confirmFirstname")
+                                                }}
+                                                disabled={editEnabled.editFirstname && userDetails.firstname !== firstname.trim() ? false : true}
                                                 sx={{ color: 'green' }}
                                             >
                                                 {<CheckCircleIcon />}
@@ -103,7 +152,7 @@ const ManageUserDetails = ({
 
                     <FormControl
                         id='addUserLastNameForm'
-                        sx={{ m: 1, width:'80%' }}>
+                        sx={{ m: 1, width: '80%' }}>
                         <InputLabel htmlFor='lastname'
                         >Last Name</InputLabel>
                         <OutlinedInput
@@ -122,8 +171,8 @@ const ManageUserDetails = ({
                                             <IconButton
                                                 aria-label="confirmLastname"
                                                 edge="end"
-                                                onClick={(e) => handleEditConfirm("confirmLastname")}
-                                                disabled={editEnabled.editLastname && userDetails.lastname !== lastname ? false : true}
+                                                onClick={(e) => setConfirmChanges("confirmLastname")}
+                                                disabled={editEnabled.editLastname && userDetails.lastname !== lastname.trim() ? false : true}
                                                 sx={{ color: 'green' }}
                                             >
                                                 {<CheckCircleIcon />}
@@ -153,7 +202,7 @@ const ManageUserDetails = ({
 
                     <FormControl
                         id='addUserUserNameForm'
-                        sx={{ m: 1, width:'80%' }}>
+                        sx={{ m: 1, width: '80%' }}>
                         <InputLabel htmlFor='username'
                         >Username</InputLabel>
                         <OutlinedInput
@@ -173,8 +222,8 @@ const ManageUserDetails = ({
                                             <IconButton
                                                 aria-label="confirmUsername"
                                                 edge="end"
-                                                disabled={!admin.error.usernameTaken && editEnabled.editUsername && userDetails.username !== username ? false : true}
-                                                onClick={(e) => handleEditConfirm("confirmUsername")}
+                                                disabled={!admin.error.usernameTaken && editEnabled.editUsername && userDetails.username !== username.trim() ? false : true}
+                                                onClick={(e) => setConfirmChanges("confirmUsername")}
                                                 sx={{ color: 'green' }}
                                             >
                                                 {<CheckCircleIcon />}
@@ -207,7 +256,59 @@ const ManageUserDetails = ({
                     </FormControl>
 
 
-                    <FormControl id='addUserEmailForm' sx={{ m: 1, width:'80%' }}>
+                    <FormControl 
+                    id='addPhoneNumberForm' 
+                    sx={phoneFormStyle()}>
+                        <PhoneInput
+                            inputProps={{
+                                id: "phone",
+                                name: 'phone',
+                                required: true,
+                            }}
+                            country={'sg'}
+                            placeholder='Enter phone number'
+                            value={phone}
+                            onChange={phone => handlePhone(phone)}
+                            inputStyle={phoneInputStyle()}
+                            containerStyle={phoneContainerStyle()}
+                            disabled={!editEnabled.editPhone}
+                            onClick={()=>setPhoneOnClick(true)}
+                            onBlur={()=>setPhoneOnClick(false)}
+                        ></PhoneInput>
+
+                            <Box width={'10%'} display={'inline-flex'} alignSelf={'center'} justifyContent={'center'}>
+                                    <IconButton
+                                        aria-label="confirmPhone"
+                                        edge="end"
+                                        disabled={editEnabled.editPhone && userDetails.phone !== phone.trim() ? false : true}
+                                        onClick={(e) => setConfirmChanges("confirmPhone")}
+                                        sx={{ color: 'green' }}
+                                    >
+                                        {<CheckCircleIcon />}
+                                    </IconButton>
+
+
+                                    <Tooltip title="Edit field">
+                                        <IconButton
+                                            name="editPhone"
+                                            aria-label="editPhone"
+                                            edge="end"
+                                            onClick={(e) => handleEditState("editPhone", true)}
+                                            sx={{ color: 'blue'}}
+                                        >
+                                            {<EditIcon
+
+                                            />}
+                                        </IconButton>
+                                    </Tooltip>
+                                    </Box>
+                    
+
+                    </FormControl>
+
+
+
+                    <FormControl id='addUserEmailForm' sx={{ m: 1, width: '80%' }}>
                         <InputLabel htmlFor="email"
                         >Email</InputLabel>
                         <OutlinedInput
@@ -233,8 +334,8 @@ const ManageUserDetails = ({
                                                 <IconButton
                                                     aria-label="confirmEmail"
                                                     edge="end"
-                                                    disabled={!emailCheck && !admin.error.emailTaken && editEnabled.editEmail && userDetails.email !== email ? false : true}
-                                                    onClick={(e) => { handleEditConfirm("confirmEmail") }}
+                                                    disabled={!emailCheck && !admin.error.emailTaken && editEnabled.editEmail && userDetails.email.trim() !== email ? false : true}
+                                                    onClick={(e) => { setConfirmChanges("confirmEmail") }}
                                                     sx={{ color: 'green' }}
                                                 >
                                                     {<CheckCircleIcon />}
@@ -267,7 +368,7 @@ const ManageUserDetails = ({
                     </FormControl>
 
 
-                    <FormControl id='jobTitleForm' sx={{ m: 1, width:'80%' }}>
+                    <FormControl id='jobTitleForm' sx={{ m: 1, width: '80%' }}>
                         <InputLabel htmlFor="jobtitle"
                         >Job Title</InputLabel>
                         <OutlinedInput
@@ -286,8 +387,8 @@ const ManageUserDetails = ({
                                             <IconButton
                                                 aria-label="confirmJobtitle"
                                                 edge="end"
-                                                disabled={editEnabled.editJobtitle && userDetails.jobtitle !== jobtitle ? false : true}
-                                                onClick={(e) => handleEditConfirm("confirmJobtitle")}
+                                                disabled={editEnabled.editJobtitle && userDetails.jobtitle !== jobtitle.trim() ? false : true}
+                                                onClick={(e) => setConfirmChanges("confirmJobtitle")}
                                                 sx={{ color: 'green' }}
                                             >
                                                 {<CheckCircleIcon />}

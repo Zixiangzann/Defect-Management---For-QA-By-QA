@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject, addUser} from '../actions/admin'
 import { showToast } from '../../utils/tools';
 import { getProjectByTitle } from '../actions/defects';
 
 const initialState = () => ({
+    loading:false,
     error:{
         emailTaken: null,
         usernameTaken:null,
@@ -18,6 +19,7 @@ const initialState = () => ({
         lastname:null,
         username:null,
         email:null,
+        phone:null,
         jobtitle:null
     },
     userPermission:{},
@@ -38,6 +40,16 @@ export const adminSlice = createSlice({
     },
     extraReducers:(builder)=>{
         builder
+        .addCase(addUser.pending,(state,action)=>{
+            state.loading = true;
+        })
+        .addCase(addUser.fulfilled,(state,action)=>{
+            state.loading = false;
+        })
+        .addCase(addUser.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.message)
+            state.loading = false;
+        })
         .addCase(getAllUsersEmail.fulfilled,(state,action)=>{
             const emails = [];
             action.payload.data.map((e)=>{
@@ -66,6 +78,7 @@ export const adminSlice = createSlice({
             state.userDetails.firstname = action.payload.data[0].firstname
             state.userDetails.lastname = action.payload.data[0].lastname
             state.userDetails.username = action.payload.data[0].username
+            state.userDetails.phone = action.payload.data[0].phone
             state.userDetails.email = action.payload.data[0].email
             state.userDetails.jobtitle = action.payload.data[0].jobtitle
             state.userDetails.role = action.payload.data[0].role

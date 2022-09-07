@@ -9,11 +9,9 @@ import bcrypt from 'bcrypt'
 import Defect from "../models/defect.js";
 
 
-// import { getAuth } from 'firebase-admin/auth';
-import admin from 'firebase-admin';
-import { getAuth } from 'firebase-admin/auth'
-import serviceAccount from "../forqabyqa-firebase-adminsdk-2d6wj-bcbbdb857e.json" assert {type: 'json'};
 
+import { getAuth } from 'firebase-admin/auth'
+import admin from "../firebase.js"
 
 export const addUser = async (req) => {
     try {
@@ -84,6 +82,7 @@ export const addUser = async (req) => {
             lastname: req.body.userDetails.lastname,
             username: req.body.userDetails.username,
             email: req.body.userDetails.email,
+            phone: req.body.userDetails.phone,
             password: req.body.userDetails.password,
             role: req.body.userDetails.role,
             jobtitle: req.body.userDetails.jobtitle,
@@ -127,10 +126,21 @@ export const getUserByEmail = async (body) => {
 export const checkUsernameExist = async (body) => {
 
     try {
-        if (await User.usernameTaken(body.username.toLowerCase())) {
+        if (await User.usernameTaken(body.username.toLowerCase().trim())) {
             return { message: 'Sorry username taken' }
         }
 
+    } catch (error) {
+        throw error
+    }
+}
+
+//might not be needed.
+export const checkPhoneExist = async (body) => {
+    try {
+        if (await User.checkPhoneExist(body.phone.trim())) {
+            return { message: 'Sorry Phone number have been registered to another account'}
+        }
     } catch (error) {
         throw error
     }
@@ -239,8 +249,8 @@ export const updateUserEmail = async (req) => {
     const userUpdatedEmail = req.body.userNewEmail
 
     //check if admin email and password is correct
-    const adminservice = await userService.findUserByEmail(adminEmail);
-    if (!(await adminservice.comparePassword(adminPassword))) {
+    const adminCredentials = await userService.findUserByEmail(adminEmail);
+    if (!(await adminCredentials.comparePassword(adminPassword))) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
     }
 
@@ -253,26 +263,28 @@ export const updateUserEmail = async (req) => {
     const updatedUserProject = Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
     const updatedUserDefect = Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
 
-    let app = admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
 
+    //firebase update email
+    getAuth().getUserByEmail(userEmail)
+    .then((userRecord)=>{
+        let uid = userRecord.uid
 
-    console.log("test")
-
-//testing , to be replace with firebase uid
-    getAuth().updateUser(
-        "uRIyzYDrJTMRuCwB0v4jTipT6Qv1", {
-        email: userUpdatedEmail
-    }
-    ).then((userRecord) => {
-        // See the UserRecord reference doc for the contents of userRecord.
-        console.log('Successfully updated user', userRecord.toJSON());
+        getAuth().updateUser(
+            uid, {
+            email: userUpdatedEmail
+        }
+        ).then((userRecord) => {
+            // See the UserRecord reference doc for the contents of userRecord.
+            console.log('Successfully updated user email, ', userRecord.email);
+        })
+            .catch((error) => {
+                console.log('Error updating user:', error);
+                throw new ApiError(httpStatus.BAD_REQUEST, error);
+            });
     })
-        .catch((error) => {
-            console.log('Error updating user:', error);
-        });
-
+    .catch((error)=>{
+        throw new ApiError(httpStatus.BAD_REQUEST, error);
+    })
 
     // join the json and return as response
     const result = new Array();

@@ -52,6 +52,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { getProjectByTitle } from '../../../../store/actions/defects';
 
 
+
+
 const ManageUser = () => {
 
     //State
@@ -77,6 +79,7 @@ const ManageUser = () => {
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('');
     const [jobtitle, setJobTitle] = useState('');
+    const [phone,setPhone] = useState('');
 
     //Modal state
     const [openModal, setOpenModal] = useState(false);
@@ -154,7 +157,6 @@ const ManageUser = () => {
         }
     }, [searchUser])
 
-    const { projectTitle } = useParams();
     useEffect(() => {
         if (selectProject !== "") {
             dispatch(getProjectByTitle({
@@ -174,6 +176,7 @@ const ManageUser = () => {
             setFirstName(userDetails.firstname)
             setLastName(userDetails.lastname)
             setUserName(userDetails.username)
+            setPhone(userDetails.phone)
             setEmail(userDetails.email)
             setJobTitle(userDetails.jobtitle)
             setRole(userDetails.role)
@@ -193,6 +196,11 @@ const ManageUser = () => {
 
     const handleUserName = (event) => {
         setUserName(event.target.value)
+    }
+
+    //library have different way of handling
+    const handlePhone = (phone) =>{
+        setPhone(phone)
     }
 
 
@@ -446,36 +454,72 @@ const ManageUser = () => {
         setEditEnabled({ [fieldName]: enabled })
     }
 
-    const handleEditConfirm = (fieldName) => {
-        setOpenModal(true)
 
-        switch (fieldName) {
+    const [confirmChanges, setConfirmChanges] = useState('')
+
+    //trimming when click confirm
+    useEffect(() => {
+        switch (confirmChanges) {
+            case "confirmFirstname":
+                setFirstName(firstname.trim())
+                setOpenModal(true)
+                break;
+            case "confirmLastname":
+                setLastName(lastname.trim())
+                setOpenModal(true)
+                break;
+            case "confirmUsername":
+                setUserName(username.trim())
+                setOpenModal(true)
+                break;
+            case "confirmEmail":
+                setEmail(email.trim())
+                setOpenModal(true)
+                break;
+            case "confirmJobtitle":
+                setJobTitle(jobtitle.trim())
+                setOpenModal(true)
+                break;
+            default:
+                break;
+        }
+    }, [confirmChanges])
+
+    useEffect(() => {
+        handleEditConfirm()
+    }, [openModal])
+
+    const handleEditConfirm = () => {
+
+        // setOpenModal(true)
+
+        switch (confirmChanges) {
             case "confirmFirstname":
                 setModalDescription(`You are about to change user's First name\n\n From: "${userDetails.firstname}" \n To: "${firstname}"`)
-                setEditingField(fieldName);
+                setEditingField(confirmChanges);
                 break;
             case "confirmLastname":
                 setModalDescription(`You are about to change user's Last name\n\n From: "${userDetails.lastname}" \n To: "${lastname}"`)
-                setEditingField(fieldName);
+                setEditingField(confirmChanges);
                 break;
             case "confirmUsername":
                 setModalDescription(`You are about to change user's Username\n\n From: "${userDetails.username}" \n To: "${username}"`)
-                setEditingField(fieldName);
+                setEditingField(confirmChanges);
                 break;
             case "confirmEmail":
                 setModalDescription(`You are about to change user's Email\n\n From: "${userDetails.email}" \n To: "${email}"`)
-                setEditingField(fieldName);
+                setEditingField(confirmChanges);
                 break;
             case "confirmJobtitle":
                 setModalDescription(`You are about to change user's Job title\n\n From: "${userDetails.jobtitle}" \n To: "${jobtitle}"`)
-                setEditingField(fieldName);
+                setEditingField(confirmChanges);
                 break;
             case "confirmRole":
                 setModalDescription(`You are about to change user's Role \n\n From: "${userDetails.role.charAt(0).toUpperCase() + userDetails.role.slice(1)}" 
                 To: "${role.charAt(0).toUpperCase() + role.slice(1)}"
                 ${role === 'user' && (userDetails.role === 'owner' || userDetails.role === 'admin') ? "Note: Account will lose all Admin permission" : ""}
                 `)
-                setEditingField(fieldName);
+                setEditingField(confirmChanges);
                 break;
             case "confirmPermission":
                 setModalDescription(`You are about to change user's Permission`)
@@ -484,6 +528,8 @@ const ManageUser = () => {
             default:
                 break;
         }
+
+        setConfirmChanges('')
     }
 
     //Permission handle
@@ -556,7 +602,7 @@ const ManageUser = () => {
                     id='searchUser'
                     sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor='searchUser'
-                    >{searchUser === "" ? "Select User" : "Selected User" }</InputLabel>
+                    >{searchUser === "" ? "Select User" : "Selected User"}</InputLabel>
                     <Select
                         id="selectuser"
                         value={searchUser}
@@ -670,6 +716,7 @@ const ManageUser = () => {
                         firstname={firstname}
                         lastname={lastname}
                         username={username}
+                        phone={phone}
                         jobtitle={jobtitle}
                         email={email}
                         emailCheck={emailCheck}
@@ -677,11 +724,13 @@ const ManageUser = () => {
                         handleFirstName={handleFirstName}
                         handleLastName={handleLastName}
                         handleUserName={handleUserName}
+                        handlePhone={handlePhone}
                         handleJobTitle={handleJobTitle}
                         handleEmail={handleEmail}
                         handleEmailCheck={handleEmailCheck}
                         editEnabled={editEnabled}
                         users={users}
+                        setConfirmChanges={setConfirmChanges}
                         handleEditConfirm={handleEditConfirm}
                         handleEditState={handleEditState}
                         dispatch={dispatch}
