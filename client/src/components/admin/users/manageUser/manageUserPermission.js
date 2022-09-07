@@ -79,6 +79,7 @@ return(
 
                         <Box display={'flex'} justifyContent={'flex-start'} flexBasis={'100%'}>
                         <Button
+                        id="changePermissionBtn"
                         variant='contained'
                         color='primary'
                         sx={{ flexBasis: '30%', mt: 1 ,mt:5}}

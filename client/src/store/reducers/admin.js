@@ -35,6 +35,7 @@ export const adminSlice = createSlice({
             state.permission = {}
             state.project = []
             state.selectedProjectDetails = {}
+            state.error={}
           },
  
     },

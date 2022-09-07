@@ -80,6 +80,7 @@ const ManageUser = () => {
     const [role, setRole] = useState('');
     const [jobtitle, setJobTitle] = useState('');
     const [phone,setPhone] = useState('');
+    const [phoneCheck, setPhoneCheck] = useState(0)
 
     //Modal state
     const [openModal, setOpenModal] = useState(false);
@@ -154,6 +155,11 @@ const ManageUser = () => {
             dispatch(getUserByEmail({
                 email: searchUser
             }))
+
+            setEditEnabled({})
+            setPhoneCheck(false)
+            setEmailCheck(false)
+            dispatch(resetState())
         }
     }, [searchUser])
 
@@ -615,12 +621,15 @@ const ManageUser = () => {
                     </Select>
                 </FormControl>
 
-                <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }}>
+                <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }} >
 
-                    <List sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
+                    <List 
+                    id="userManagementInnerTab"
+                    sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap'}} 
+                    >
                         {userDetails.email ?
                             <ListItem className='tab-userdetails'
-                                sx={{}}>
+                                sx={{width:'max-content'}}>
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 0 ? '#a534eb' : 'black'),
@@ -638,7 +647,7 @@ const ManageUser = () => {
 
                         {userDetails.email && users.data.permission[0].resetUserPassword ?
                             <ListItem className='tab-resetpassword'
-                                sx={{}}>
+                                sx={{width:'max-content'}}>
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 1 ? '#a534eb' : 'black'),
@@ -656,7 +665,10 @@ const ManageUser = () => {
 
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
-                            <ListItem className='tab-managerole'>
+                            <ListItem 
+                            className='tab-managerole'
+                            sx={{width:'max-content'}}
+                            >
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 2 ? '#a534eb' : 'black'),
@@ -673,7 +685,10 @@ const ManageUser = () => {
                             : null}
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
-                            <ListItem className='tab-managepermission'>
+                            <ListItem 
+                            className='tab-managepermission'
+                            sx={{width:'max-content'}}
+                            >
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 3 ? '#a534eb' : 'black'),
@@ -690,7 +705,10 @@ const ManageUser = () => {
                             : null}
 
                         {userDetails.email && users.data.permission[0].assignProject ?
-                            <ListItem className='tab-assignproject'>
+                            <ListItem 
+                            className='tab-assignproject'
+                            sx={{width:'max-content'}}
+                            >
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 4 ? '#a534eb' : 'black'),
@@ -728,6 +746,8 @@ const ManageUser = () => {
                         handleJobTitle={handleJobTitle}
                         handleEmail={handleEmail}
                         handleEmailCheck={handleEmailCheck}
+                        phoneCheck={phoneCheck}
+                        setPhoneCheck={setPhoneCheck}
                         editEnabled={editEnabled}
                         users={users}
                         setConfirmChanges={setConfirmChanges}

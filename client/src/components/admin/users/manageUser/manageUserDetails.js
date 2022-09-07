@@ -17,6 +17,8 @@ import PhoneInput from 'react-phone-input-2'
 
 import { useState } from 'react';
 
+import '../../../../styles/main.css'
+
 const ManageUserDetails = ({
     userDetails,
     firstname,
@@ -34,6 +36,8 @@ const ManageUserDetails = ({
     handleEmail,
     handlePhone,
     handleEmailCheck,
+    phoneCheck,
+    setPhoneCheck,
     editEnabled,
     users,
     setConfirmChanges,
@@ -44,44 +48,44 @@ const ManageUserDetails = ({
     checkEmailExist
 }) => {
 
-    const [phoneOnClick,setPhoneOnClick] = useState(false)
+    const [phoneOnClick, setPhoneOnClick] = useState(false)
 
     const phoneFormStyle = () => {
 
 
-        if(!editEnabled.editPhone){
-            return { m: 1, width: '80%',display:'inline-flex',flexDirection:'row' , border:'1px solid #bdbdbd', borderRadius: '4px'}
-        }else if(phoneOnClick){
-            return { m: 1, width: '80%',display:'inline-flex',flexDirection:'row' , border:'1px solid blue' , borderRadius: '4px'}
-        }else{
-            return { m: 1, width: '80%',display:'inline-flex',flexDirection:'row' , "&:hover":{border:'1px solid black'} ,border:'1px solid #bdbdbd' , borderRadius: '4px'}
+        if (!editEnabled.editPhone) {
+            return { m: 1, width: '80%', display: 'inline-flex', flexDirection: 'row', border: '1px solid #bdbdbd', borderRadius: '4px' }
+        } else if (phoneOnClick) {
+            return { m: 1, width: '80%', display: 'inline-flex', flexDirection: 'row', border: '1px solid blue', borderRadius: '4px' }
+        } else {
+            return { m: 1, width: '80%', display: 'inline-flex', flexDirection: 'row', "&:hover": { border: '1px solid black' }, border: '1px solid #bdbdbd', borderRadius: '4px' }
         }
 
 
     }
 
     const phoneInputStyle = () => {
-        if(!editEnabled.editPhone){
-            return { width: 100 + '%', color: 'grey', backgroundColor: 'white' ,cursor:'default',border:'none'}
-        }else{
-            return { width: 100 + '%', backgroundColor: 'white' ,cursor:'default',border:'none', boxShadow:'none'}
+        if (!editEnabled.editPhone) {
+            return { width: 100 + '%', color: 'grey', backgroundColor: 'white', cursor: 'default', border: 'none' }
+        } else {
+            return { width: 100 + '%', backgroundColor: 'white', cursor: 'default', border: 'none', boxShadow: 'none' }
         }
     }
 
     const phoneContainerStyle = () => {
-        if(!editEnabled.editPhone){
-            return { color: 'grey' ,border:'none'}
-        }else if(phoneOnClick){
-            return { color: 'blue'}
+        if (!editEnabled.editPhone) {
+            return { color: 'grey', border: 'none' }
+        } else if (phoneOnClick) {
+            return { color: 'blue' }
         }
-        else{
-            return { color: 'black' ,border:'none'}
+        else {
+            return { color: 'black', border: 'none' }
         }
     }
 
 
     return (
-        
+
         <Box flexBasis='100%'>
             {userDetails.email ?
                 <Box>
@@ -256,9 +260,9 @@ const ManageUserDetails = ({
                     </FormControl>
 
 
-                    <FormControl 
-                    id='addPhoneNumberForm' 
-                    sx={phoneFormStyle()}>
+                    <FormControl
+                        id='addPhoneNumberForm'
+                        sx={phoneFormStyle()}>
                         <PhoneInput
                             inputProps={{
                                 id: "phone",
@@ -272,39 +276,52 @@ const ManageUserDetails = ({
                             inputStyle={phoneInputStyle()}
                             containerStyle={phoneContainerStyle()}
                             disabled={!editEnabled.editPhone}
-                            onClick={()=>setPhoneOnClick(true)}
-                            onBlur={()=>setPhoneOnClick(false)}
+                            onClick={() => setPhoneOnClick(true)}
+                            onBlur={() => {
+                                phone.length >= 8 ? setPhoneCheck(false) : setPhoneCheck(true)
+                                setPhoneOnClick(false)
+                            }}
                         ></PhoneInput>
 
-                            <Box width={'10%'} display={'inline-flex'} alignSelf={'center'} justifyContent={'center'}>
-                                    <IconButton
-                                        aria-label="confirmPhone"
-                                        edge="end"
-                                        disabled={editEnabled.editPhone && userDetails.phone !== phone.trim() ? false : true}
-                                        onClick={(e) => setConfirmChanges("confirmPhone")}
-                                        sx={{ color: 'green' }}
-                                    >
-                                        {<CheckCircleIcon />}
-                                    </IconButton>
+                        <Box
+                            id="updatePhoneContainer"
+                            width={'97px'}
+                            display={'inline-flex'}
+                            alignSelf={'center'}
+                            justifyContent={'center'}
+                        >
+                            <IconButton
+                                aria-label="confirmPhone"
+                                edge="end"
+                                disabled={editEnabled.editPhone && userDetails.phone !== phone.trim() ? false : true}
+                                onClick={(e) => {
+                                    phone.length >= 8 ? setPhoneCheck(false) : setPhoneCheck(true)
+                                    setConfirmChanges("confirmPhone")
+                                }}
+                                sx={{ color: 'green' }}
+                            >
+                                {<CheckCircleIcon />}
+                            </IconButton>
 
 
-                                    <Tooltip title="Edit field">
-                                        <IconButton
-                                            name="editPhone"
-                                            aria-label="editPhone"
-                                            edge="end"
-                                            onClick={(e) => handleEditState("editPhone", true)}
-                                            sx={{ color: 'blue'}}
-                                        >
-                                            {<EditIcon
+                            <Tooltip title="Edit field">
+                                <IconButton
+                                    name="editPhone"
+                                    aria-label="editPhone"
+                                    edge="end"
+                                    onClick={(e) => handleEditState("editPhone", true)}
+                                    sx={{ color: 'blue' }}
+                                >
+                                    {<EditIcon
 
-                                            />}
-                                        </IconButton>
-                                    </Tooltip>
-                                    </Box>
-                    
+                                    />}
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+
 
                     </FormControl>
+                    <FormHelperText error sx={{ ml: 2.3 ,mb:1}}>{phoneCheck ? "Valid Phone number is required" : null}</FormHelperText>
 
 
 
@@ -362,7 +379,7 @@ const ManageUserDetails = ({
                                     null
                             }
                         />
-                        <FormHelperText error>{emailCheck ? "Invalid email" : null}</FormHelperText>
+                        <FormHelperText error>{!admin.error.emailTaken && emailCheck ? "Invalid email" : null}</FormHelperText>
                         <FormHelperText error>{admin.error.emailTaken ? admin.error.emailTaken : null}</FormHelperText>
 
                     </FormControl>

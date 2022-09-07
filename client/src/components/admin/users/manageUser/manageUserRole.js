@@ -45,6 +45,7 @@ const ManageUserRole = ({
 
                         <Box sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'start' }}>
                             <Button
+                                id="changeRoleBtn"
                                 variant='contained'
                                 color='primary'
                                 // disabled={userDetails.role === role}
