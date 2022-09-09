@@ -29,7 +29,8 @@ import {
     updateRole,
     getAllProjects,
     removeFromProject,
-    assignProject
+    assignProject,
+    updatePhone
 } from '../../../../store/actions/admin';
 
 
@@ -273,6 +274,21 @@ const ManageUser = () => {
                         // dispatch(isAuth())
                     })
                 break;
+            case "confirmPhone":{
+                dispatch(updatePhone({
+                    adminPassword,
+                    userEmail,
+                    userNewPhone: phone
+                }))
+                .unwrap()
+                .then(()=>{
+                    handleEditState("editPhone",false)
+                })
+                .then(()=>{
+                    dispatch(getUserByEmail({ email: searchUser }))
+                })
+                break;
+            }    
             case "confirmUsername":
                 dispatch(updateUsername({
                     adminPassword,
@@ -486,6 +502,9 @@ const ManageUser = () => {
                 setJobTitle(jobtitle.trim())
                 setOpenModal(true)
                 break;
+            case "confirmPhone":
+                setOpenModal(true)
+                break;   
             default:
                 break;
         }
@@ -531,6 +550,12 @@ const ManageUser = () => {
                 setModalDescription(`You are about to change user's Permission`)
                 setEditingField("confirmUpdatePermission");
                 break;
+            case "confirmPhone":
+                setModalDescription(`You are about to change user's phone number \n\n From: "${userDetails.phone}" 
+                To: "${phone}
+                `)
+                setEditingField(confirmChanges);
+                break;    
             default:
                 break;
         }
@@ -606,7 +631,7 @@ const ManageUser = () => {
 
                 <FormControl
                     id='searchUser'
-                    sx={{ m: 1, flexBasis: '45%' }}>
+                    sx={{ m: 1, flexBasis: '45%'}}>
                     <InputLabel htmlFor='searchUser'
                     >{searchUser === "" ? "Select User" : "Selected User"}</InputLabel>
                     <Select
@@ -614,6 +639,7 @@ const ManageUser = () => {
                         value={searchUser}
                         label="usersEmails"
                         onChange={handleSelectUsers}
+                        MenuProps={{sx:{maxHeight:'18rem'}}}
                     >
                         {admin.userEmails.map((email) => (
                             <MenuItem key={email} value={email}>{email}</MenuItem>

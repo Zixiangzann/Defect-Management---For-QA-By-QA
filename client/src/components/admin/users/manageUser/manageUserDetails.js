@@ -68,7 +68,7 @@ const ManageUserDetails = ({
         if (!editEnabled.editPhone) {
             return { width: 100 + '%', color: 'grey', backgroundColor: 'white', cursor: 'default', border: 'none' }
         } else {
-            return { width: 100 + '%', backgroundColor: 'white', cursor: 'default', border: 'none', boxShadow: 'none' }
+            return { width: 100 + '%', backgroundColor: 'white', cursor: 'text', border: 'none', boxShadow: 'none'}
         }
     }
 
@@ -76,7 +76,7 @@ const ManageUserDetails = ({
         if (!editEnabled.editPhone) {
             return { color: 'grey', border: 'none' }
         } else if (phoneOnClick) {
-            return { color: 'blue' }
+            return { color: 'blue'}
         }
         else {
             return { color: 'black', border: 'none' }

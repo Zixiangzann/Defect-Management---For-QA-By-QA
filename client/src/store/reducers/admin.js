@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject, addUser} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject, addUser, updatePhone} from '../actions/admin'
 import { showToast } from '../../utils/tools';
 import { getProjectByTitle } from '../actions/defects';
 
@@ -115,6 +115,12 @@ export const adminSlice = createSlice({
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateUsername.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(updatePhone.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Successfully Updated")
+        })
+        .addCase(updatePhone.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(updateEmail.fulfilled,(state,action)=>{

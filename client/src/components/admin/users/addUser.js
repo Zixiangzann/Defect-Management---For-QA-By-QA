@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import ModalComponent from '../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser, checkEmailExist, checkUsernameExist } from '../../../store/actions/admin';
-import { Loader } from '../../../utils/tools';
+import { Loader,ProfilePicEditor } from '../../../utils/tools';
+
 
 //MUI
 import Button from '@mui/material/Button'
@@ -29,11 +30,14 @@ import InputAdornment from '@mui/material/InputAdornment';
 //React-phone-number-input
 import 'react-phone-input-2/lib/material.css'
 import PhoneInput from 'react-phone-input-2'
+import { Avatar } from '@mui/material';
 
 const AddUser = () => {
 
     const [emailCheck, setEmailCheck] = useState(false);
     const [phoneCheck, setPhoneCheck] = useState(0)
+    const [profilePicture, setProfilePicture] = useState('');
+    const [profilePictureSample, setProfilePictureSample] = useState('')
 
     const [userDetails, setUserDetails] = useState({
         firstname: '',
@@ -73,7 +77,7 @@ const AddUser = () => {
         editOwnComment: true,
         deleteOwnComment: true,
         viewAllDefect: false,
-        editAllDefect: false,
+        editAllDefect: true,
         deleteAllDefect: false,
         editAllComment: false,
         deleteAllComment: false,
@@ -88,6 +92,10 @@ const AddUser = () => {
         addComponent: false,
         deleteComponent: false
     })
+
+    useEffect(()=>{
+        console.log(permission)
+    },[permission])
 
     const handlePermission = (event) => {
         const value = event.target.checked;
@@ -175,7 +183,47 @@ const AddUser = () => {
 
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
 
-                <Typography variant='h4' mb={5} flexBasis='60%'>Account Details</Typography>
+                <Typography variant='h4' mb={5} flexBasis='100%'>Account Details</Typography>
+
+
+                <Typography sx={{m:1}}>Profile picture: </Typography>
+                <Box id="upload-profile-picture-container" 
+                sx={{display:'flex',flexBasis:'100%',justifyContent:'center'}}>
+                
+                {/* <Avatar
+                    id="add-profile-picture"
+                    label="profile"
+                    alt="profile"
+                    src={profilePictureSample}
+                    sx={{ width: 200, height: 200}}
+                    /> */}
+
+                </Box>
+
+                <ProfilePicEditor
+                imageUrl={profilePictureSample}
+                >
+
+                </ProfilePicEditor>
+
+                <Box flexBasis={'100%'}></Box>
+                
+                <Button 
+                color='primary' 
+                variant='outlined'
+                component="label"
+                onChange={(e)=> {
+                    console.log(URL.createObjectURL(e.target.files[0]))
+                    setProfilePictureSample(URL.createObjectURL(e.target.files[0]))
+                    setProfilePicture(e.target.files[0])
+                }}
+                sx={{mt:2}}
+                >
+                    Upload profile picture
+                    <input hidden accept="image/*" type="file" />
+                </Button>
+                
+                <Box flexBasis={'100%'} m={2}></Box>    
 
                 <FormControl
                     id='addUserFirstNameForm'
@@ -246,7 +294,9 @@ const AddUser = () => {
                         country={'sg'}
                         placeholder='Enter phone number'
                         value={userDetails.phone}
-                        onChange={phone => setUserDetails({ ...userDetails, phone })}
+                        onChange={phone => 
+                            setUserDetails({ ...userDetails, phone })
+                        }
                         inputStyle={{ width: 100 + '%' }}
                         onBlur={() => {
                             userDetails.phone.length >= 8 ? setPhoneCheck(false) : setPhoneCheck(true)

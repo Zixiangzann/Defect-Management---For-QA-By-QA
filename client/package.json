@@ -26,6 +26,7 @@
     "jspdf": "^2.5.1",
     "react": "^18.2.0",
     "react-audio-player": "^0.17.0",
+    "react-avatar-editor": "^13.0.0",
     "react-bootstrap": "^2.4.0",
     "react-chartjs-2": "^4.3.1",
     "react-cookies": "^0.1.1",

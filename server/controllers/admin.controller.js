@@ -118,6 +118,15 @@ const adminController = {
         }
     },
 
+    async updateUserPhone(req, res, next){
+        try {
+            const updatedUser = await adminService.updateUserPhone(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
     async updateUserEmail(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserEmail(req)

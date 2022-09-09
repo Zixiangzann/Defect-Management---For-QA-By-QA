@@ -3,14 +3,14 @@ import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 import { initializeApp } from "firebase/app";
-import { getAuth,createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 export const getAllUsersEmail = createAsyncThunk(
     'admin/getAllUsersEmail',
-    async({})=> {
+    async ({ }) => {
         try {
-            const request = await axios.get('/api/admin/allusersemail',getAuthHeader())
-            return { data: request.data}
+            const request = await axios.get('/api/admin/allusersemail', getAuthHeader())
+            return { data: request.data }
         } catch (error) {
             throw error;
         }
@@ -21,30 +21,30 @@ export const addUser = createAsyncThunk(
     async ({
         userDetails,
         permission
-    }, { dispatch,rejectWithValue}) => {
+    }, { dispatch, rejectWithValue }) => {
 
         try {
 
-            const auth = getAuth();
+            // const auth = getAuth();
 
             const request = await axios.post('/api/admin/adduser', {
                 userDetails,
                 permission
             }, getAuthHeader());
 
-            createUserWithEmailAndPassword(auth,userDetails.email,userDetails.password)
-            .then((userCredential)=>{
-                console.log("created")
-            })
+            // createUserWithEmailAndPassword(auth, userDetails.email, userDetails.password)
+            //     .then((userCredential) => {
+            //         console.log("created")
+            //     })
 
             return { data: request.data.user }
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
         }
     })
 
@@ -94,7 +94,7 @@ export const updateFirstname = createAsyncThunk(
     async ({
         adminPassword,
         userEmail,
-        userNewFirstName },{rejectWithValue}) => {
+        userNewFirstName }, { rejectWithValue }) => {
         try {
             const request = await axios.patch('/api/admin/updateuser/firstname', {
                 adminPassword,
@@ -104,12 +104,12 @@ export const updateFirstname = createAsyncThunk(
             return { data: request.data }
 
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
         }
 
     })
@@ -119,7 +119,7 @@ export const updateLastname = createAsyncThunk(
     async ({
         adminPassword,
         userEmail,
-        userNewLastName },{rejectWithValue}) => {
+        userNewLastName }, { rejectWithValue }) => {
         try {
             const request = await axios.patch('/api/admin/updateuser/lastname', {
                 adminPassword,
@@ -129,12 +129,12 @@ export const updateLastname = createAsyncThunk(
             return { data: request.data }
 
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
         }
 
     })
@@ -144,7 +144,7 @@ export const updateUsername = createAsyncThunk(
     async ({
         adminPassword,
         userEmail,
-        userNewUsername},{rejectWithValue}) => {
+        userNewUsername }, { rejectWithValue }) => {
         try {
             const request = await axios.patch('/api/admin/updateuser/username', {
                 adminPassword,
@@ -154,12 +154,37 @@ export const updateUsername = createAsyncThunk(
             return { data: request.data }
 
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
+        }
+
+    })
+
+export const updatePhone = createAsyncThunk(
+    'admin/updatePhone',
+    async ({
+        adminPassword,
+        userEmail,
+        userNewPhone }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/admin/updateuser/phone', {
+                adminPassword,
+                userEmail,
+                userNewPhone
+            }, getAuthHeader())
+            return { data: request.data }
+
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+
+            return rejectWithValue(error.response)
+
         }
 
     })
@@ -169,7 +194,7 @@ export const updateEmail = createAsyncThunk(
     async ({
         adminPassword,
         userEmail,
-        userNewEmail },{rejectWithValue}) => {
+        userNewEmail }, { rejectWithValue }) => {
         try {
             const request = await axios.patch('/api/admin/updateuser/email', {
                 adminPassword,
@@ -180,12 +205,12 @@ export const updateEmail = createAsyncThunk(
             return { data: request.data }
 
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
         }
 
     })
@@ -195,7 +220,7 @@ export const updateJobtitle = createAsyncThunk(
     async ({
         adminPassword,
         userEmail,
-        userNewJobTitle },{rejectWithValue}) => {
+        userNewJobTitle }, { rejectWithValue }) => {
         try {
             const request = await axios.patch('/api/admin/updateuser/jobtitle', {
                 adminPassword,
@@ -205,44 +230,44 @@ export const updateJobtitle = createAsyncThunk(
             return { data: request.data }
 
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
         }
 
     })
 
- export const updateRole = createAsyncThunk(
+export const updateRole = createAsyncThunk(
     'admin/updateRole',
-    async({
+    async ({
         adminPassword,
         userEmail,
-        userNewRole },{rejectWithValue}) => {
-            try {
-                const request = await axios.patch('/api/admin/updateuser/role', {
-                    adminPassword,
-                    userEmail,
-                    userNewRole
-                }, getAuthHeader())
-                return { data: request.data }
-            } catch (error) {
-                if(!error.response){
-                    throw error
-                }
-                return rejectWithValue(error.response)
+        userNewRole }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/admin/updateuser/role', {
+                adminPassword,
+                userEmail,
+                userNewRole
+            }, getAuthHeader())
+            return { data: request.data }
+        } catch (error) {
+            if (!error.response) {
+                throw error
             }
-    })   
+            return rejectWithValue(error.response)
+        }
+    })
 
 export const resetUserPassword = createAsyncThunk(
     'admin/resetUserPassword',
-    async({
+    async ({
         adminPassword,
         userEmail,
         userNewPassword
-    },{rejectWithValue}) => {
+    }, { rejectWithValue }) => {
         try {
             const request = await axios.patch('/api/admin/updateuser/resetpassword', {
                 adminPassword,
@@ -252,101 +277,101 @@ export const resetUserPassword = createAsyncThunk(
             return { data: request.data }
 
         } catch (error) {
-            if(!error.response){
+            if (!error.response) {
                 throw error
             }
 
             return rejectWithValue(error.response)
-            
+
         }
 
     })
 
-    export const updateUserPermission = createAsyncThunk(
-        'admin/updateUserPermission',
-        async({
-            adminPassword,
-            userEmail,
-            userNewPermission
-        },{rejectWithValue}) => {
-            try {
-                const request = await axios.patch('/api/admin/updateuser/permission', {
-                    adminPassword,
-                    userEmail,
-                    userNewPermission
-                }, getAuthHeader())
+export const updateUserPermission = createAsyncThunk(
+    'admin/updateUserPermission',
+    async ({
+        adminPassword,
+        userEmail,
+        userNewPermission
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/admin/updateuser/permission', {
+                adminPassword,
+                userEmail,
+                userNewPermission
+            }, getAuthHeader())
 
-                console.log(userNewPermission)
-                return { data: request.data }
-    
-            } catch (error) {
-                if(!error.response){
-                    throw error
-                }
-                return rejectWithValue(error.response)   
+            console.log(userNewPermission)
+            return { data: request.data }
+
+        } catch (error) {
+            if (!error.response) {
+                throw error
             }
-        })
+            return rejectWithValue(error.response)
+        }
+    })
 
-        export const getAllProjects = createAsyncThunk(
-            'project/getAllProjects',
-            async () => {
-                try {
-                    const request = await axios.post('/api/project/all', {}, getAuthHeader())
-                    return { project: request.data }
-                } catch (error) {
-                    throw error;
-                }
-            }
-        )
+export const getAllProjects = createAsyncThunk(
+    'project/getAllProjects',
+    async () => {
+        try {
+            const request = await axios.post('/api/project/all', {}, getAuthHeader())
+            return { project: request.data }
+        } catch (error) {
+            throw error;
+        }
+    }
+)
 
-        export const assignProject = createAsyncThunk(
-            'project/assignProject',
-            async ({
+export const assignProject = createAsyncThunk(
+    'project/assignProject',
+    async ({
+        adminEmail,
+        adminPassword,
+        userEmail,
+        projectTitle
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/assign', {
                 adminEmail,
                 adminPassword,
                 userEmail,
                 projectTitle
-            },{rejectWithValue}) =>{
-                try {
-                    const request = await axios.patch('/api/project/assign',{
-                        adminEmail,
-                        adminPassword,
-                        userEmail,
-                        projectTitle
-                    },getAuthHeader())
+            }, getAuthHeader())
 
-                    return request
-                }  catch (error) {
-                    if(!error.response){
-                        throw error
-                    }
-                    return rejectWithValue(error.response)   
-                }
+            return request
+        } catch (error) {
+            if (!error.response) {
+                throw error
             }
-        )
+            return rejectWithValue(error.response)
+        }
+    }
+)
 
-        export const removeFromProject = createAsyncThunk(
-            'project/removeFromProject',
-            async ({
+export const removeFromProject = createAsyncThunk(
+    'project/removeFromProject',
+    async ({
+        adminEmail,
+        adminPassword,
+        userEmail,
+        projectTitle
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/removefromproject', {
                 adminEmail,
                 adminPassword,
                 userEmail,
                 projectTitle
-            },{rejectWithValue}) =>{
-                try {
-                    const request = await axios.patch('/api/project/removefromproject',{
-                        adminEmail,
-                        adminPassword,
-                        userEmail,
-                        projectTitle
-                    },getAuthHeader())
-                    return request
-                }  catch (error) {
-                    if(!error.response){
-                        throw error
-                    }
-                    return rejectWithValue(error.response)   
-                }
+            }, getAuthHeader())
+            return request
+        } catch (error) {
+            if (!error.response) {
+                throw error
             }
-        )
+            return rejectWithValue(error.response)
+        }
+    }
+)
 

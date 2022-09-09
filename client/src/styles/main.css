@@ -32,6 +32,9 @@
     border-color: rgba(0, 0, 0, 0.23);
 }
 
+#profilePicEditor {
+    border-radius: 50%;
+}
 
 .modal-box{
     position: absolute;

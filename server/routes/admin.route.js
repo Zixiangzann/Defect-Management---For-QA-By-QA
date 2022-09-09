@@ -24,6 +24,7 @@ router.post('/getuserbyemail',auth('readAny','admin'),adminController.getUserByE
 router.patch('/updateuser/firstname',auth('updateAny','admin'),adminController.updateUserFirstName)
 router.patch('/updateuser/lastname',auth('updateAny','admin'),adminController.updateUserLastName)
 router.patch('/updateuser/username',auth('updateAny','admin'),adminController.updateUserUserName)
+router.patch('/updateuser/phone',auth('updateAny','admin'),adminController.updateUserPhone)
 router.patch('/updateuser/email',auth('updateAny','admin'),adminController.updateUserEmail)
 router.patch('/updateuser/jobtitle',auth('updateAny','admin'),adminController.updateUserJobTitle)
 router.patch('/updateuser/resetpassword',auth('updateAny','admin'),adminController.resetUserPassword)
