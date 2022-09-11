@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify'
 import cookie from 'react-cookies'
 import { Button, FormHelperText, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 
 import AvatarEditor from 'react-avatar-editor'
@@ -11,15 +11,15 @@ import AvatarEditor from 'react-avatar-editor'
 import CirularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
-import { grey } from '@mui/material/colors'
+import { Avatar } from '@mui/material';
 
 export const ProfilePicEditor = ({
     imageUrl
 }) => {
     let editor = "";
 
-    // const [image, setImage] = useState(imageUrl)
-    const [zoom, setZoom] = useState(1)
+    const [pictureChanges, setPictureChanges] = useState("")
+    const [zoom, setZoom] = useState(2)
 
     const handleZoom = (event, value) => {
         setZoom(value)
@@ -30,14 +30,24 @@ export const ProfilePicEditor = ({
     };
 
 
-    const handleDownloadFile = () => {
+    const handleDownload = () => {
 
+        console.log('test')
         const canvas = editor.getImageScaledToCanvas();
         canvas.toBlob((blob) => {
-            let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
+            // let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
+            // console.log(file)
+            // setPictureChanges(file)
+            const anchor = document.createElement('a');
+            anchor.download = 'fileName.jpg'; // optional, but you can give the file a name
+            anchor.href = URL.createObjectURL(blob);
+            anchor.href = URL.createObjectURL(blob);
+            anchor.click(); 
+            URL.revokeObjectURL(anchor.href);
+            let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
             console.log(file)
-        })
 
+        },'image/jpeg')
 
     }
 
@@ -46,9 +56,10 @@ export const ProfilePicEditor = ({
 
 
         <Box display="flex" flexBasis={'100%'} justifyContent={'center'}>
-            {imageUrl !== "" ?
 
-                <Box display="block">
+            <Box display="block">
+
+                {imageUrl ?
                     <AvatarEditor
                         ref={setEditorRef}
                         image={imageUrl}
@@ -60,9 +71,20 @@ export const ProfilePicEditor = ({
                         rotate={0}
                         scale={zoom}
                         id="profilePicEditor"
+                        crossOrigin='anonymous'
                     />
 
+                    :
+                    <Avatar
+                    id="add-profile-picture"
+                    label="profile"
+                    alt="profile"
+                    src={"https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/Profile-Picture%2Fno-profile-pic.png?alt=media&token=be97a0fa-2ac8-4fd6-9beb-018269fb8bea"}
+                    sx={{ width: 200, height: 200}}
+                    /> 
+                }
 
+                {imageUrl ?
                     <Slider
                         aria-label="zoom"
                         value={zoom}
@@ -71,12 +93,15 @@ export const ProfilePicEditor = ({
                         step={0.1}
                         onChange={handleZoom}
                     ></Slider>
+                    :
+                    null
+                }
 
-                </Box>
-                            :
-                            null
-                            }
+                {/* <Button onClick={()=>handleDownload()}>test</Button> */}
+
             </Box>
+
+        </Box>
     )
 }
 

@@ -86,7 +86,7 @@ export const addUser = async (req) => {
                 phoneNumber: "+" + req.body.userDetails.phone,
                 password: req.body.userDetails.password,
                 displayName: req.body.userDetails.username,
-                photoURL: "https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/DefectID_114%2Fpiggylogo.jpg?alt=media&token=279e08f5-f9aa-420e-932f-2e58764efd95",
+                photoURL: req.body.photoURL,
                 disabled: false,
             })
             .then(async (userRecord) => {
@@ -102,6 +102,7 @@ export const addUser = async (req) => {
 
             const user = new User({
                 firebaseuid:firebaseuid,
+                photoURL: req.body.photoURL,
                 firstname: req.body.userDetails.firstname,
                 lastname: req.body.userDetails.lastname,
                 username: req.body.userDetails.username,

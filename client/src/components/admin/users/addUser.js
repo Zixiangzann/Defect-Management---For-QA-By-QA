@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import ModalComponent from '../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser, checkEmailExist, checkUsernameExist } from '../../../store/actions/admin';
-import { Loader,ProfilePicEditor } from '../../../utils/tools';
+import { Loader, ProfilePicEditor } from '../../../utils/tools';
 
 
 //MUI
@@ -36,10 +36,10 @@ const AddUser = () => {
 
     const [emailCheck, setEmailCheck] = useState(false);
     const [phoneCheck, setPhoneCheck] = useState(0)
-    const [profilePicture, setProfilePicture] = useState('');
-    const [profilePictureSample, setProfilePictureSample] = useState('')
+    const [uploadProfilePicture, setUploadProfilePicture] = useState('');
+    const [profilePictureSample, setProfilePictureSample] = useState('');
 
-    const [userDetails, setUserDetails] = useState({
+    const userDetailsDefaultState = {
         firstname: '',
         lastname: '',
         username: '',
@@ -48,7 +48,32 @@ const AddUser = () => {
         password: '',
         role: 'user',
         jobtitle: ''
-    })
+    }
+
+    const permissionDefaultState = {
+        addDefect: true,
+        editOwnDefect: true,
+        addComment: true,
+        editOwnComment: true,
+        deleteOwnComment: true,
+        viewAllDefect: false,
+        editAllDefect: true,
+        deleteAllDefect: false,
+        editAllComment: false,
+        deleteAllComment: false,
+        addUser: false,
+        disableUser: false,
+        deleteUser: false,
+        changeUserDetails: false,
+        resetUserPassword: false,
+        addProject: false,
+        assignProject: false,
+        deleteProject: false,
+        addComponent: false,
+        deleteComponent: false
+    }
+
+    const [userDetails, setUserDetails] = useState(userDetailsDefaultState)
 
 
     const handleUserDetails = (event) => {
@@ -70,32 +95,11 @@ const AddUser = () => {
     }
 
     //Permission state
-    const [permission, setPermission] = useState({
-        addDefect: true,
-        editOwnDefect: true,
-        addComment: true,
-        editOwnComment: true,
-        deleteOwnComment: true,
-        viewAllDefect: false,
-        editAllDefect: true,
-        deleteAllDefect: false,
-        editAllComment: false,
-        deleteAllComment: false,
-        addUser: false,
-        disableUser: false,
-        deleteUser: false,
-        changeUserDetails: false,
-        resetUserPassword: false,
-        addProject: false,
-        assignProject: false,
-        deleteProject: false,
-        addComponent: false,
-        deleteComponent: false
-    })
+    const [permission, setPermission] = useState(permissionDefaultState)
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(permission)
-    },[permission])
+    }, [permission])
 
     const handlePermission = (event) => {
         const value = event.target.checked;
@@ -109,9 +113,8 @@ const AddUser = () => {
     const dispatch = useDispatch();
 
     //Modal
-    const [open, setOpen] = useState(false);
     const [openModal, setOpenModal] = useState(false);
-
+    const [modalTitle, setModalTitle] = useState("");
 
     const handleGeneratePassword = () => {
         const password = createPassword();
@@ -150,11 +153,36 @@ const AddUser = () => {
         showToast('SUCCESS', 'Copied')
     }
 
+
+    //profile pic handler
+    const handleProfilePic = (e) => {
+        const fileSizeKb = e.target.files[0].size / 1024;
+        const MAX_FILE_SIZE = 3072;
+
+        //max 5mb
+        if (fileSizeKb > MAX_FILE_SIZE) {
+            alert('Maximum file size limit is 3MB')
+        } else {
+            setProfilePictureSample(URL.createObjectURL(e.target.files[0]))
+        }
+    }
+
+    const handleProfilePicToBlob = () => {
+        //profile pic from canvas
+        const canvas = document.getElementById("profilePicEditor")
+
+        canvas.toBlob((blob) => {
+            let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
+            setUploadProfilePicture(file)
+        }, 'image/jpeg')
+
+    }
+
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
-
-        //to find a better way for validation.
+        //to find a better way for phone number validation.
         //Currently checking if the phone number is at least 8 characters including country code..
         if (userDetails.phone.length >= 8) {
             //if false mean ok, else throw error
@@ -168,15 +196,33 @@ const AddUser = () => {
         if (admin.error.emailTaken) showToast('ERROR', <div>Failed to create user <br></br>Email have been taken</div>)
         if (admin.error.usernameTaken) showToast('ERROR', <div>Failed to create user <br></br>Username have been taken</div>)
 
-        if (!phoneCheck && !emailCheck && !admin.error.emailTaken && !admin.error.usernameTaken) {
+        if (!phoneCheck && userDetails.phone.length && !emailCheck && !admin.error.emailTaken && !admin.error.usernameTaken) {
             dispatch(addUser({
+                uploadProfilePicture,
                 userDetails,
                 permission
             }))
                 .unwrap()
-                .then(() => setOpenModal(true))
+                .then(() => {
+                    setModalTitle("Account created")
+                    setOpenModal(true)
+                }
+                )
         }
+
     }
+
+    //reset state to default if account is created and modal is closed
+    useEffect(() => {
+        if (modalTitle === "Account created" && openModal === false) {
+            //reset back to default state
+            setUserDetails(userDetailsDefaultState)
+            setPermission(permissionDefaultState)
+            setModalTitle("")
+            setUploadProfilePicture("")
+            setProfilePictureSample("")
+        }
+    }, [openModal])
 
     return (
         <Box mt={5} overflow={'auto'} maxHeight={'650px'} >
@@ -186,44 +232,52 @@ const AddUser = () => {
                 <Typography variant='h4' mb={5} flexBasis='100%'>Account Details</Typography>
 
 
-                <Typography sx={{m:1}}>Profile picture: </Typography>
-                <Box id="upload-profile-picture-container" 
-                sx={{display:'flex',flexBasis:'100%',justifyContent:'center'}}>
-                
-                {/* <Avatar
-                    id="add-profile-picture"
-                    label="profile"
-                    alt="profile"
-                    src={profilePictureSample}
-                    sx={{ width: 200, height: 200}}
-                    /> */}
+                <Typography variant='h6' sx={{ m: 1 }}>Profile picture: </Typography>
+                <Box id="upload-profile-picture-container"
+                    sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'center' }}>
 
                 </Box>
 
                 <ProfilePicEditor
-                imageUrl={profilePictureSample}
+                    imageUrl={profilePictureSample}
                 >
-
                 </ProfilePicEditor>
 
                 <Box flexBasis={'100%'}></Box>
-                
-                <Button 
-                color='primary' 
-                variant='outlined'
-                component="label"
-                onChange={(e)=> {
-                    console.log(URL.createObjectURL(e.target.files[0]))
-                    setProfilePictureSample(URL.createObjectURL(e.target.files[0]))
-                    setProfilePicture(e.target.files[0])
-                }}
-                sx={{mt:2}}
+                <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred', ml: 1, mt: 3 }}>Note: Max File size: 3MB</InputLabel>
+                <Box flexBasis={'100%'}></Box>
+                <Button
+                    id="uploadProfilePictureBtn"
+                    color='secondary'
+                    variant='contained'
+                    component="label"
+                    onChange={(e) => handleProfilePic(e)}
+                    sx={{ mt: 2 }}
                 >
-                    Upload profile picture
+                    Upload picture
                     <input hidden accept="image/*" type="file" />
                 </Button>
-                
-                <Box flexBasis={'100%'} m={2}></Box>    
+
+
+                {profilePictureSample ?
+                    <Button
+                        id="confirmProfilePictureBtn"
+                        color='primary'
+                        variant='contained'
+                        component="label"
+                        onClick={() => {
+                            showToast('SUCCESS', <div>Profile Image set</div>)
+                            handleProfilePicToBlob()
+                        }}
+                        sx={{ mt: 2, ml: 2 }}
+                    >Confirm Picture</Button>
+                    :
+                    null
+                }
+
+
+                <Box flexBasis={'100%'} borderBottom={'1px solid grey'} m={6}></Box>
+                <Typography variant='h6' sx={{ m: 1, flexBasis: '100%' }}>Profile Info: </Typography>
 
                 <FormControl
                     id='addUserFirstNameForm'
@@ -294,7 +348,7 @@ const AddUser = () => {
                         country={'sg'}
                         placeholder='Enter phone number'
                         value={userDetails.phone}
-                        onChange={phone => 
+                        onChange={phone =>
                             setUserDetails({ ...userDetails, phone })
                         }
                         inputStyle={{ width: 100 + '%' }}
@@ -469,13 +523,16 @@ const AddUser = () => {
 
                 {admin.loading ?
                     <Loader
-                    message={"Creating account, please wait.."}
+                        message={"Creating account, please wait.."}
                     ></Loader> :
                     <Button
                         id='addUserBtn'
                         variant='contained'
                         type='submit'
                         sx={{ mt: 5, flexBasis: '25%' }}
+                        onClick={() => {
+                            handleProfilePicToBlob()
+                        }}
                     >Add user</Button>
 
                 }
@@ -489,7 +546,7 @@ const AddUser = () => {
             <ModalComponent
                 open={openModal}
                 setOpenModal={setOpenModal}
-                title="Account created"
+                title={modalTitle}
                 description={`Email: ${userDetails.email} \n Password: ${userDetails.password} \n Role: ${userDetails.role.toLocaleUpperCase()}`}
                 warn="Please copy and pass to the user, you will only see this password once"
                 handleModalConfirm={handleModalConfirm}

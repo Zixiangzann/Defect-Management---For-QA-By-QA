@@ -2,8 +2,16 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
 import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
+
+
+//firebase storage
+import { storage } from '../../firebase';
+import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject, listAll } from "firebase/storage"
+
+//firebase auth
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+const auth = getAuth();
 
 export const getAllUsersEmail = createAsyncThunk(
     'admin/getAllUsersEmail',
@@ -19,25 +27,54 @@ export const getAllUsersEmail = createAsyncThunk(
 export const addUser = createAsyncThunk(
     'admin/addUser',
     async ({
+        uploadProfilePicture,
         userDetails,
         permission
     }, { dispatch, rejectWithValue }) => {
 
         try {
 
-            // const auth = getAuth();
+            //Upload profile picture to firebase storage, get url and put the url to db. 
+            //use user email as the name of the profile picture
+            let photoURL = ""
+            console.log(uploadProfilePicture)
 
-            const request = await axios.post('/api/admin/adduser', {
-                userDetails,
-                permission
-            }, getAuthHeader());
+            const uploadPic = () => {
+                return new Promise((resolve, reject) => {
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            const storageRef = ref(storage, `Profile-Picture/${userDetails.email}`)
+                            const uploadTask = uploadBytesResumable(storageRef, uploadProfilePicture)
 
-            // createUserWithEmailAndPassword(auth, userDetails.email, userDetails.password)
-            //     .then((userCredential) => {
-            //         console.log("created")
-            //     })
+                            uploadTask.then((snapshot) => {
+                                getDownloadURL(snapshot.ref).then((downloadURL) => {
+                                    photoURL = downloadURL
+                                    console.log(photoURL)
+                                    resolve(photoURL)
+                                })
+                            })
+                        }
+                    })
+                })
+            }
 
-            return { data: request.data.user }
+            const createUser = async () => {
+                const request = await axios.post('/api/admin/adduser', {
+                    photoURL,
+                    userDetails,
+                    permission
+                }, getAuthHeader());
+
+                return { data: request.data.user }
+
+            }
+
+            //Get downloadURL then create user
+            uploadPic().then(() => {
+                console.log(photoURL)
+                createUser()
+            })
+
         } catch (error) {
             if (!error.response) {
                 throw error
