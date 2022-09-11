@@ -41,6 +41,7 @@ export const addUser = createAsyncThunk(
 
             const uploadPic = () => {
                 return new Promise((resolve, reject) => {
+                    if(uploadProfilePicture){
                     onAuthStateChanged(auth, async (user) => {
                         if (user) {
                             const storageRef = ref(storage, `Profile-Picture/${userDetails.email}`)
@@ -55,6 +56,11 @@ export const addUser = createAsyncThunk(
                             })
                         }
                     })
+                }else{
+                    //if user did not upload profile pic, then set it to the default (no-profile-pic)
+                    photoURL = "https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/Profile-Picture%2Fno-profile-pic.png?alt=media&token=be97a0fa-2ac8-4fd6-9beb-018269fb8bea"
+                    resolve(photoURL)
+                }
                 })
             }
 

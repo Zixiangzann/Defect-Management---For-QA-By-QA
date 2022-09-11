@@ -72,6 +72,9 @@ const ManageUser = () => {
     const userProject = useSelector(state => state.admin.userProject)
 
     //User Field state
+    const [profilePictureSample, setProfilePictureSample] = useState('');
+    const [editProfilePicture, setEditProfilePicture] = useState(false)
+    const [uploadProfilePicture, setUploadProfilePicture] = useState('');
     const [firstname, setFirstName] = useState('')
     const [lastname, setLastName] = useState('')
     const [username, setUserName] = useState('')
@@ -80,7 +83,7 @@ const ManageUser = () => {
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('');
     const [jobtitle, setJobTitle] = useState('');
-    const [phone,setPhone] = useState('');
+    const [phone, setPhone] = useState('');
     const [phoneCheck, setPhoneCheck] = useState(0)
 
     //Modal state
@@ -97,6 +100,7 @@ const ManageUser = () => {
     const [editingField, setEditingField] = useState('')
 
     const defaultEditState = {
+        editProfilePicture: false,
         editEmail: false,
         editFirstname: false,
         editJobtitle: false,
@@ -150,6 +154,38 @@ const ManageUser = () => {
         setSearchUser(event.target.value)
     }
 
+    const handleProfilePic = (e) => {
+        const fileSizeKb = e.target.files[0].size / 1024;
+        const MAX_FILE_SIZE = 3072;
+
+        //max 5mb
+        if (fileSizeKb > MAX_FILE_SIZE) {
+            alert('Maximum file size limit is 3MB')
+        } else {
+            setProfilePictureSample(URL.createObjectURL(e.target.files[0]))
+            // setUserDet
+        }
+
+        // if(userDetails.photoURL !== )
+        setEditEnabled({
+            ...editEnabled,
+            editProfilePicture: true
+        })
+    }
+
+    const handleProfilePicToBlob = () => {
+        //profile pic from canvas
+        if (profilePictureSample) {
+            const canvas = document.getElementById("profilePicEditor")
+
+            canvas.toBlob((blob) => {
+                let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
+                setUploadProfilePicture(file)
+                showToast('SUCCESS', <div>Profile picture set</div>)
+            }, 'image/jpeg')
+        }
+    }
+
 
     useEffect(() => {
         if (searchUser !== "") {
@@ -180,6 +216,7 @@ const ManageUser = () => {
 
             //set at inital state and after changes.
             //set field back to default(before change) when click on other edit state
+
             setFirstName(userDetails.firstname)
             setLastName(userDetails.lastname)
             setUserName(userDetails.username)
@@ -187,6 +224,13 @@ const ManageUser = () => {
             setEmail(userDetails.email)
             setJobTitle(userDetails.jobtitle)
             setRole(userDetails.role)
+
+            //profile pic initial set
+            //if changes is not confirmed. and user going to edit other field, change back to initial picture
+            if (uploadProfilePicture === "" && !editEnabled.editProfilePicture) {
+                setProfilePictureSample(userDetails.photoURL)
+            }
+
         }
 
 
@@ -206,7 +250,7 @@ const ManageUser = () => {
     }
 
     //library have different way of handling
-    const handlePhone = (phone) =>{
+    const handlePhone = (phone) => {
         setPhone(phone)
     }
 
@@ -274,21 +318,21 @@ const ManageUser = () => {
                         // dispatch(isAuth())
                     })
                 break;
-            case "confirmPhone":{
+            case "confirmPhone": {
                 dispatch(updatePhone({
                     adminPassword,
                     userEmail,
                     userNewPhone: phone
                 }))
-                .unwrap()
-                .then(()=>{
-                    handleEditState("editPhone",false)
-                })
-                .then(()=>{
-                    dispatch(getUserByEmail({ email: searchUser }))
-                })
+                    .unwrap()
+                    .then(() => {
+                        handleEditState("editPhone", false)
+                    })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                    })
                 break;
-            }    
+            }
             case "confirmUsername":
                 dispatch(updateUsername({
                     adminPassword,
@@ -504,7 +548,7 @@ const ManageUser = () => {
                 break;
             case "confirmPhone":
                 setOpenModal(true)
-                break;   
+                break;
             default:
                 break;
         }
@@ -555,7 +599,7 @@ const ManageUser = () => {
                 To: "${phone}
                 `)
                 setEditingField(confirmChanges);
-                break;    
+                break;
             default:
                 break;
         }
@@ -631,7 +675,7 @@ const ManageUser = () => {
 
                 <FormControl
                     id='searchUser'
-                    sx={{ m: 1, flexBasis: '45%'}}>
+                    sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor='searchUser'
                     >{searchUser === "" ? "Select User" : "Selected User"}</InputLabel>
                     <Select
@@ -639,7 +683,7 @@ const ManageUser = () => {
                         value={searchUser}
                         label="usersEmails"
                         onChange={handleSelectUsers}
-                        MenuProps={{sx:{maxHeight:'18rem'}}}
+                        MenuProps={{ sx: { maxHeight: '18rem' } }}
                     >
                         {admin.userEmails.map((email) => (
                             <MenuItem key={email} value={email}>{email}</MenuItem>
@@ -649,13 +693,13 @@ const ManageUser = () => {
 
                 <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }} >
 
-                    <List 
-                    id="userManagementInnerTab"
-                    sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap'}} 
+                    <List
+                        id="userManagementInnerTab"
+                        sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}
                     >
                         {userDetails.email ?
                             <ListItem className='tab-userdetails'
-                                sx={{width:'max-content'}}>
+                                sx={{ width: 'max-content' }}>
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 0 ? '#a534eb' : 'black'),
@@ -673,7 +717,7 @@ const ManageUser = () => {
 
                         {userDetails.email && users.data.permission[0].resetUserPassword ?
                             <ListItem className='tab-resetpassword'
-                                sx={{width:'max-content'}}>
+                                sx={{ width: 'max-content' }}>
                                 <ListItemButton
                                     sx={{
                                         color: (tab === 1 ? '#a534eb' : 'black'),
@@ -691,9 +735,9 @@ const ManageUser = () => {
 
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
-                            <ListItem 
-                            className='tab-managerole'
-                            sx={{width:'max-content'}}
+                            <ListItem
+                                className='tab-managerole'
+                                sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
                                     sx={{
@@ -711,9 +755,9 @@ const ManageUser = () => {
                             : null}
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
-                            <ListItem 
-                            className='tab-managepermission'
-                            sx={{width:'max-content'}}
+                            <ListItem
+                                className='tab-managepermission'
+                                sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
                                     sx={{
@@ -731,9 +775,9 @@ const ManageUser = () => {
                             : null}
 
                         {userDetails.email && users.data.permission[0].assignProject ?
-                            <ListItem 
-                            className='tab-assignproject'
-                            sx={{width:'max-content'}}
+                            <ListItem
+                                className='tab-assignproject'
+                                sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
                                     sx={{
@@ -757,6 +801,7 @@ const ManageUser = () => {
                 {tab === 0 ?
                     <ManageUserDetails
                         userDetails={userDetails}
+                        profilePictureSample={profilePictureSample}
                         firstname={firstname}
                         lastname={lastname}
                         username={username}
@@ -765,6 +810,8 @@ const ManageUser = () => {
                         email={email}
                         emailCheck={emailCheck}
                         admin={admin}
+                        handleProfilePic={handleProfilePic}
+                        handleProfilePicToBlob={handleProfilePicToBlob}
                         handleFirstName={handleFirstName}
                         handleLastName={handleLastName}
                         handleUserName={handleUserName}

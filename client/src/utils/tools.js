@@ -14,12 +14,14 @@ import Slider from '@mui/material/Slider'
 import { Avatar } from '@mui/material';
 
 export const ProfilePicEditor = ({
-    imageUrl
+    imageUrl,
+    defaultZoom,
+    editingEnabled,
 }) => {
     let editor = "";
 
     const [pictureChanges, setPictureChanges] = useState("")
-    const [zoom, setZoom] = useState(2)
+    const [zoom, setZoom] = useState(defaultZoom)
 
     const handleZoom = (event, value) => {
         setZoom(value)
@@ -30,26 +32,26 @@ export const ProfilePicEditor = ({
     };
 
 
-    const handleDownload = () => {
+    // const handleDownload = () => {
 
-        console.log('test')
-        const canvas = editor.getImageScaledToCanvas();
-        canvas.toBlob((blob) => {
-            // let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
-            // console.log(file)
-            // setPictureChanges(file)
-            const anchor = document.createElement('a');
-            anchor.download = 'fileName.jpg'; // optional, but you can give the file a name
-            anchor.href = URL.createObjectURL(blob);
-            anchor.href = URL.createObjectURL(blob);
-            anchor.click(); 
-            URL.revokeObjectURL(anchor.href);
-            let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
-            console.log(file)
+    //     console.log('test')
+    //     const canvas = editor.getImageScaledToCanvas();
+    //     canvas.toBlob((blob) => {
+    //         // let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
+    //         // console.log(file)
+    //         // setPictureChanges(file)
+    //         const anchor = document.createElement('a');
+    //         anchor.download = 'fileName.jpg'; 
+    //         anchor.href = URL.createObjectURL(blob);
+    //         anchor.href = URL.createObjectURL(blob);
+    //         anchor.click(); 
+    //         URL.revokeObjectURL(anchor.href);
+    //         let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
+    //         console.log(file)
 
-        },'image/jpeg')
+    //     },'image/jpeg')
 
-    }
+    // }
 
 
     return (
@@ -59,7 +61,7 @@ export const ProfilePicEditor = ({
 
             <Box display="block">
 
-                {imageUrl ?
+                {editingEnabled ?
                     <AvatarEditor
                         ref={setEditorRef}
                         image={imageUrl}
@@ -79,12 +81,12 @@ export const ProfilePicEditor = ({
                     id="add-profile-picture"
                     label="profile"
                     alt="profile"
-                    src={"https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/Profile-Picture%2Fno-profile-pic.png?alt=media&token=be97a0fa-2ac8-4fd6-9beb-018269fb8bea"}
+                    src={imageUrl ? imageUrl : "https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/Profile-Picture%2Fno-profile-pic.png?alt=media&token=be97a0fa-2ac8-4fd6-9beb-018269fb8bea"}
                     sx={{ width: 200, height: 200}}
                     /> 
                 }
 
-                {imageUrl ?
+                {editingEnabled ?
                     <Slider
                         aria-label="zoom"
                         value={zoom}

@@ -15,6 +15,7 @@ const initialState = () => ({
     projectList:[],
     selectedProjectDetails:{},
     userDetails:{
+        profilepicture: null,
         firstname:null,
         lastname:null,
         username:null,
@@ -75,7 +76,8 @@ export const adminSlice = createSlice({
             }
         })
         .addCase(getUserByEmail.fulfilled,(state,action)=>{
-            // state.userDetails = action.payload.data            
+            // state.userDetails = action.payload.data
+            state.userDetails.photoURL = action.payload.data[0].photoURL            
             state.userDetails.firstname = action.payload.data[0].firstname
             state.userDetails.lastname = action.payload.data[0].lastname
             state.userDetails.username = action.payload.data[0].username

@@ -6,7 +6,7 @@ import ModalComponent from '../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser, checkEmailExist, checkUsernameExist } from '../../../store/actions/admin';
 import { Loader, ProfilePicEditor } from '../../../utils/tools';
-
+import { showToast } from '../../../utils/tools';
 
 //MUI
 import Button from '@mui/material/Button'
@@ -16,7 +16,6 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
-import { showToast } from '../../../utils/tools';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
@@ -169,13 +168,15 @@ const AddUser = () => {
 
     const handleProfilePicToBlob = () => {
         //profile pic from canvas
-        const canvas = document.getElementById("profilePicEditor")
+        if (profilePictureSample) {
+            const canvas = document.getElementById("profilePicEditor")
 
-        canvas.toBlob((blob) => {
-            let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
-            setUploadProfilePicture(file)
-        }, 'image/jpeg')
-
+            canvas.toBlob((blob) => {
+                let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
+                setUploadProfilePicture(file)
+                showToast('SUCCESS', <div>Profile picture set</div>)
+            }, 'image/jpeg')        
+        }
     }
 
 
@@ -232,7 +233,7 @@ const AddUser = () => {
                 <Typography variant='h4' mb={5} flexBasis='100%'>Account Details</Typography>
 
 
-                <Typography variant='h6' sx={{ m: 1 }}>Profile picture: </Typography>
+                <Typography variant='h6' sx={{ m: 1 }}>Profile Picture: </Typography>
                 <Box id="upload-profile-picture-container"
                     sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'center' }}>
 
@@ -240,6 +241,8 @@ const AddUser = () => {
 
                 <ProfilePicEditor
                     imageUrl={profilePictureSample}
+                    defaultZoom={1.5}
+                    editingEnabled={profilePictureSample ? true : false}
                 >
                 </ProfilePicEditor>
 
@@ -264,9 +267,7 @@ const AddUser = () => {
                         id="confirmProfilePictureBtn"
                         color='primary'
                         variant='contained'
-                        component="label"
                         onClick={() => {
-                            showToast('SUCCESS', <div>Profile Image set</div>)
                             handleProfilePicToBlob()
                         }}
                         sx={{ mt: 2, ml: 2 }}
@@ -530,9 +531,6 @@ const AddUser = () => {
                         variant='contained'
                         type='submit'
                         sx={{ mt: 5, flexBasis: '25%' }}
-                        onClick={() => {
-                            handleProfilePicToBlob()
-                        }}
                     >Add user</Button>
 
                 }

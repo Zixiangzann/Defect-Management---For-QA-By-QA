@@ -1,3 +1,8 @@
+//lib
+import { ProfilePicEditor } from '../../../../utils/tools';
+import { showToast } from '../../../../utils/tools'
+
+//mui
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button'
@@ -15,12 +20,13 @@ import Tooltip from '@mui/material/Tooltip';
 import 'react-phone-input-2/lib/material.css'
 import PhoneInput from 'react-phone-input-2'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import '../../../../styles/main.css'
 
 const ManageUserDetails = ({
     userDetails,
+    profilePictureSample,
     firstname,
     lastname,
     username,
@@ -29,6 +35,8 @@ const ManageUserDetails = ({
     email,
     emailCheck,
     admin,
+    handleProfilePic,
+    handleProfilePicToBlob,
     handleFirstName,
     handleLastName,
     handleUserName,
@@ -50,6 +58,8 @@ const ManageUserDetails = ({
 
     const [phoneOnClick, setPhoneOnClick] = useState(false)
 
+
+
     const phoneFormStyle = () => {
 
 
@@ -68,7 +78,7 @@ const ManageUserDetails = ({
         if (!editEnabled.editPhone) {
             return { width: 100 + '%', color: 'grey', backgroundColor: 'white', cursor: 'default', border: 'none' }
         } else {
-            return { width: 100 + '%', backgroundColor: 'white', cursor: 'text', border: 'none', boxShadow: 'none'}
+            return { width: 100 + '%', backgroundColor: 'white', cursor: 'text', border: 'none', boxShadow: 'none' }
         }
     }
 
@@ -76,12 +86,15 @@ const ManageUserDetails = ({
         if (!editEnabled.editPhone) {
             return { color: 'grey', border: 'none' }
         } else if (phoneOnClick) {
-            return { color: 'blue'}
+            return { color: 'blue' }
         }
         else {
             return { color: 'black', border: 'none' }
         }
     }
+
+
+
 
 
     return (
@@ -92,6 +105,8 @@ const ManageUserDetails = ({
 
                     <Typography variant='h5' mb={5} mt={5} flexBasis='60%'>User Details</Typography>
 
+
+
                     {users.data.permission[0].changeUserDetails ?
                         <Typography variant='h7' mb={5} mt={5} flexBasis='100%'>Click on <EditIcon sx={{ color: 'blue' }} />
                             to edit field and click on <CheckCircleIcon sx={{ color: 'green' }} /> to confirm changes, unconfirmed changes will not be saved</Typography>
@@ -99,6 +114,47 @@ const ManageUserDetails = ({
                         null}
 
                     <Box flexBasis={100} mb={5}></Box>
+
+                    <Typography variant='h6' sx={{ m: 1 }}>Profile Picture: </Typography>
+                    <ProfilePicEditor
+                        imageUrl={profilePictureSample}
+                        defaultZoom={1.5}
+                        editingEnabled={profilePictureSample ? true : false}
+                    >
+                    </ProfilePicEditor>
+
+                    <Button
+                        id="changeProfilePictureBtn"
+                        variant='contained'
+                        color='secondary'
+                        component="label"
+                        onChange={(e) => handleProfilePic(e)}
+                        sx={{ mt: 2, ml: 2 }}
+                    >
+                        Change Picture
+                        <input hidden accept="image/*" type="file" />
+                    </Button>
+
+                    <Box flexBasis={'100%'}></Box>
+
+                    {profilePictureSample ?
+                    <Button
+                        id="confirmProfilePictureBtn"
+                        color='primary'
+                        variant='contained'
+                        onClick={() => {
+                            handleProfilePicToBlob()
+                        }}
+                        sx={{ mt: 2, ml: 2 }}
+                    >Confirm Picture</Button>
+                    :
+                    null
+                }
+
+
+                    <Box flexBasis={'100%'} borderBottom={'1px solid grey'} m={6}></Box>
+
+                    <Typography variant='h6' sx={{ m: 1 }}>Profile Info: </Typography>
 
                     <FormControl
                         id='addUserFirstNameForm'
@@ -321,7 +377,7 @@ const ManageUserDetails = ({
 
 
                     </FormControl>
-                    <FormHelperText error sx={{ ml: 2.3 ,mb:1}}>{phoneCheck ? "Valid Phone number is required" : null}</FormHelperText>
+                    <FormHelperText error sx={{ ml: 2.3, mb: 1 }}>{phoneCheck ? "Valid Phone number is required" : null}</FormHelperText>
 
 
 
