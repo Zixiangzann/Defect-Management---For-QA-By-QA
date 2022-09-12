@@ -246,8 +246,14 @@ export const paginateDefectList = async (req) => {
 //Get assignee of the project.
 export const getAllAssignee = async (title) => {
     try {
-        const assignee = Project.find({ title: title }).select('assignee -_id')
-        return assignee;
+        const project = await Project.find({ title: title })
+        const assignee = project[0].assignee
+
+        //using the assignee from project, find the users
+        //username and photourl
+        const users = await User.find({email:assignee}).select(["photoURL","username","email"])
+  
+        return users;
     } catch (error) {
         throw error
     }

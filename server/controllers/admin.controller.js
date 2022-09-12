@@ -91,6 +91,15 @@ const adminController = {
         }
     },
 
+    async updateUserPhotoURL(req, res, next) {
+        try {
+            const updatedUser = await adminService.updateProfilePicture(req)
+            res.status(httpStatus.OK).json(updatedUser)
+        } catch (error) {
+            next(error)
+        }
+    },
+
     async updateUserFirstName(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserFirstName(req)

@@ -37,6 +37,7 @@ const ManageUserDetails = ({
     admin,
     handleProfilePic,
     handleProfilePicToBlob,
+    initialZoom,
     handleFirstName,
     handleLastName,
     handleUserName,
@@ -118,8 +119,8 @@ const ManageUserDetails = ({
                     <Typography variant='h6' sx={{ m: 1 }}>Profile Picture: </Typography>
                     <ProfilePicEditor
                         imageUrl={profilePictureSample}
-                        defaultZoom={1.5}
-                        editingEnabled={profilePictureSample ? true : false}
+                        defaultZoom={1}
+                        editingEnabled={editEnabled.editProfilePicture ? true : false}
                     >
                     </ProfilePicEditor>
 
@@ -137,13 +138,13 @@ const ManageUserDetails = ({
 
                     <Box flexBasis={'100%'}></Box>
 
-                    {profilePictureSample ?
+                    {editEnabled.editProfilePicture ?
                     <Button
                         id="confirmProfilePictureBtn"
                         color='primary'
                         variant='contained'
                         onClick={() => {
-                            handleProfilePicToBlob()
+                            setConfirmChanges("confirmProfilePicture")
                         }}
                         sx={{ mt: 2, ml: 2 }}
                     >Confirm Picture</Button>

@@ -38,11 +38,13 @@ import VideoFileIcon from '@mui/icons-material/VideoFile';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
 import ArticleIcon from '@mui/icons-material/Article';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAssignee, getAllComponents, getAllProjects, createDefect, updateAttachment } from '../../store/actions/defects';
 import { resetDataState } from '../../store/reducers/defects';
+import { Avatar } from '@mui/material';
 
 
 const CreateDefect = () => {
@@ -78,6 +80,7 @@ const CreateDefect = () => {
             // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,
         )
+        console.log(assignee)
     };
 
     const handleEditorState = (state) => {
@@ -110,32 +113,32 @@ const CreateDefect = () => {
         const fileName = e.target.files[0].name
 
         //max 5mb
-        if(fileSizeKb > MAX_FILE_SIZE){
+        if (fileSizeKb > MAX_FILE_SIZE) {
             alert('Maximum file size limit is 5MB')
-        }else if(filesArray.some(e => e.name === fileName)){
+        } else if (filesArray.some(e => e.name === fileName)) {
             alert('Filename must be unique, not allowed to attach file with same name')
             console.log(filesArray)
             console.log(filesArray.values('name'))
-        }else{
+        } else {
             setFilesArray([...filesArray, e.target.files[0]]);
             console.log(filesArray)
         }
-       
+
 
     }
 
     const attachmentIcon = (filetype) => {
         let icon = <InsertDriveFileIcon />
 
-        if(filetype.includes('image')) icon = <PhotoIcon />
-        if(filetype.includes('pdf')) icon = <PictureAsPdfIcon/>
-        if(filetype.includes('audio')) icon = <AudioFileIcon/>
-        if(filetype.includes('video')) icon = <VideoFileIcon/>
-        if(filetype.includes('text')) icon = <ArticleIcon/>
-        if(filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz') 
-        || filetype.includes('rar') || filetype.includes('tar') ) icon = <FolderZipIcon/>
-        
-        
+        if (filetype.includes('image')) icon = <PhotoIcon />
+        if (filetype.includes('pdf')) icon = <PictureAsPdfIcon />
+        if (filetype.includes('audio')) icon = <AudioFileIcon />
+        if (filetype.includes('video')) icon = <VideoFileIcon />
+        if (filetype.includes('text')) icon = <ArticleIcon />
+        if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
+            || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
+
+
         return (
             <ListItemIcon>
                 {icon}
@@ -159,7 +162,7 @@ const CreateDefect = () => {
                         attachment: filesArray,
                         action: 'uploadFile'
                     }
-                    
+
                     ))
                     navigate('/')
                 })
@@ -259,6 +262,14 @@ const CreateDefect = () => {
 
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
+
+                        {/* TODO */}
+                        {/* To add generate template function, set description */}
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button>Generate Template</Button>
+                        </Box>
+
+                
                         <InputLabel>Description: </InputLabel>
                         <FormControl
                             sx={{ marginTop: '1rem' }}>
@@ -282,42 +293,42 @@ const CreateDefect = () => {
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
                         <InputLabel>Attach Files:</InputLabel>
-                        <InputLabel sx={{fontSize:'0.8rem',color:'darkred'}}>Note: Max File size: 5MB</InputLabel>
-                        <Box sx={{display:'flex',justifyContent:'flex-end',mb:2}}>
-                        
-                        <FormControl>
-                            <Button
-                                variant="contained"
-                                component="label"
-                                onChange={(e) => handleFileArray(e)}
-                                startIcon={<AttachmentIcon sx={{transform: 'rotate(265deg)'}}/>}
-                            >
-                                Upload
-                                <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
-                            </Button>
-                        </FormControl>
+                        <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred' }}>Note: Max File size: 5MB</InputLabel>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+
+                            <FormControl>
+                                <Button
+                                    variant="contained"
+                                    component="label"
+                                    onChange={(e) => handleFileArray(e)}
+                                    startIcon={<AttachmentIcon sx={{ transform: 'rotate(265deg)' }} />}
+                                >
+                                    Upload
+                                    <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
+                                </Button>
+                            </FormControl>
                         </Box>
 
-                        <Box sx={{display:'flex',maxHeight:'150px',overflow:'auto'}}>
+                        <Box sx={{ display: 'flex', maxHeight: '150px', overflow: 'auto' }}>
 
                             <List>
-                                {filesArray.map((item)=>(
-                                <ListItem
-                                    key={`${item.name}_${item.lastModified}`}
-                                    secondaryAction={
-                                        <IconButton 
-                                        edge="end" 
-                                        aria-label="delete"
-                                        onClick={()=>handleRemoveFileArray(item)}
-                                        >
-                                            <DeleteIcon sx={{color:'red'}}/>
-                                        </IconButton>}
-                                >
-                                    {attachmentIcon(item.type)}
-                                    <ListItemText
-                                        primary={item.name}
-                                    />
-                                </ListItem>
+                                {filesArray.map((item) => (
+                                    <ListItem
+                                        key={`${item.name}_${item.lastModified}`}
+                                        secondaryAction={
+                                            <IconButton
+                                                edge="end"
+                                                aria-label="delete"
+                                                onClick={() => handleRemoveFileArray(item)}
+                                            >
+                                                <DeleteIcon sx={{ color: 'red' }} />
+                                            </IconButton>}
+                                    >
+                                        {attachmentIcon(item.type)}
+                                        <ListItemText
+                                            primary={item.name}
+                                        />
+                                    </ListItem>
                                 ))}
                             </List>
                         </Box>
@@ -375,12 +386,35 @@ const CreateDefect = () => {
                                             renderValue={(selected) => selected.join(', ')}
                                         >
                                             {defects.data.assignee ? defects.data.assignee.map((item) => (
-                                                <MenuItem key={item} value={item}>
+
+                                                <MenuItem
+                                                    key={item.email}
+                                                    value={item.email}
+                                                >
                                                     <Checkbox
-                                                        checked={assignee.indexOf(item) > -1}
+                                                        checked={assignee.indexOf(item.email) > -1}
+                                                        icon={<AddCircleIcon sx={{ display: 'none' }} />}
+                                                        checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
                                                     />
-                                                    <ListItemText primary={item} />
+
+                                                    <Avatar
+                                                        alt={item.email}
+                                                        src={item.photoURL}
+                                                        sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
+
+
+
+                                                    <Box>
+                                                        <Typography
+                                                            sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
+                                                        >{item.email}</Typography>
+                                                        <Typography
+                                                            sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
+                                                        >@{item.username}</Typography>
+                                                    </Box>
+
                                                 </MenuItem>
+
                                             )
                                             ) : null}
 

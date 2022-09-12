@@ -18,7 +18,7 @@ export const getAllAssignee = createAsyncThunk(
             const request = await axios.post('/api/defect/assignee',
                 { title: title }
                 , getAuthHeader())
-            return { assignee: request.data[0].assignee.sort() }
+            return { assignee: request.data }
         } catch (error) {
             throw error;
         }

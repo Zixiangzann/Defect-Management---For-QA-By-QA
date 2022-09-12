@@ -36,7 +36,7 @@ const authController = {
     async firstLoginValidation(req,res,next){
         try {
             const validatedUser = await authService.firstLoginValidation(req)
-            const token = await authService.genAuthToken(validatedUser);
+            const token = await authService.genAuthToken(validatedUser[0]);
 
             res.cookie('x-access-token',token)
             .json({ 

@@ -188,8 +188,9 @@ userSchema.statics.usernameTaken = async function (username) {
     return !!user;
 }
 
+//need to add "+" to the string as it is store with + in the db due to  required by firebase
 userSchema.statics.phoneTaken = async function (phone) {
-    const user = await this.findOne({ "phone": phone.trim() })
+    const user = await this.findOne({ "phone": "+" + phone.trim() })
     return !!user;
 }
 

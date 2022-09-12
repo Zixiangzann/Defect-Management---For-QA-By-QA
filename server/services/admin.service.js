@@ -91,37 +91,37 @@ export const addUser = async (req) => {
             })
             .then(async (userRecord) => {
                 firebaseuid = userRecord.uid
-                
+
             })
             .catch((error) => {
                 console.log(error)
                 throw new ApiError(httpStatus.BAD_REQUEST, error.message);
             })
 
-            if(firebaseuid === "") throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create user');
+        if (firebaseuid === "") throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create user');
 
-            const user = new User({
-                firebaseuid:firebaseuid,
-                photoURL: req.body.photoURL,
-                firstname: req.body.userDetails.firstname,
-                lastname: req.body.userDetails.lastname,
-                username: req.body.userDetails.username,
-                email: req.body.userDetails.email,
-                phone: "+" + req.body.userDetails.phone,
-                password: req.body.userDetails.password,
-                role: req.body.userDetails.role,
-                jobtitle: req.body.userDetails.jobtitle,
-                permission: req.body.permission
-            });  
+        const user = new User({
+            firebaseuid: firebaseuid,
+            photoURL: req.body.photoURL,
+            firstname: req.body.userDetails.firstname,
+            lastname: req.body.userDetails.lastname,
+            username: req.body.userDetails.username,
+            email: req.body.userDetails.email,
+            phone: "+" + req.body.userDetails.phone,
+            password: req.body.userDetails.password,
+            role: req.body.userDetails.role,
+            jobtitle: req.body.userDetails.jobtitle,
+            permission: req.body.permission
+        });
 
-            
-            await user.save();
-            return user;
+
+        await user.save();
+        return user;
 
     } catch (error) {
         console.log(error)
         throw error;
-        
+
 
     }
 }
@@ -130,7 +130,7 @@ export const checkEmailExist = async (body) => {
 
     try {
         if (await User.emailTaken(body.email)) {
-            return { message: 'Sorry email taken' }
+            return { message: 'Sorry, Email taken' }
         }
     } catch (error) {
         throw error
@@ -155,7 +155,7 @@ export const checkUsernameExist = async (body) => {
 
     try {
         if (await User.usernameTaken(body.username.toLowerCase().trim())) {
-            return { message: 'Sorry username taken' }
+            return { message: 'Sorry, Username taken' }
         }
 
     } catch (error) {
@@ -163,15 +163,68 @@ export const checkUsernameExist = async (body) => {
     }
 }
 
-//might not be needed.
 export const checkPhoneExist = async (body) => {
     try {
-        if (await User.checkPhoneExist(body.phone.trim())) {
-            return { message: 'Sorry Phone number have been registered to another account' }
+        if (await User.phoneTaken(body.phone.trim())) {
+            return { message: 'Sorry, Phone number has been registered with another account.' }
         }
     } catch (error) {
         throw error
     }
+}
+
+export const updateProfilePicture = async (req) => {
+
+    const result = new Array();
+
+    //check account permission
+    if (!req.user.permission[0].changeUserDetails) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+    }
+
+    const adminEmail = req.user.email
+    const adminPassword = req.body.adminPassword
+    //user details
+    const userEmail = req.body.userEmail
+    const userUpdatedPhotoURL = req.body.userNewPhotoURL
+
+    //validate if url is valid
+    try {
+        Boolean(new URL(userUpdatedPhotoURL))
+    } catch (error) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'A valid URL is required.');
+    }
+
+    //check if admin email and password is correct
+    const admin = await userService.findUserByEmail(adminEmail);
+    if (!(await admin.comparePassword(adminPassword))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    }
+
+    //check if user email is found
+    const user = await User.findOne({ email: userEmail })
+    if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
+
+    const updateUser = User.findOneAndUpdate({ email: userEmail }, { photoURL: userUpdatedPhotoURL }, { new: true });
+    result.push(await updateUser)
+
+    //firebase
+    const uid = user.firebaseuid
+
+    await getAuth().updateUser(
+        uid,
+        {
+            photoURL: userUpdatedPhotoURL
+        }
+    ).then((userRecord) => {
+        result.push({ 'firebase photoURL updated': userRecord.photoURL })
+    }).catch((error) => {
+        console.log('Error updating user:', error);
+        throw new ApiError(httpStatus.BAD_REQUEST, error);
+    });
+
+    return result;
+
 }
 
 
@@ -233,6 +286,8 @@ export const updateUserLastName = async (req) => {
 
 export const updateUserUserName = async (req) => {
 
+    const result = new Array();
+
     //check account permission
     if (!req.user.permission[0].changeUserDetails) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
@@ -243,6 +298,8 @@ export const updateUserUserName = async (req) => {
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedUsername = req.body.userNewUsername
+
+    if (await User.usernameTaken(userUpdatedUsername)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Username taken');
 
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
@@ -255,11 +312,31 @@ export const updateUserUserName = async (req) => {
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
     const updateUser = User.findOneAndUpdate({ email: userEmail }, { username: userUpdatedUsername }, { new: true });
-    return updateUser;
+
+    result.push(await updateUser)
+
+    //firebase
+    const uid = user.firebaseuid
+
+    await getAuth().updateUser(
+        uid,
+        {
+            displayName: userUpdatedUsername
+        }
+    ).then((userRecord) => {
+        result.push({ 'firebase displayName updated': userRecord.displayName })
+    }).catch((error) => {
+        console.log('Error updating user:', error);
+        throw new ApiError(httpStatus.BAD_REQUEST, error);
+    });
+
+    return result;
 
 }
 
 export const updateUserPhone = async (req) => {
+
+    const result = new Array();
 
     //check account permission
     if (!req.user.permission[0].changeUserDetails) {
@@ -272,6 +349,9 @@ export const updateUserPhone = async (req) => {
     const userEmail = req.body.userEmail
     const userUpdatedPhone = req.body.userNewPhone
 
+    //to check if user new phone is already taken.
+    if (await User.phoneTaken(userUpdatedPhone)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Phone number has been registered with another account.');
+
     //check if admin email and password is correct
     const admin = await userService.findUserByEmail(adminEmail);
     if (!(await admin.comparePassword(adminPassword))) {
@@ -282,8 +362,26 @@ export const updateUserPhone = async (req) => {
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    const updatedUser = User.findOneAndUpdate({ email: userEmail }, { phone: userUpdatedPhone }, { new: true });
-    return updatedUser;
+    const updatedUser = User.findOneAndUpdate({ email: userEmail }, { phone: "+" + userUpdatedPhone }, { new: true });
+
+    result.push(await updatedUser)
+
+    //firebase
+    const uid = user.firebaseuid
+
+    await getAuth().updateUser(
+        uid,
+        {
+            phoneNumber: "+" + userUpdatedPhone
+        }
+    ).then((userRecord) => {
+        result.push({ 'firebase phone updated': userRecord.phoneNumber })
+    }).catch((error) => {
+        console.log('Error updating user:', error);
+        throw new ApiError(httpStatus.BAD_REQUEST, error);
+    });
+
+    return result;
 
 }
 
@@ -295,13 +393,15 @@ export const updateUserEmail = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-
     //update in user collection
     const adminEmail = req.user.email
     const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedEmail = req.body.userNewEmail
+
+    //to check if user new email is already taken.
+    if (await User.emailTaken(userUpdatedEmail)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Email taken')
 
     //check if admin email and password is correct
     const adminCredentials = await userService.findUserByEmail(adminEmail);
@@ -318,34 +418,26 @@ export const updateUserEmail = async (req) => {
     const updatedUserProject = Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
     const updatedUserDefect = Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
 
-
-    //firebase update email
-    getAuth().getUserByEmail(userEmail)
-        .then((userRecord) => {
-            let uid = userRecord.uid
-
-            getAuth().updateUser(
-                uid, {
-                email: userUpdatedEmail
-            }
-            ).then((userRecord) => {
-                // See the UserRecord reference doc for the contents of userRecord.
-                console.log('Successfully updated user email, ', userRecord.email);
-            })
-                .catch((error) => {
-                    console.log('Error updating user:', error);
-                    throw new ApiError(httpStatus.BAD_REQUEST, error);
-                });
-        })
-        .catch((error) => {
-            throw new ApiError(httpStatus.BAD_REQUEST, error);
-        })
-
     // join the json and return as response
     const result = new Array();
     result.push(await updatedUser)
     result.push(await updatedUserProject)
     result.push(await updatedUserDefect)
+
+    //firebase
+    const uid = user.firebaseuid
+
+    await getAuth().updateUser(
+        uid,
+        {
+            email: userUpdatedEmail
+        }
+    ).then((userRecord) => {
+        result.push({ 'firebase email updated': userRecord.email })
+    }).catch((error) => {
+        console.log('Error updating user:', error);
+        throw new ApiError(httpStatus.BAD_REQUEST, error);
+    });
 
     return result;
 
@@ -380,6 +472,8 @@ export const updateUserJobTitle = async (req) => {
 }
 //reset user password
 export const resetUserPassword = async (req) => {
+
+    const result = new Array();
 
     //check account permission
     if (!req.user.permission[0].resetUserPassword) {
@@ -427,7 +521,24 @@ export const resetUserPassword = async (req) => {
         { new: true }
     )
 
-    return updatedUser;
+    result.push(await updatedUser)
+
+    //firebase
+    const uid = user.firebaseuid
+
+    await getAuth().updateUser(
+        uid,
+        {
+            password: userNewPassword
+        }
+    ).then((userRecord) => {
+        result.push({ 'firebase password updated': "success" })
+    }).catch((error) => {
+        console.log('Error updating user:', error);
+        throw new ApiError(httpStatus.BAD_REQUEST, error);
+    });
+
+    return result;
 
 }
 

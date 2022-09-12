@@ -30,7 +30,8 @@ import {
     getAllProjects,
     removeFromProject,
     assignProject,
-    updatePhone
+    updatePhone,
+    updateProfilePicture
 } from '../../../../store/actions/admin';
 
 
@@ -73,7 +74,7 @@ const ManageUser = () => {
 
     //User Field state
     const [profilePictureSample, setProfilePictureSample] = useState('');
-    const [editProfilePicture, setEditProfilePicture] = useState(false)
+    const [editProfilePicture, setEditProfilePicture] = useState(false);
     const [uploadProfilePicture, setUploadProfilePicture] = useState('');
     const [firstname, setFirstName] = useState('')
     const [lastname, setLastName] = useState('')
@@ -166,7 +167,6 @@ const ManageUser = () => {
             // setUserDet
         }
 
-        // if(userDetails.photoURL !== )
         setEditEnabled({
             ...editEnabled,
             editProfilePicture: true
@@ -181,7 +181,6 @@ const ManageUser = () => {
             canvas.toBlob((blob) => {
                 let file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" })
                 setUploadProfilePicture(file)
-                showToast('SUCCESS', <div>Profile picture set</div>)
             }, 'image/jpeg')
         }
     }
@@ -229,6 +228,7 @@ const ManageUser = () => {
             //if changes is not confirmed. and user going to edit other field, change back to initial picture
             if (uploadProfilePicture === "" && !editEnabled.editProfilePicture) {
                 setProfilePictureSample(userDetails.photoURL)
+
             }
 
         }
@@ -288,6 +288,21 @@ const ManageUser = () => {
         const userEmail = searchUser
 
         switch (editingField) {
+            case "confirmProfilePicture":
+                dispatch(updateProfilePicture({
+                    adminPassword,
+                    userEmail,
+                    uploadProfilePicture: uploadProfilePicture
+                }))
+                    .unwrap()
+                    .then(() => {
+                        setEditEnabled({ ...editEnabled, "editProfilePicture": false })
+                        setUploadProfilePicture("")
+                    })
+                    .then(() => {
+                        dispatch(getUserByEmail({ email: searchUser }))
+                    })
+                break;
             case "confirmFirstname":
                 dispatch(updateFirstname({
                     adminPassword,
@@ -356,15 +371,15 @@ const ManageUser = () => {
                 }))
                     .unwrap()
                     .then(() => {
+                        setSearchUser("")
                         handleEditState("editEmail", false)
-                        setSearchUser(email);
-                    })
-                    .then(() => {
-                        dispatch(getUserByEmail({ email: searchUser }))
-                        // dispatch(isAuth())
-                    })
-                    .catch(() => {
-                        setSearchUser(userDetails.email);
+                        dispatch(getUserByEmail({ email: email }))
+                        dispatch(getAllUsersEmail({}))
+                        .unwrap()
+                        .then(()=>{
+                            setSearchUser(email)
+                        })
+                        
                     })
                 break;
             case "confirmJobtitle":
@@ -547,6 +562,12 @@ const ManageUser = () => {
                 setOpenModal(true)
                 break;
             case "confirmPhone":
+                //no trimming required
+                setOpenModal(true)
+                break;
+            case "confirmProfilePicture":
+                //no trimming required
+                handleProfilePicToBlob()
                 setOpenModal(true)
                 break;
             default:
@@ -563,6 +584,10 @@ const ManageUser = () => {
         // setOpenModal(true)
 
         switch (confirmChanges) {
+            case "confirmProfilePicture":
+                setModalDescription(`You are about to change user's Profile Picture`)
+                setEditingField(confirmChanges);
+                break;
             case "confirmFirstname":
                 setModalDescription(`You are about to change user's First name\n\n From: "${userDetails.firstname}" \n To: "${firstname}"`)
                 setEditingField(confirmChanges);
@@ -596,7 +621,7 @@ const ManageUser = () => {
                 break;
             case "confirmPhone":
                 setModalDescription(`You are about to change user's phone number \n\n From: "${userDetails.phone}" 
-                To: "${phone}
+                To: "+${phone}"
                 `)
                 setEditingField(confirmChanges);
                 break;

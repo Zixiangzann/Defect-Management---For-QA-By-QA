@@ -39,7 +39,7 @@ let DEFAULT_DEFECT_STATE = {
     search: '',
   },
   sort: {
-    order: 1,
+    order: -1,
     sortby: 'defectid'
   },
   current: null

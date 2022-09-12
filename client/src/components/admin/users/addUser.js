@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 //lib
 import ModalComponent from '../../../utils/modal/modal';
 import { useDispatch, useSelector } from 'react-redux';
-import { addUser, checkEmailExist, checkUsernameExist } from '../../../store/actions/admin';
+import { addUser, checkEmailExist, checkPhoneExist, checkUsernameExist } from '../../../store/actions/admin';
 import { Loader, ProfilePicEditor } from '../../../utils/tools';
 import { showToast } from '../../../utils/tools';
 
@@ -355,10 +355,12 @@ const AddUser = () => {
                         inputStyle={{ width: 100 + '%' }}
                         onBlur={() => {
                             userDetails.phone.length >= 8 ? setPhoneCheck(false) : setPhoneCheck(true)
+                            dispatch(checkPhoneExist({phone: userDetails.phone}))
                         }
                         }
                     ></PhoneInput>
                     <FormHelperText error>{phoneCheck ? "Valid Phone number is required" : null}</FormHelperText>
+                    <FormHelperText error>{admin.error.phoneTaken ? admin.error.phoneTaken : null}</FormHelperText>
                 </FormControl>
 
 

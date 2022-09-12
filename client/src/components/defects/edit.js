@@ -37,10 +37,13 @@ import ArticleIcon from '@mui/icons-material/Article';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AttachmentIcon from '@mui/icons-material/Attachment';
+import Avatar from '@mui/material/Avatar';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAssignee, getAllComponents, getAllProjects, createDefect, getDefectById, updateDefect,updateAttachment } from '../../store/actions/defects';
+import { getAllAssignee, getAllComponents, getAllProjects, createDefect, getDefectById, updateDefect, updateAttachment } from '../../store/actions/defects';
 
 
 const EditDefect = () => {
@@ -65,14 +68,14 @@ const EditDefect = () => {
     //Modal
     const [openModal, setOpenModal] = useState(false);
     const [modalDescription, setModalDescription] = useState('');
-    const [modalType , setModalType] = useState('');
+    const [modalType, setModalType] = useState('');
 
     //add files to be uploaded in a array
-    const [ filesArray, setFilesArray ] = useState([])
+    const [filesArray, setFilesArray] = useState([])
     //item state for to be deleted
     const [toBeDeleted, setToBeDeleted] = useState('')
     //Attachment action
-    const [attachmentAction,setAttachmentAction] = useState('')
+    const [attachmentAction, setAttachmentAction] = useState('')
 
 
     const handleChange = async (event) => {
@@ -85,6 +88,7 @@ const EditDefect = () => {
         )
     };
 
+
     const handleEditorState = (state) => {
         formik.setFieldValue('description', state, true)
     }
@@ -95,27 +99,27 @@ const EditDefect = () => {
 
     const handleModalConfirm = () => {
 
-        if(modalType === 'changeProject'){
-        setShowSelectProject(true)
-        dispatch(getAllProjects());
-        setAssignee([])
-        setAssigneeSelectTouched(false)
-        formik.resetForm()
-    }
+        if (modalType === 'changeProject') {
+            setShowSelectProject(true)
+            dispatch(getAllProjects());
+            setAssignee([])
+            setAssigneeSelectTouched(false)
+            formik.resetForm()
+        }
 
-        if(modalType === 'deleteFile'){
+        if (modalType === 'deleteFile') {
             handleDeleteFile(toBeDeleted)
-    }
-        
+        }
+
     }
 
-    useEffect(()=>{
-        if(modalType === 'changeProject'){
+    useEffect(() => {
+        if (modalType === 'changeProject') {
             setModalDescription("Changing of Project will require to re-select Assignee and Components.")
-        }else if(modalType === 'deleteFile'){
+        } else if (modalType === 'deleteFile') {
             setModalDescription(`You are about to permanently delete file "${toBeDeleted.name}"`)
         }
-    },[openModal])
+    }, [openModal])
 
     //handler for file delete
     const handleDeleteFile = (item) => {
@@ -133,13 +137,13 @@ const EditDefect = () => {
         const fileName = e.target.files[0].name
 
         //max 5mb
-        if(fileSizeKb > MAX_FILE_SIZE){
+        if (fileSizeKb > MAX_FILE_SIZE) {
             alert('Maximum file size limit is 5MB')
-        }else if(filesArray.some(e => e.name === fileName)){
+        } else if (filesArray.some(e => e.name === fileName)) {
             alert('Filename must be unique, not allowed to attach file with same name')
             console.log(filesArray)
             console.log(filesArray.values('name'))
-        }else{
+        } else {
             setFilesArray([...filesArray, e.target.files[0]]);
             console.log(filesArray)
             setAttachmentAction('uploadFile')
@@ -147,7 +151,7 @@ const EditDefect = () => {
 
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(filesArray)
         console.log(toBeDeleted)
         dispatch(updateAttachment({
@@ -156,60 +160,60 @@ const EditDefect = () => {
             action: attachmentAction,
             toBeDeleted: toBeDeleted.name
         }))
-    },[filesArray])
+    }, [filesArray])
 
 
     const attachmentRender = () => {
 
-        return(
-<>
-        <InputLabel>Attach Files:</InputLabel>
-        <InputLabel sx={{fontSize:'0.8rem',color:'darkred'}}>Note: Max File size: 5MB</InputLabel>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        return (
+            <>
+                <InputLabel>Attach Files:</InputLabel>
+                <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred' }}>Note: Max File size: 5MB</InputLabel>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
 
-            <FormControl>
-                <Button
-                    variant="contained"
-                    component="label"
-                    onChange={(e) => handleUploadFile(e)}
-                    startIcon={<AttachmentIcon sx={{ transform: 'rotate(265deg)' }} />}
-                >
-                    Upload
-                    <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
-                </Button>
-            </FormControl>
-        </Box>
+                    <FormControl>
+                        <Button
+                            variant="contained"
+                            component="label"
+                            onChange={(e) => handleUploadFile(e)}
+                            startIcon={<AttachmentIcon sx={{ transform: 'rotate(265deg)' }} />}
+                        >
+                            Upload
+                            <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
+                        </Button>
+                    </FormControl>
+                </Box>
 
-        <Box sx={{ display: 'flex', maxHeight: '150px', overflow: 'auto' }}>
+                <Box sx={{ display: 'flex', maxHeight: '150px', overflow: 'auto' }}>
 
-            <List>
+                    <List>
 
-                {filesArray.map((item) => (
-                    <ListItem
-                        key={`${item.name}_${item.lastModified}`}
-                        secondaryAction={
-                            <IconButton
-                                edge="end"
-                                aria-label="delete"
-                                onClick={() => {
-                                    setModalType('deleteFile');
-                                    setToBeDeleted(item);
-                                    setOpenModal(true);
-                                }}
+                        {filesArray.map((item) => (
+                            <ListItem
+                                key={`${item.name}_${item.lastModified}`}
+                                secondaryAction={
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="delete"
+                                        onClick={() => {
+                                            setModalType('deleteFile');
+                                            setToBeDeleted(item);
+                                            setOpenModal(true);
+                                        }}
+                                    >
+                                        <DeleteIcon sx={{ color: 'red' }} />
+                                    </IconButton>}
                             >
-                                <DeleteIcon sx={{ color: 'red' }} />
-                            </IconButton>}
-                    >
-                        {attachmentIcon(item.type)}
-                        <ListItemText
-                            primary={item.name}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-        </Box>
-        </>
-)
+                                {attachmentIcon(item.type)}
+                                <ListItemText
+                                    primary={item.name}
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Box>
+            </>
+        )
     }
 
 
@@ -446,7 +450,6 @@ const EditDefect = () => {
                                             name='assignee'
                                             label='Assignee'
                                             value={assignee}
-
                                             onChange={
                                                 (e) => {
                                                     handleChange(e)
@@ -462,12 +465,34 @@ const EditDefect = () => {
                                         >
 
                                             {defects.data.assignee ? defects.data.assignee.map((item) => (
-                                                <MenuItem key={item} value={item}>
+
+                                                <MenuItem
+                                                    key={item.email}
+                                                    value={item.email}
+                                                >
                                                     <Checkbox
-                                                        checked={assignee.indexOf(item) > -1}
+                                                        checked={assignee.indexOf(item.email) > -1}
+                                                        icon={<AddCircleIcon sx={{display:'none'}}/>}
+                                                        checkedIcon={<AddCircleIcon sx={{color:'green'}}/>}
                                                     />
-                                                    <ListItemText primary={item} />
+                                                    <Avatar
+                                                        alt={item.email}
+                                                        src={item.photoURL}
+                                                        sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
+
+                                                    <Box>
+                                                    <Typography
+                                                        sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
+                                                    >{item.email}</Typography>
+                                                    <Typography
+                                                        sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
+                                                    >@{item.username}</Typography>
+                                                    </Box>
+                                                    
+
+
                                                 </MenuItem>
+
                                             )
                                             ) : null}
 

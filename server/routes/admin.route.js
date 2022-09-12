@@ -16,11 +16,13 @@ router.patch('/changerole',auth('updateAny','admin'),adminController.changeRole)
 //check if email exist
 router.post('/checkemailexist',auth('readAny','admin'),adminController.checkEmailExist)
 router.post('/checkusernameexist',auth('readAny','admin'),adminController.checkUsernameExist)
+router.post('/checkphoneexist',auth('readAny','admin'),adminController.checkPhoneExist)
 
 //get user
 router.post('/getuserbyemail',auth('readAny','admin'),adminController.getUserByEmail)
 
 //update user details
+router.patch('/updateuser/photourl',auth('updateAny','admin'),adminController.updateUserPhotoURL)
 router.patch('/updateuser/firstname',auth('updateAny','admin'),adminController.updateUserFirstName)
 router.patch('/updateuser/lastname',auth('updateAny','admin'),adminController.updateUserLastName)
 router.patch('/updateuser/username',auth('updateAny','admin'),adminController.updateUserUserName)

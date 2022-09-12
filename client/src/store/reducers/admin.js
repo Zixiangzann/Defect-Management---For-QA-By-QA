@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject, addUser, updatePhone} from '../actions/admin'
+import {addComment, checkEmailExist, checkUsernameExist, getAllProjects, getAllUsersEmail, getCommentByDefectIdPaginate, getUserByEmail, resetUserPassword, updateEmail, updateFirstname, updateJobtitle, updateLastname, updateRole, updateUsername, updateUserPermission, assignProject, removeFromProject, addUser, updatePhone, checkPhoneExist, updateProfilePicture} from '../actions/admin'
 import { showToast } from '../../utils/tools';
 import { getProjectByTitle } from '../actions/defects';
 
@@ -9,7 +9,8 @@ const initialState = () => ({
     error:{
         emailTaken: null,
         usernameTaken:null,
-        userNotFound:null
+        userNotFound:null,
+        phoneTaken: null,
     },
     userEmails:[],
     projectList:[],
@@ -75,6 +76,13 @@ export const adminSlice = createSlice({
                 state.error.usernameTaken = null
             }
         })
+        .addCase(checkPhoneExist.fulfilled,(state,action)=>{
+            if (action.payload.message) {
+                state.error.phoneTaken = action.payload.message
+            } else {
+                state.error.phoneTaken = null
+            }
+        })
         .addCase(getUserByEmail.fulfilled,(state,action)=>{
             // state.userDetails = action.payload.data
             state.userDetails.photoURL = action.payload.data[0].photoURL            
@@ -100,6 +108,13 @@ export const adminSlice = createSlice({
         })
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project
+        })
+        .addCase(updateProfilePicture.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Successfully Updated")
+            console.log("change profile pic fulfiled")
+        })
+        .addCase(updateProfilePicture.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
         })
         .addCase(updateFirstname.fulfilled,(state,action)=>{
             showToast('SUCCESS',"Successfully Updated")
