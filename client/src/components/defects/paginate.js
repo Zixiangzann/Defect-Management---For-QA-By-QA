@@ -327,7 +327,7 @@ const PaginateComponent = ({
                                         <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>{item.status}</TableCell>
                                         <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
                                         <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
-                                        <TableCell key={`${item.date}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.date}</Moment></TableCell>
+                                        <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
                                     </TableRow>
 
                                 ))}

@@ -42,7 +42,10 @@ let DEFAULT_DEFECT_STATE = {
     order: -1,
     sortby: 'defectid'
   },
-  current: null
+  current: {
+    defect: null,
+    assignee: null
+  }
 }
 
 export const defectsSlice = createSlice({
@@ -107,7 +110,8 @@ export const defectsSlice = createSlice({
       .addCase(getDefectById.pending, (state) => { state.loading = true })
       .addCase(getDefectById.fulfilled, (state, action) => {
         state.loading = false;
-        state.current = action.payload;
+        state.current.defect = action.payload[0].defect;
+        state.current.assignee = action.payload[1].assignee;
       })
       .addCase(getDefectById.rejected, (state) => { state.loading = false })
   }

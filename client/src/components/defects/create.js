@@ -39,6 +39,7 @@ import AudioFileIcon from '@mui/icons-material/AudioFile';
 import ArticleIcon from '@mui/icons-material/Article';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import Chip from '@mui/material/Chip';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
@@ -54,7 +55,7 @@ const CreateDefect = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [showSelectProject, setShowSelectProject] = useState(true)
+    const [enableSelectProject, setEnableSelectProject] = useState(false)
     const [assignee, setAssignee] = useState([])
     const [assigneeSelectTouched, setAssigneeSelectTouched] = useState(false);
     //add files to be uploaded in a array
@@ -80,7 +81,6 @@ const CreateDefect = () => {
             // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,
         )
-        console.log(assignee)
     };
 
     const handleEditorState = (state) => {
@@ -93,7 +93,7 @@ const CreateDefect = () => {
 
 
     const handleModalConfirm = () => {
-        setShowSelectProject(true)
+        setEnableSelectProject(false)
         setAssignee([])
         setAssigneeSelectTouched(false)
         formik.resetForm()
@@ -151,7 +151,14 @@ const CreateDefect = () => {
         initialValues: formValues,
         validationSchema: validation,
         onSubmit: (values) => {
+            //only want to save the assignee email
+            const assigneeEmail = []
+            assignee.map((item) => {
+                assigneeEmail.push(item.email)
+            })
+            console.log(assigneeEmail)
             formik.values.status = "New"
+            formik.values.assignee = assigneeEmail
             dispatch(createDefect(
                 values))
                 .unwrap()
@@ -174,54 +181,41 @@ const CreateDefect = () => {
             <Typography variant='h4' sx={{ marginTop: '2rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Create Issue</Typography>
 
 
-
             <form className='defect_form' style={{ marginTop: '2rem' }} onSubmit={formik.handleSubmit}>
 
-                {/* hide project select box after selecting */}
-                {showSelectProject === true ?
-                    <Box>
-                        <Typography variant='h6' sx={{ marginTop: '2rem' }}>Select a project to continue</Typography>
 
+                {/* revamp project select */}
+                <Box sx={{ display: 'flex', marginBottom: '2rem' }}>
 
-                        <FormControl
-                            fullWidth
-                            sx={{ marginTop: '1rem' }}>
+                    <FormControl
+                        fullWidth
+                        sx={{ marginTop: '1rem', flexBasis: '50%' }}>
 
+                        <InputLabel>Select Project</InputLabel>
+                        <Select
+                            name='project'
+                            label='Project'
+                            disabled={enableSelectProject}
+                            {...formik.getFieldProps('project')}
+                        >
+                            {defects.data.project ? defects.data.project.map((item) => (
+                                <MenuItem
+                                    key={item.title}
+                                    value={item.title}
+                                    onClick={(e) => {
+                                        setEnableSelectProject(true)
+                                        dispatch(getAllAssignee(e.target.textContent))
+                                        dispatch(getAllComponents(e.target.textContent))
+                                    }}
+                                >{item.title}</MenuItem>
+                            )
+                            ) : null}
 
-                            <InputLabel>Project</InputLabel>
-                            <Select
-                                name='project'
-                                label='Project'
-                                sx={{ width: '50%' }}
-                                {...formik.getFieldProps('project')}
-                            >
-                                {defects.data.project ? defects.data.project.map((item) => (
-                                    <MenuItem
-                                        key={item.title}
-                                        value={item.title}
-                                        onClick={(e) => {
-                                            setShowSelectProject(false)
-                                            dispatch(getAllAssignee(e.target.textContent))
-                                            dispatch(getAllComponents(e.target.textContent))
-                                        }}
-                                    >{item.title}</MenuItem>
-                                )
-                                ) : null}
+                        </Select>
 
-                            </Select>
-
-                            {errorHelperSelect(formik, 'project')}
-                        </FormControl>
-                    </Box>
-                    : null
-                }
-
-                {/* show other components ONLY if project is selected */}
-
-                {showSelectProject === true ? null :
-                    <>
-                        <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500}>Project: {formik.values.project}</Typography>
-
+                        {errorHelperSelect(formik, 'project')}
+                    </FormControl>
+                    
                         <Tooltip title="Change Project">
                             <IconButton
                                 color="primary"
@@ -229,146 +223,136 @@ const CreateDefect = () => {
                                     setOpenModal(true)
                                 }
                                 }
-                                sx={{ marginRight: '3rem' }}>
+                                sx={{ mt:'1rem',ml:'1rem' }}>
                                 <ModeEditIcon />
                             </IconButton>
                         </Tooltip>
 
-                        <ModalComponent
-                            open={openModal}
-                            setOpenModal={setOpenModal}
-                            title="Warning"
-                            description={"Changing of Project will reset all field"}
-                            warn={"Are you sure you want to continue?"}
-                            handleModalConfirm={handleModalConfirm}
-                            button1="Confirm"
-                            button2="Cancel"
-                            titleColor="darkred"
-                        >
-                        </ModalComponent>
-
-                        <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
-                        <FormGroup
-                            sx={{ marginTop: '0.5rem' }}>
-                            <TextField
-                                name='title'
-                                label='Defect Summary'
-                                variant='outlined'
-                                {...formik.getFieldProps('title')}
-                                {...errorHelper(formik, 'title')}
-                            />
-                        </FormGroup>
+                </Box>
 
 
-                        <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
+                {/* show other components ONLY if project is selected */}
 
 
-                        {/* TODO */}
-                        {/* To add generate template function, set description */}
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button>Generate Template</Button>
-                        </Box>
+                <Box id="defectDetails" sx={{ border: '1px dotted black', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant='body' mb={2}>Defect Details</Typography>
 
-                
-                        <InputLabel>Description: </InputLabel>
-                        <FormControl
-                            sx={{ marginTop: '1rem' }}>
-                            <WYSIWYG
-                                setEditorState={(state) => handleEditorState(state)}
-                                setEditorBlur={(blur) => handleEditorBlur(blur)}
-                                onError={formik.errors.description}
-                                editorBlur={editorBlur}
-                            />
+                    <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500} mt={5}>Project: {formik.values.project}</Typography>
+                    
+                    <ModalComponent
+                        open={openModal}
+                        setOpenModal={setOpenModal}
+                        title="Warning"
+                        description={"Changing of Project will reset all field"}
+                        warn={"Are you sure you want to continue?"}
+                        handleModalConfirm={handleModalConfirm}
+                        button1="Confirm"
+                        button2="Cancel"
+                        titleColor="darkred"
+                    >
+                    </ModalComponent>
 
-                            {formik.errors.description || (formik.errors.description && editorBlur)
-                                ?
-                                <FormHelperText error={true}>
-                                    {formik.errors.description}
-                                </FormHelperText>
-                                :
-                                null
-                            }
-                        </FormControl>
+                    <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
+                    <InputLabel>Summary: </InputLabel>
+                    <FormGroup
+                        sx={{ marginTop: '0.5rem' }}>
+                        <TextField
+                            name='title'
+                            label='Defect Summary'
+                            variant='outlined'
+                            {...formik.getFieldProps('title')}
+                            {...errorHelper(formik, 'title')}
+                        />
+                    </FormGroup>
 
-                        <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
-                        <InputLabel>Attach Files:</InputLabel>
-                        <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred' }}>Note: Max File size: 5MB</InputLabel>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
-                            <FormControl>
-                                <Button
-                                    variant="contained"
-                                    component="label"
-                                    onChange={(e) => handleFileArray(e)}
-                                    startIcon={<AttachmentIcon sx={{ transform: 'rotate(265deg)' }} />}
-                                >
-                                    Upload
-                                    <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
-                                </Button>
-                            </FormControl>
-                        </Box>
 
-                        <Box sx={{ display: 'flex', maxHeight: '150px', overflow: 'auto' }}>
+                    {/* TODO */}
+                    {/* To add generate template function, set description */}
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button>Generate Template</Button>
+                    </Box>
 
-                            <List>
-                                {filesArray.map((item) => (
-                                    <ListItem
-                                        key={`${item.name}_${item.lastModified}`}
-                                        secondaryAction={
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="delete"
-                                                onClick={() => handleRemoveFileArray(item)}
-                                            >
-                                                <DeleteIcon sx={{ color: 'red' }} />
-                                            </IconButton>}
-                                    >
-                                        {attachmentIcon(item.type)}
-                                        <ListItemText
-                                            primary={item.name}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Box>
 
-                        <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
+                    <InputLabel>Description: </InputLabel>
+                    <FormControl
+                        sx={{ marginTop: '1rem' }}>
+                        <WYSIWYG
+                            setEditorState={(state) => handleEditorState(state)}
+                            setEditorBlur={(blur) => handleEditorBlur(blur)}
+                            onError={formik.errors.description}
+                            editorBlur={editorBlur}
+                        />
 
-                        <FormControl
-                            sx={{ margin: '1rem 1.5rem 0 0' }}>
+                        {formik.errors.description || (formik.errors.description && editorBlur)
+                            ?
+                            <FormHelperText error={true}>
+                                {formik.errors.description}
+                            </FormHelperText>
+                            :
+                            null
+                        }
+                    </FormControl>
 
-                            <InputLabel>Components</InputLabel>
+                    <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
-                            <Select
-                                name='components'
-                                label='components'
-                                sx={{ width: '250px' }}
-                                value={defects.data.components}
-                                {...formik.getFieldProps('components')}
+                    <InputLabel>Attach Files:</InputLabel>
+                    <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred' }}>Note: Max File size: 5MB</InputLabel>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+
+                        <FormControl>
+                            <Button
+                                variant="contained"
+                                component="label"
+                                onChange={(e) => handleFileArray(e)}
+                                startIcon={<AttachmentIcon sx={{ transform: 'rotate(265deg)' }} />}
                             >
-
-                                {defects.data.components ? defects.data.components.map((item) => (
-                                    <MenuItem
-                                        key={item}
-                                        value={item}
-                                    >{item}</MenuItem>
-                                )) : null
-                                }
-                            </Select>
-
-                            {errorHelperSelect(formik, 'components')}
+                                Upload
+                                <input hidden accept=".csv, .xlsx , .xls , image/* , .pdf , text/plain , video/* , audio/*" multiple type="file" />
+                            </Button>
                         </FormControl>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', maxHeight: '150px', overflow: 'auto' }}>
+
+                        <List>
+                            {filesArray.map((item) => (
+                                <ListItem
+                                    key={`${item.name}_${item.lastModified}`}
+                                    secondaryAction={
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            onClick={() => handleRemoveFileArray(item)}
+                                        >
+                                            <DeleteIcon sx={{ color: 'red' }} />
+                                        </IconButton>}
+                                >
+                                    {attachmentIcon(item.type)}
+                                    <ListItemText
+                                        primary={item.name}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+
+                    <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
+
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+
 
                         <FormikProvider value={formik}>
                             <FieldArray
                                 name="assignee"
                                 render={arrayHelpers => (
                                     <FormControl
-                                        sx={{ margin: '1rem 1.5rem 0 0' }}>
+                                        id="createDefectAssignee"
+                                        sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
                                         <InputLabel>Assignee</InputLabel>
                                         <Select
-                                            sx={{ width: '250px' }}
                                             multiple
                                             name='assignee'
                                             label='Assignee'
@@ -383,18 +367,31 @@ const CreateDefect = () => {
                                                 formik.setFieldValue('assignee', [...assignee])
                                             }}
                                             required
-                                            renderValue={(selected) => selected.join(', ')}
+                                            renderValue={(selected) => (
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                    {selected.map((value) => (
+                                                        <Chip
+                                                            avatar={<Avatar alt={value.username} src={value.photoURL} />}
+                                                            key={value.username}
+                                                            label={value.username}
+                                                            color="primary"
+                                                            variant='outlined'
+                                                            sx={{ ml: 2 }} />
+                                                    ))}
+                                                </Box>
+                                            )}
                                         >
                                             {defects.data.assignee ? defects.data.assignee.map((item) => (
 
                                                 <MenuItem
                                                     key={item.email}
-                                                    value={item.email}
+                                                    value={item}
                                                 >
                                                     <Checkbox
-                                                        checked={assignee.indexOf(item.email) > -1}
+                                                        checked={assignee.indexOf(item) > -1}
                                                         icon={<AddCircleIcon sx={{ display: 'none' }} />}
                                                         checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
+
                                                     />
 
                                                     <Avatar
@@ -430,16 +427,42 @@ const CreateDefect = () => {
                                 )}
                             />
                         </FormikProvider>
-                        <br></br>
+
 
                         <FormControl
-                            sx={{ margin: '1rem 1.5rem 0 0' }}>
+                            id="createDefectComponents"
+                            sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+
+                            <InputLabel>Components</InputLabel>
+
+                            <Select
+                                name='components'
+                                label='components'
+                                value={defects.data.components}
+                                {...formik.getFieldProps('components')}
+                            >
+
+                                {defects.data.components ? defects.data.components.map((item) => (
+                                    <MenuItem
+                                        key={item}
+                                        value={item}
+                                    >{item}</MenuItem>
+                                )) : null
+                                }
+                            </Select>
+
+                            {errorHelperSelect(formik, 'components')}
+                        </FormControl>
+
+
+                        <FormControl
+                            id="createDefectServer"
+                            sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
                             <InputLabel>Server</InputLabel>
                             <Select
                                 name='server'
                                 label='Server'
-                                sx={{ width: '250px' }}
                                 {...formik.getFieldProps('server')}
                             >
 
@@ -454,13 +477,14 @@ const CreateDefect = () => {
 
 
                         <FormControl
-                            sx={{ marginTop: '1rem' }}>
+                            id="createDefectIssueType"
+                            sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
                             <InputLabel>Issue Type</InputLabel>
                             <Select
+
                                 name='issuetype'
                                 label='Issue Type'
-                                sx={{ width: '250px' }}
                                 {...formik.getFieldProps('issuetype')}
                             >
                                 <MenuItem key="Bug" value="Bug">Bug</MenuItem>
@@ -473,13 +497,13 @@ const CreateDefect = () => {
 
                         <br></br>
                         <FormControl
-                            sx={{ marginTop: '1rem' }}>
+                            id="createDefectSeverity"
+                            sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
                             <InputLabel>Severity</InputLabel>
                             <Select
                                 name='severity'
                                 label='severity'
-                                sx={{ width: '250px' }}
                                 {...formik.getFieldProps('severity')}
                             >
 
@@ -491,8 +515,11 @@ const CreateDefect = () => {
 
                             {errorHelperSelect(formik, 'severity')}
                         </FormControl>
-                        <br></br>
 
+                    </Box>
+                    <br></br>
+
+                    <Box>
                         <Button
                             variant='text'
                             onClick={() => navigate('/')}
@@ -507,8 +534,10 @@ const CreateDefect = () => {
                             Create
                         </Button>
 
-                    </>
-                }
+                    </Box>
+
+                </Box>
+
 
             </form>
         </>

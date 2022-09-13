@@ -55,7 +55,11 @@ export const defectSchema = mongoose.Schema({
     attachment:{
         type:[{}]
     },
-    date:{
+    createdDate:{
+        type: Date,
+        default: Date.now
+    },
+    lastUpdatedDate:{
         type: Date,
         default: Date.now
     }

@@ -127,6 +127,26 @@
         flex-wrap: wrap;
     }
 
+    #createDefectAssignee{
+        flex-basis: 100%;
+    }
+
+    #createDefectServer{
+        flex-basis: 100%;
+    }
+
+    #createDefectComponents{
+        flex-basis: 100%;
+    }
+
+    #createDefectSeverity{
+        flex-basis: 100%;
+    }
+    
+    #createDefectIssueType{
+        flex-basis: 100%;
+    }
+
   }
 
 

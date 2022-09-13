@@ -104,7 +104,9 @@ const ViewDefect = () => {
     const [previewDocContent, setPreviewDocContent] = useState('');
 
 
-    const defects = useSelector(state => state.defects)
+    const currentDefect = useSelector(state => state.defects.current.defect)
+    const currentAssignee = useSelector(state => state.defects.current.assignee)
+
     const comments = useSelector(state => state.comments)
     const dispatch = useDispatch();
     const { defectId } = useParams();
@@ -260,60 +262,60 @@ const ViewDefect = () => {
 
     return (
         <Box>
-            {defects && defects.current ?
+            {currentDefect ?
                 <Box className='defect_container' mt={5} >
 
                     <Typography className='view-title' sx={viewTitleStyle}>Title:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.title}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.title}</Typography>
                     <Divider></Divider>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Defect ID:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.defectid}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.defectid}</Typography>
                     <Divider></Divider>
                     <Typography className='view-title' sx={viewTitleStyle}>Status:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.status}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.status}</Typography>
 
                     <Divider></Divider>
                     <Typography className='view-title' sx={viewTitleStyle}>Project:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.project}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.project}</Typography>
                     <Divider></Divider>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Components:</Typography>
 
-                    <Tooltip title={defects.current.components}>
-                        <Typography className='view-value' sx={viewValueStyle}>{defects.current.components}</Typography>
+                    <Tooltip title={currentDefect.components}>
+                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.components}</Typography>
                     </Tooltip>
 
                     <Divider></Divider>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Server:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.server}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.server}</Typography>
 
                     <Divider></Divider>
                     <Typography className='view-title' sx={viewTitleStyle}>Issue Type:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.issuetype}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.issuetype}</Typography>
                     <Divider></Divider>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Severity:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.severity}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.severity}</Typography>
 
 
                     <Box sx={boxDescription}>
                         <Typography>Description: </Typography>
                         <div className='defect-description' style={{ margin: '2rem' }}>
                             <div dangerouslySetInnerHTML={
-                                { __html: htmlDecode(defects.current.description) }
+                                { __html: htmlDecode(currentDefect.description) }
                             }>
                             </div>
                         </div>
                     </Box>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Created on:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}><Moment format="DD/MMM/YYYY HH:MMA">{defects.current.date}</Moment></Typography>
+                    <Typography className='view-value' sx={viewValueStyle}><Moment format="DD/MMM/YYYY HH:MMA">{currentDefect.createdDate}</Moment></Typography>
 
 
                     <Typography className='view-title' sx={viewTitleStyle}>Created by:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{defects.current.reporter}</Typography>
+                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.reporter}</Typography>
 
 
                     <List className='card' sx={{ ml: 3, mt: 2 }}>
@@ -326,14 +328,16 @@ const ViewDefect = () => {
                             </ListItemAvatar>
                             <Typography>Assignee:</Typography>
                             <div>
-                                {defects.current.assignee.map((item, index) => (
+                                {currentAssignee.map((item, index) => (
                                     <Chip
-                                        key={`${item + index}`}
-                                        item={item}
-                                        label={item}
+                                        key={`${item.username + index}`}
+                                        item={item.username}
+                                        label={item.username}
                                         color="primary"
                                         className='chip'
-                                        sx={{ m: 0.5 }}
+                                        avatar={<Avatar alt={item.username} src={item.photoURL}/>}
+                                        variant='outlined'
+                                        sx={{ ml: 2 }}
                                     />
                                 ))}
                             </div>
@@ -344,7 +348,7 @@ const ViewDefect = () => {
                         <List
                             className='attachment' sx={{ ml: 3, mt: 2 }}>
                             <Typography>Attachment: </Typography>
-                            {defects.current.attachment.map((item, index) => (
+                            {currentDefect.attachment.map((item, index) => (
                                 <ListItem
                                     key={`${item.name}_${item.lastModified}`}
                                     secondaryAction={

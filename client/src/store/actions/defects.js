@@ -104,11 +104,10 @@ export const updateAttachment = createAsyncThunk(
                         //Only upload if it is a new file type
                         //if already have downloadURL, do NOT reupload.  
                         if (item.downloadURL) {
-                            console.log(item)
                             fileDetailsArray.push(item)
                         }
                     })
-                    console.log(fileDetailsArray)
+                    
                     resolve(fileDetailsArray);
                 })
 
@@ -150,12 +149,12 @@ export const updateAttachment = createAsyncThunk(
                             console.log('Error deleting file')
                         })
                     }
-                    console.log(fileDetailsArray)
+                    
                     resolve(fileDetailsArray);
                 })
 
                 Promise.all([p1, p2]).then(async (values) => {
-                    console.log(values[1])
+                    
                     setTimeout(async () => {
                         const request = await axios.patch(
                             `/api/defect/update/attachment/${defectId}`, {
