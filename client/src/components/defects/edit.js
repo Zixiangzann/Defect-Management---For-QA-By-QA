@@ -58,7 +58,7 @@ const EditDefect = () => {
 
     let { defectId } = useParams();
 
-    const [showSelectProject, setShowSelectProject] = useState(false)
+    const [enableSelectProject, setEnableSelectProject] = useState(true)
     const [assignee, setAssignee] = useState([])
     const [assigneeSelectTouched, setAssigneeSelectTouched] = useState(false);
 
@@ -83,22 +83,11 @@ const EditDefect = () => {
 
     //temp workaround for assignee issue not deselecting. to further check why
     const [projectAssignee, setProjectAssignee] = useState([])
-    const [currentAssigneeEmail , setCurrentAssigneeEmail] = useState([])
+    const [currentAssigneeEmail, setCurrentAssigneeEmail] = useState([])
 
 
-    const handleChange = async (event) => {
-
-
-        const {
-            target: { value },
-        } = event;
-
-        setAssignee(
-            // On autofill we get a stringified value.
-            // typeof value === 'string' ? value.split(',') : value,
-            value
-        )
-
+    const handleChange = async (value) => {
+        setAssignee(value)
     };
 
 
@@ -113,8 +102,7 @@ const EditDefect = () => {
     const handleModalConfirm = () => {
 
         if (modalType === 'changeProject') {
-            setShowSelectProject(true)
-            dispatch(getAllProjects());
+            setEnableSelectProject(false)
             setAssignee([])
             setAssigneeSelectTouched(false)
             formik.resetForm()
@@ -236,6 +224,7 @@ const EditDefect = () => {
         if (filetype.includes('audio')) icon = <AudioFileIcon />
         if (filetype.includes('video')) icon = <VideoFileIcon />
         if (filetype.includes('text')) icon = <ArticleIcon />
+        if(filetype.includes('vnd.ms-excel')) icon = <ArticleIcon />
         if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
             || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
 
@@ -279,39 +268,26 @@ const EditDefect = () => {
             setEditorContent(currentDefect.description)
 
             dispatch(getAllComponents(currentDefect.project))
-
-            setAssignee(
-                currentAssignee
-            )
             setFilesArray([...currentDefect.attachment])
-
-            //temp workaround for assignee issue not deselecting. to further check why
-
-            const emails = []
-            if (assignee) {
-                assignee.map((item) => {
-                    emails.push(item.email)
-                })
-
-                setCurrentAssigneeEmail([...emails])
-            }
-
             dispatch(getAllAssignee(currentDefect.project))
-
-
-            // const notInCurrentAssignee = defect.assignee.filter(f => !emails.includes(f.email))
-            // setProjectAssignee([...notInCurrentAssignee])
-      
-            //end of workaround
+            dispatch(getAllProjects())
 
         }
+
+        setAssignee(currentAssignee)
 
     }, [currentDefect])
 
     useEffect(() => {
 
 
-    }, [defect])
+
+
+        // setAssignee(
+        //     defect.assignee
+        // )
+
+    }, [defect.assignee])
 
 
 
@@ -323,63 +299,60 @@ const EditDefect = () => {
 
             <form className='defect_form' style={{ marginTop: '2rem' }} onSubmit={formik.handleSubmit}>
 
-                {/* hide project select box after selecting */}
-                {showSelectProject === true ?
-                    <Box>
-                        <Typography variant='h6' sx={{ marginTop: '2rem' }}>Select a project to continue</Typography>
+                {/* revamp project select */}
+                <Box sx={{ display: 'flex', marginBottom: '2rem' }}>
 
+                <FormControl
+                    fullWidth
+                    sx={{ marginTop: '1rem', flexBasis: '50%' }}>
 
-                        <FormControl
-                            fullWidth
-                            sx={{ marginTop: '1rem' }}>
+                    <InputLabel>Select Project</InputLabel>
+                    <Select
+                        name='project'
+                        label='Project'
+                        value={currentDefect ? currentDefect.project : ""}
+                        disabled={enableSelectProject}
+                        {...formik.getFieldProps('project')}
+                    >
+                        {defect.project ? defect.project.map((item) => (
+                            <MenuItem
+                                key={item.title}
+                                value={item.title}
+                                onClick={(e) => {
+                                    setEnableSelectProject(true)
+                                    dispatch(getAllAssignee(e.target.textContent))
+                                    dispatch(getAllComponents(e.target.textContent))
+                                }}
+                            >{item.title}</MenuItem>
+                        )
+                        ) : null}
 
+                    </Select>
 
-                            <InputLabel>Project</InputLabel>
-                            <Select
-                                name='project'
-                                label='Project'
-                                sx={{ width: '50%' }}
-                                {...formik.getFieldProps('project')}
-                            >
-                                {currentDefect.project ? currentDefect.project.map((item) => (
-                                    <MenuItem
-                                        key={item.title}
-                                        value={item.title}
-                                        onClick={(e) => {
-                                            setShowSelectProject(false)
-                                            dispatch(getAllAssignee(e.target.textContent))
-                                            dispatch(getAllComponents(e.target.textContent))
-                                        }}
-                                    >{item.title}</MenuItem>
-                                )
-                                ) : null}
+                    {errorHelperSelect(formik, 'project')}
+                </FormControl>
+                
+                    <Tooltip title="Change Project">
+                        <IconButton
+                            color="primary"
+                            onClick={() => {
+                                setModalType('changeProject');
+                                setOpenModal(true);
+                            }
+                            }
+                            sx={{ mt:'1rem',ml:'1rem' }}>
+                            <ModeEditIcon />
+                        </IconButton>
+                    </Tooltip>
 
-                            </Select>
-
-                            {errorHelperSelect(formik, 'project')}
-                        </FormControl>
-                    </Box>
-                    : null
-                }
+            </Box>
 
                 {/* show other components ONLY if project is selected */}
 
                 {currentDefect ?
-                    <>
-                        <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500}>Project: {formik.values.project}</Typography>
-
-                        <Tooltip title="Change Project">
-                            <IconButton
-                                color="primary"
-                                onClick={() => {
-                                    setModalType('changeProject');
-                                    setOpenModal(true);
-                                }
-                                }
-                                sx={{ marginRight: '3rem' }}>
-                                <ModeEditIcon />
-                            </IconButton>
-                        </Tooltip>
+                     <Box id="defectDetails" sx={{ border: '1px dotted black', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+                     <Typography variant='body' mb={2}>Defect Details</Typography>
+                    <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500}>Project: {formik.values.project}</Typography>
 
                         <ModalComponent
                             open={openModal}
@@ -422,11 +395,12 @@ const EditDefect = () => {
                         </FormControl>
 
                         <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
+                    <InputLabel>Defect Summary: </InputLabel>
                         <FormGroup
-                            sx={{ marginTop: '0.5rem' }}>
+                            sx={{ mt:'1.5rem' }}>
                             <TextField
                                 name='title'
-                                label='Defect Summary'
+                                label='Summary'
                                 variant='outlined'
                                 {...formik.getFieldProps('title')}
                                 {...errorHelper(formik, 'title')}
@@ -463,120 +437,115 @@ const EditDefect = () => {
 
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 
-                            <FormikProvider value={formik}>
-                                <FieldArray
-                                    name="assignee"
-                                    render={arrayHelpers => (
-                                        <FormControl
-                                            id="createDefectAssignee"
-                                            sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-                                            <InputLabel>Assignee</InputLabel>
-                                            <Select
-                                                multiple
-                                                name='assignee'
-                                                label='Assignee'
-                                                value={assignee}
-                                                onChange={
-                                                    (e) => {
-                                                        console.log(e)
-                                                        handleChange(e)
-                                                    }
+                            {assignee ?
+                                <FormikProvider value={formik}>
+                                    <FieldArray
+                                        name="assignee"
+                                        render={arrayHelpers => (
+                                            <FormControl
+                                                id="createDefectAssignee"
+                                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+                                                <InputLabel>Assignee</InputLabel>
+                                                <Select
+                                                    multiple
+                                                    name='assignee'
+                                                    label='Assignee'
+                                                    value={assignee}
+                                                    onChange={
+                                                        (e) => {
+                                                            
+                                                            if(e.target.value.length){
+                                                            const value = e.target.value
+                                                            const clickedEmail = value[value.length -1].email
+
+                                                            let count = 0;
+                                                            value.map((item)=>{
+                                                                if(item.email === clickedEmail){
+                                                                    count++
+                                                                }
+                                                            })
+
+                                                            if(count >= 2){
+                                                                const removed = value.filter(e => e.email !== clickedEmail)
+                                                                console.log(removed)
+                                                                setAssignee([...removed])
+                                                            }else{
+                                                                setAssignee(value)
+                                                            }
+                                                           
+                                                        }else{
+                                                            if(e.length){
+                                                            setAssignee(e)
+                                                            }else{
+                                                                setAssignee([])
+                                                            }
+                                                        }
+                                                        }}
+                                                    onClose={() => {
+                                                        setAssigneeSelectTouched(true);
+                                                        // formik.values.assignee = assignee
+                                                        formik.setFieldValue('assignee', [...assignee])
+                                                    }}
+                                                    required
+                                                    renderValue={(selected) => (
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {selected.map((value, index) => (
+                                                                <Chip
+                                                                    avatar={<Avatar alt={value.username} src={value.photoURL} />}
+                                                                    key={`${value.username}-${index}`}
+                                                                    label={value.username}
+                                                                    color="primary"
+                                                                    variant='outlined'
+                                                                    sx={{ ml: 2 }} />
+                                                            ))}
+                                                        </Box>
+                                                    )}
+                                                >
+
+                                                    {defect.assignee ? defect.assignee.map((item) => (
+                                                        <MenuItem
+                                                            key={item.email}
+                                                            value={item}
+                                                        >
+                                                            <Checkbox
+                                                                checked={assignee.filter(e => e.email === item.email).length > 0}
+                                                                icon={<AddCircleIcon sx={{ display: 'none' }} />}
+                                                                checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
+                                                            />
+                                                            <Avatar
+                                                                alt={item.email}
+                                                                src={item.photoURL}
+                                                                sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
+
+                                                            <Box>
+                                                                <Typography
+                                                                    sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
+                                                                >{item.email}</Typography>
+                                                                <Typography
+                                                                    sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
+                                                                >@{item.username}</Typography>
+                                                            </Box>
+
+                                                        </MenuItem>
+
+                                                    ))
+                                                        : null}
+
+                                                </Select>
+                                                {assignee.length === 0 && assigneeSelectTouched === true ?
+                                                    <FormHelperText error={true}>
+                                                        Please select a assignee
+                                                    </FormHelperText>
+                                                    :
+                                                    null
                                                 }
-                                                onClose={() => {
-                                                    setAssigneeSelectTouched(true);
-                                                    // formik.values.assignee = assignee
-                                                    formik.setFieldValue('assignee', [...assignee])
-                                                }}
-                                                required
-                                                renderValue={(selected) => (
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                        {selected.map((value, index) => (
-                                                            <Chip
-                                                                avatar={<Avatar alt={value.username} src={value.photoURL} />}
-                                                                key={`${value.username}-${index}`}
-                                                                label={value.username}
-                                                                color="primary"
-                                                                variant='outlined'
-                                                                sx={{ ml: 2 }} />
-                                                        ))}
-                                                    </Box>
-                                                )}
-                                            >
-
-                                                {currentAssignee ? currentAssignee.map((item) => (
-
-                                                    <MenuItem
-                                                        key={item.email}
-                                                        value={item}
-                                                        name={item.email}
-                                                    >
-                                                        <Checkbox
-                                                            checked={assignee.includes(item)}
-                                                            icon={<AddCircleIcon sx={{ display: 'none' }} />}
-                                                            checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
-                                                        />
-                                                        <Avatar
-                                                            alt={item.email}
-                                                            src={item.photoURL}
-                                                            sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
-
-                                                        <Box>
-                                                            <Typography
-                                                                sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
-                                                            >{item.email}</Typography>
-                                                            <Typography
-                                                                sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
-                                                            >@{item.username}</Typography>
-                                                        </Box>
-
-                                                    </MenuItem>
-
-                                                )
-                                                ) : null}
-
-                                                {/* temp workaround for assignee issue not deselecting. need to use loop a seperate menu item, to further check why */}
-                                                {defect.assignee ? defect.assignee.filter(f => !currentAssigneeEmail.includes(f.email)).map((item) => (
-                                                    <MenuItem
-                                                        key={item.email}
-                                                        value={item}
-                                                        name={item.email}
-                                                    >
-                                                        <Checkbox
-                                                            checked={assignee.includes(item)}
-                                                            icon={<AddCircleIcon sx={{ display: 'none' }} />}
-                                                            checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
-                                                        />
-                                                        <Avatar
-                                                            alt={item.email}
-                                                            src={item.photoURL}
-                                                            sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
-
-                                                        <Box>
-                                                            <Typography
-                                                                sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
-                                                            >{item.email}</Typography>
-                                                            <Typography
-                                                                sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
-                                                            >@{item.username}</Typography>
-                                                        </Box>
-
-                                                    </MenuItem>
-
-                                                ))
-                                                    : null}
-
-                                            </Select>
-                                            {assignee.length === 0 && assigneeSelectTouched === true ?
-                                                <FormHelperText error={true}>
-                                                    Please select a assignee
-                                                </FormHelperText>
-                                                :
-                                                null
-                                            }
-                                        </FormControl>
-                                    )}
-                                />
-                            </FormikProvider>
+                                            </FormControl>
+                                        )}
+                                    />
+                                </FormikProvider>
+                                :
+                                null
+                            }
 
                             <FormControl
                                 id="createDefectComponents"
@@ -670,6 +639,7 @@ const EditDefect = () => {
                             <br></br>
                         </Box>
 
+                        <Box>
                         <Button
                             variant='text'
                             onClick={() => navigate('/')}
@@ -683,8 +653,9 @@ const EditDefect = () => {
                             sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
                             Edit
                         </Button>
+                        </Box>
 
-                    </>
+                    </Box>
                     :
                     null
                 }

@@ -253,12 +253,12 @@ const CreateDefect = () => {
                     </ModalComponent>
 
                     <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
-                    <InputLabel>Summary: </InputLabel>
+                    <InputLabel>Defect Summary: </InputLabel>
                     <FormGroup
-                        sx={{ marginTop: '0.5rem' }}>
+                        sx={{ mt:'1.5rem' }}>
                         <TextField
                             name='title'
-                            label='Defect Summary'
+                            label='Summary'
                             variant='outlined'
                             {...formik.getFieldProps('title')}
                             {...errorHelper(formik, 'title')}

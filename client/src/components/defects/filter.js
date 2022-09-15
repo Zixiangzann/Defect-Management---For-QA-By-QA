@@ -58,7 +58,6 @@ const DefectFilter = ({
         if(drawerState) {
             dispatch(getAllProjects())
         }
-        console.log(defects.data.components)
     }, [drawerState]);
 
     const handleChange = (event) =>{

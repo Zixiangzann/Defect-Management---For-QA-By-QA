@@ -223,6 +223,7 @@ const ViewDefect = () => {
         if (filetype.includes('audio')) icon = <AudioFileIcon />
         if (filetype.includes('video')) icon = <VideoFileIcon />
         if (filetype.includes('text')) icon = <ArticleIcon />
+        if(filetype.includes('vnd.ms-excel')) icon = <ArticleIcon />
         if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
             || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
 
@@ -388,7 +389,7 @@ const ViewDefect = () => {
                                         null
                                     }
 
-                                    {item.type.includes('video') ?
+                                    {item.type.includes('video/mp4') ?
                                         <Tooltip title="Preview video">
                                             <IconButton
                                                 onClick={() => {
@@ -437,7 +438,7 @@ const ViewDefect = () => {
                                         null
                                     }
 
-                                    {item.type.includes('text') ?
+                                    {item.type.includes('text') || item.type.includes('vnd.ms-excel') ?
                                         <Tooltip title="Preview document">
                                             <IconButton
                                                 onClick={() => {
