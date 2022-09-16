@@ -1,13 +1,14 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import cookie from 'react-cookies'
+import { setAuthNull } from "../store/reducers/users";
 
 export const LoginGuard = (props) => {
     const users = useSelector(state => state.users);
     let location = useLocation();
     const navigate = useNavigate();
-
+    const dispatch = useDispatch();
 
     //temp solution.. need to check when the firebase token will expired.
     const auth = getAuth()
@@ -15,7 +16,8 @@ export const LoginGuard = (props) => {
         if (!user) {
             console.log(user)
             cookie.remove('x-access-token', { path: '/' });
-            return <Navigate to="/auth" state={{ from: location }} replace />
+            dispatch(setAuthNull())
+
         }
     })
 
