@@ -7,6 +7,7 @@ import { userService } from "./index.js";
 import Project from "../models/project.js";
 import bcrypt from 'bcrypt'
 import Defect from "../models/defect.js";
+import Comment from "../models/comment.js";
 
 
 
@@ -205,8 +206,10 @@ export const updateProfilePicture = async (req) => {
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    const updateUser = User.findOneAndUpdate({ email: userEmail }, { photoURL: userUpdatedPhotoURL }, { new: true });
-    result.push(await updateUser)
+    const updateUser = await User.findOneAndUpdate({ email: userEmail }, { photoURL: userUpdatedPhotoURL }, { new: true });
+    //update user in comment collection
+    const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.photoURL": userUpdatedPhotoURL},{ new: true });
+    result.push(updateUser)
 
     //firebase
     const uid = user.firebaseuid
@@ -223,6 +226,7 @@ export const updateProfilePicture = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, error);
     });
 
+    result.push(updateUserInComment)
     return result;
 
 }
@@ -311,9 +315,11 @@ export const updateUserUserName = async (req) => {
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    const updateUser = User.findOneAndUpdate({ email: userEmail }, { username: userUpdatedUsername }, { new: true });
-
-    result.push(await updateUser)
+    //update in user collection
+    const updateUser = await User.findOneAndUpdate({ email: userEmail }, { username: userUpdatedUsername }, { new: true });
+    //update in comment collection
+    const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.username": userUpdatedUsername},{ new: true });
+    result.push(updateUser)
 
     //firebase
     const uid = user.firebaseuid
@@ -329,6 +335,8 @@ export const updateUserUserName = async (req) => {
         console.log('Error updating user:', error);
         throw new ApiError(httpStatus.BAD_REQUEST, error);
     });
+
+    result.push(updateUserInComment)
 
     return result;
 
@@ -413,16 +421,19 @@ export const updateUserEmail = async (req) => {
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    //need to update in User(email),Project(assignee),Defects(Reporter)
-    const updatedUser = User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
-    const updatedUserProject = Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
-    const updatedUserDefect = Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
+    //need to update in User(email),Project(assignee),Defects(Reporter),Comments(email)
+    const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
+    const updatedUserProject = await Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
+    const updatedUserDefect = await Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
+    const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.email": userUpdatedEmail},{ new: true });
+    
 
     // join the json and return as response
     const result = new Array();
-    result.push(await updatedUser)
-    result.push(await updatedUserProject)
-    result.push(await updatedUserDefect)
+    result.push(updatedUser)
+    result.push(updatedUserProject)
+    result.push(updatedUserDefect)
+    result.push(updateUserInComment)
 
     //firebase
     const uid = user.firebaseuid
@@ -438,6 +449,8 @@ export const updateUserEmail = async (req) => {
         console.log('Error updating user:', error);
         throw new ApiError(httpStatus.BAD_REQUEST, error);
     });
+
+
 
     return result;
 

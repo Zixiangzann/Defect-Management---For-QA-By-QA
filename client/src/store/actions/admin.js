@@ -168,7 +168,6 @@ export const updateProfilePicture = createAsyncThunk(
                             if (user) {
                                 const storageRef = ref(storage, `Profile-Picture/${userEmail}`)
                                 const uploadTask = uploadBytesResumable(storageRef, uploadProfilePicture)
-
                                 uploadTask.then((snapshot) => {
                                     getDownloadURL(snapshot.ref).then((downloadURL) => {
                                         photoURL = downloadURL
@@ -176,6 +175,9 @@ export const updateProfilePicture = createAsyncThunk(
                                         resolve(photoURL)
                                     })
                                 })
+                            }else{
+                                throw new Error("Firebase unable to get user, please relogin")
+                               
                             }
                         })
                     }
@@ -195,8 +197,9 @@ export const updateProfilePicture = createAsyncThunk(
             }
 
             // upload the new profile picture to firebase, get the url and update the photoURL in firebase account and db
-            await uploadPic()
-            await updatePhotoURL()
+            await uploadPic().then(async()=>{
+                await updatePhotoURL()
+            })
 
         } catch (error) {
             if (!error.response) {

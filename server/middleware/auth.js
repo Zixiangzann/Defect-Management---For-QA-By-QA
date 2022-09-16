@@ -15,6 +15,7 @@ const verify = (req,res,resolve,reject,rights) => async(err,user) => {
         firstname: user.firstname,
         lastname: user.lastname,
         username: user.username,
+        photoURL: user.photoURL,
         jobtitle: user.jobtitle,
         project:user.project,
         role:user.role,

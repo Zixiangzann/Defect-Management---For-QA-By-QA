@@ -49,20 +49,30 @@ import { getAllAssignee, getAllComponents, getAllProjects, createDefect, getDefe
 
 const EditDefect = () => {
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    let { defectId } = useParams();
+
+    //redux selector
     const defect = useSelector(state => state.defects.data)
     const currentDefect = useSelector(state => state.defects.current.defect)
     const currentAssignee = useSelector(state => state.defects.current.assignee)
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    //states
+    //selected project,components
+    const [selectedProject, setSelectedProject] = useState("")
+    const [selectedComponents, setSelectedComponents] = useState("")
 
-    let { defectId } = useParams();
+    //default, disable selectproject
+    const [enableSelectProject, setEnableSelectProject] = useState(false)
 
-    const [enableSelectProject, setEnableSelectProject] = useState(true)
     const [assignee, setAssignee] = useState([])
     const [assigneeSelectTouched, setAssigneeSelectTouched] = useState(false);
 
-    const [loading, setLoading] = useState(true);
+    //state for changing project, when confirmation of changning project, set the state to true and reset components and assignee.
+    const [projectChanging, setProjectChanging] = useState(false)
+
+    //formik
     const [formData, setFormData] = useState(formValues)
     const [editorContent, setEditorContent] = useState(null);
     //WYSIWYG Blur state
@@ -81,16 +91,12 @@ const EditDefect = () => {
     const [attachmentAction, setAttachmentAction] = useState('')
 
 
-    //temp workaround for assignee issue not deselecting. to further check why
-    const [projectAssignee, setProjectAssignee] = useState([])
-    const [currentAssigneeEmail, setCurrentAssigneeEmail] = useState([])
+    //TODO
+    //Store all the initial value state, will be using this to compare to the current value.
+    //If have differences, add it as a comment as a history log.
+    
 
-
-    const handleChange = async (value) => {
-        setAssignee(value)
-    };
-
-
+    //handler
     const handleEditorState = (state) => {
         formik.setFieldValue('description', state, true)
     }
@@ -102,10 +108,7 @@ const EditDefect = () => {
     const handleModalConfirm = () => {
 
         if (modalType === 'changeProject') {
-            setEnableSelectProject(false)
-            setAssignee([])
-            setAssigneeSelectTouched(false)
-            formik.resetForm()
+            setProjectChanging(true)
         }
 
         if (modalType === 'deleteFile') {
@@ -113,14 +116,6 @@ const EditDefect = () => {
         }
 
     }
-
-    useEffect(() => {
-        if (modalType === 'changeProject') {
-            setModalDescription("Changing of Project will require to re-select Assignee and Components.")
-        } else if (modalType === 'deleteFile') {
-            setModalDescription(`You are about to permanently delete file "${toBeDeleted.name}"`)
-        }
-    }, [openModal])
 
     //handler for file delete
     const handleDeleteFile = (item) => {
@@ -152,16 +147,7 @@ const EditDefect = () => {
 
     }
 
-    useEffect(() => {
-        dispatch(updateAttachment({
-            defectId: defectId,
-            attachment: filesArray,
-            action: attachmentAction,
-            toBeDeleted: toBeDeleted.name
-        }))
-    }, [filesArray])
-
-
+    //attachment components
     const attachmentRender = () => {
 
         return (
@@ -224,7 +210,7 @@ const EditDefect = () => {
         if (filetype.includes('audio')) icon = <AudioFileIcon />
         if (filetype.includes('video')) icon = <VideoFileIcon />
         if (filetype.includes('text')) icon = <ArticleIcon />
-        if(filetype.includes('vnd.ms-excel')) icon = <ArticleIcon />
+        if (filetype.includes('vnd.ms-excel')) icon = <ArticleIcon />
         if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
             || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
 
@@ -235,6 +221,73 @@ const EditDefect = () => {
             </ListItemIcon>
         )
     }
+
+    //useEffect
+
+    //inital, get defect details and 
+    useEffect(() => {
+        dispatch(getDefectById(defectId))
+    }, [dispatch, defectId])
+
+
+    // initial, set formdata,selected,attachment to currentDefect(before edit) 
+    // set assignee to currentAssignee(before edit)
+    // dispatch to get the project's assignee and components 
+    useEffect(() => {
+
+        if (currentDefect) {
+            setFormData(currentDefect);
+            setEditorContent(currentDefect.description)
+
+            dispatch(getAllComponents(currentDefect.project))
+            setFilesArray([...currentDefect.attachment])
+            dispatch(getAllAssignee(currentDefect.project))
+            dispatch(getAllProjects())
+            setAssignee(currentAssignee)
+
+            setSelectedProject(currentDefect.project)
+            setSelectedComponents(currentDefect.components)
+
+        }
+
+    }, [currentDefect])
+
+
+    //when add/remove attachment, update filesarray
+    useEffect(() => {
+        dispatch(updateAttachment({
+            defectId: defectId,
+            attachment: filesArray,
+            action: attachmentAction,
+            toBeDeleted: toBeDeleted.name
+        }))
+    }, [filesArray])
+
+    //When modal open
+    useEffect(() => {
+        if (modalType === 'changeProject') {
+            setModalDescription("Changing of Project will require to re-select Assignee and Components.")
+        } else if (modalType === 'deleteFile') {
+            setModalDescription(`You are about to permanently delete file "${toBeDeleted.name}"`)
+        }
+    }, [openModal])
+
+    //project changed
+    useEffect(() => {
+
+        if (projectChanging) {
+            setEnableSelectProject(true)
+            setAssignee([])
+            setSelectedComponents("")
+            formik.setFieldValue("components","")
+            setAssigneeSelectTouched(false)
+
+            setProjectChanging(false)
+            // formik.resetForm()
+        }
+       
+    }, [projectChanging])
+
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -255,42 +308,6 @@ const EditDefect = () => {
         }
     })
 
-    useEffect(() => {
-        dispatch(getDefectById(defectId))
-    }, [dispatch, defectId])
-
-
-    // only dispatch once
-    useEffect(() => {
-
-        if (currentDefect) {
-            setFormData(currentDefect);
-            setEditorContent(currentDefect.description)
-
-            dispatch(getAllComponents(currentDefect.project))
-            setFilesArray([...currentDefect.attachment])
-            dispatch(getAllAssignee(currentDefect.project))
-            dispatch(getAllProjects())
-
-        }
-
-        setAssignee(currentAssignee)
-
-    }, [currentDefect])
-
-    useEffect(() => {
-
-
-
-
-        // setAssignee(
-        //     defect.assignee
-        // )
-
-    }, [defect.assignee])
-
-
-
     return (
         <>
             <Typography variant='h4' sx={{ marginTop: '2rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Edit Issue</Typography>
@@ -302,36 +319,37 @@ const EditDefect = () => {
                 {/* revamp project select */}
                 <Box sx={{ display: 'flex', marginBottom: '2rem' }}>
 
-                <FormControl
-                    fullWidth
-                    sx={{ marginTop: '1rem', flexBasis: '50%' }}>
+                    <FormControl
+                        fullWidth
+                        sx={{ marginTop: '1rem', flexBasis: '50%' }}>
 
-                    <InputLabel>Select Project</InputLabel>
-                    <Select
-                        name='project'
-                        label='Project'
-                        value={currentDefect ? currentDefect.project : ""}
-                        disabled={enableSelectProject}
-                        {...formik.getFieldProps('project')}
-                    >
-                        {defect.project ? defect.project.map((item) => (
-                            <MenuItem
-                                key={item.title}
-                                value={item.title}
-                                onClick={(e) => {
-                                    setEnableSelectProject(true)
-                                    dispatch(getAllAssignee(e.target.textContent))
-                                    dispatch(getAllComponents(e.target.textContent))
-                                }}
-                            >{item.title}</MenuItem>
-                        )
-                        ) : null}
+                        <InputLabel>Select Project</InputLabel>
+                        <Select
+                            name='project'
+                            label='Select Project'
+                            value={selectedProject}
+                            //if enableSelectProject is true, set disabled to false
+                            disabled={enableSelectProject ? false : true}
+                            {...formik.getFieldProps('project')}
+                        >
+                            {defect.project ? defect.project.map((item) => (
+                                <MenuItem
+                                    key={item.title}
+                                    value={item.title}
+                                    onClick={(e) => {
+                                        setEnableSelectProject(false)
+                                        dispatch(getAllAssignee(e.target.textContent))
+                                        dispatch(getAllComponents(e.target.textContent))
+                                    }}
+                                >{item.title}</MenuItem>
+                            )
+                            ) : null}
 
-                    </Select>
+                        </Select>
 
-                    {errorHelperSelect(formik, 'project')}
-                </FormControl>
-                
+                        {errorHelperSelect(formik, 'project')}
+                    </FormControl>
+
                     <Tooltip title="Change Project">
                         <IconButton
                             color="primary"
@@ -340,20 +358,19 @@ const EditDefect = () => {
                                 setOpenModal(true);
                             }
                             }
-                            sx={{ mt:'1rem',ml:'1rem' }}>
+                            sx={{ mt: '1rem', ml: '1rem' }}>
                             <ModeEditIcon />
                         </IconButton>
                     </Tooltip>
 
-            </Box>
+                </Box>
 
                 {/* show other components ONLY if project is selected */}
 
                 {currentDefect ?
-                     <Box id="defectDetails" sx={{ border: '1px dotted black', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
-                     <Typography variant='body' mb={2}>Defect Details</Typography>
-                    <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500}>Project: {formik.values.project}</Typography>
-
+                    <Box id="defectDetails" sx={{ border: '1px dotted black', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant='body' mb={5}>Defect Details</Typography>
+                        <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500}>Project: {formik.values.project}</Typography>
                         <ModalComponent
                             open={openModal}
                             setOpenModal={setOpenModal}
@@ -366,16 +383,17 @@ const EditDefect = () => {
                             titleColor="darkred"
                         >
                         </ModalComponent>
-
+                        <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
                         <FormControl
                             variant="standard"
-                            sx={{ margin: '1rem 1.5rem 0 0', textAlign: 'center', float: 'right' }}>
+                            sx={{ margin: '1rem 1.5rem 0 0', textAlign: 'center' }}>
 
-                            <InputLabel>Status</InputLabel>
+                            {/* <InputLabel sx={{}}>Status</InputLabel> */}
+                            <Typography variant='body' mb={1} alignSelf={'flex-start'} color={'rgba(0, 0, 0, 0.6)'} >Status: </Typography>
                             <Select
                                 name='status'
                                 label='Status'
-                                sx={{ width: '150px' }}
+                                sx={{ width: '190px',mb:'1rem' }}
                                 {...formik.getFieldProps('status')}
                             >
 
@@ -395,12 +413,13 @@ const EditDefect = () => {
                         </FormControl>
 
                         <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
-                    <InputLabel>Defect Summary: </InputLabel>
+                        <InputLabel>Defect Summary: </InputLabel>
                         <FormGroup
-                            sx={{ mt:'1.5rem' }}>
+                            sx={{ mt: '1rem','& legend': { display: 'none' },
+                            '& fieldset': { top: 0 }}}>
                             <TextField
                                 name='title'
-                                label='Summary'
+                                // label='Summary'
                                 variant='outlined'
                                 {...formik.getFieldProps('title')}
                                 {...errorHelper(formik, 'title')}
@@ -453,33 +472,33 @@ const EditDefect = () => {
                                                     value={assignee}
                                                     onChange={
                                                         (e) => {
-                                                            
-                                                            if(e.target.value.length){
-                                                            const value = e.target.value
-                                                            const clickedEmail = value[value.length -1].email
 
-                                                            let count = 0;
-                                                            value.map((item)=>{
-                                                                if(item.email === clickedEmail){
-                                                                    count++
+                                                            if (e.target.value.length) {
+                                                                const value = e.target.value
+                                                                const clickedEmail = value[value.length - 1].email
+
+                                                                let count = 0;
+                                                                value.map((item) => {
+                                                                    if (item.email === clickedEmail) {
+                                                                        count++
+                                                                    }
+                                                                })
+
+                                                                if (count >= 2) {
+                                                                    const removed = value.filter(e => e.email !== clickedEmail)
+                                                                    console.log(removed)
+                                                                    setAssignee([...removed])
+                                                                } else {
+                                                                    setAssignee(value)
                                                                 }
-                                                            })
 
-                                                            if(count >= 2){
-                                                                const removed = value.filter(e => e.email !== clickedEmail)
-                                                                console.log(removed)
-                                                                setAssignee([...removed])
-                                                            }else{
-                                                                setAssignee(value)
+                                                            } else {
+                                                                if (e.length) {
+                                                                    setAssignee(e)
+                                                                } else {
+                                                                    setAssignee([])
+                                                                }
                                                             }
-                                                           
-                                                        }else{
-                                                            if(e.length){
-                                                            setAssignee(e)
-                                                            }else{
-                                                                setAssignee([])
-                                                            }
-                                                        }
                                                         }}
                                                     onClose={() => {
                                                         setAssigneeSelectTouched(true);
@@ -556,7 +575,7 @@ const EditDefect = () => {
                                 <Select
                                     name='components'
                                     label='components'
-                                    value={currentDefect.components}
+                                    value={selectedComponents}
                                     {...formik.getFieldProps('components')}
                                 >
 
@@ -640,19 +659,19 @@ const EditDefect = () => {
                         </Box>
 
                         <Box>
-                        <Button
-                            variant='text'
-                            onClick={() => navigate('/')}
-                            sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
-                            Cancel
-                        </Button>
+                            <Button
+                                variant='text'
+                                onClick={() => navigate('/')}
+                                sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
+                                Cancel
+                            </Button>
 
-                        <Button
-                            variant='contained'
-                            type="submit"
-                            sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
-                            Edit
-                        </Button>
+                            <Button
+                                variant='contained'
+                                type="submit"
+                                sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
+                                Edit
+                            </Button>
                         </Box>
 
                     </Box>

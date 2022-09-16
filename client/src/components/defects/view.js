@@ -49,31 +49,36 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { borderBottom } from '@mui/system';
 
 const ViewDefect = () => {
 
     const viewTitleStyle = {
-        display: 'inline-block',
-        marginLeft: '2rem'
+        // display: 'inline-block',
+        marginLeft: '2rem',
+        width: 'max-content',
+        fontWeight: '300',
+        borderBottom: '1px dotted grey'
     }
 
     const viewValueStyle = {
-        display: 'inline-block',
-        marginLeft: '2rem',
+        // display: 'inline-block',
+        marginLeft: '1rem',
         fontWeight: '600',
-        overflowWrap: 'anywhere'
+        overflowWrap: 'anywhere',
+        width: 'max-content'
     }
 
     const boxDescription = {
-        border: '1px solid black',
-        margin: '2rem',
-        minWidth: '200px',
+        border: '1px dotted black',
+        margin: '1rem 0rem 2rem 2rem',
+        flexBasis: '100%',
         minHeight: '300px',
         maxHeight: '500px',
         overflow: 'auto'
     }
 
-    
+
 
 
     //paginate
@@ -154,65 +159,66 @@ const ViewDefect = () => {
     const handlePreview = async (downloadURL, itemType) => {
         const storage = getStorage();
         const storageRef = ref(storage, downloadURL)
-        onAuthStateChanged(auth,(user)=>{
-        if(user){
-        getDownloadURL(storageRef)
-            .then((url) => {
-                const xhr = new XMLHttpRequest();
-                let blob = ''
-                let fileURL = ''
-                xhr.responseType = 'blob';
-                xhr.onload = async (event) => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                getDownloadURL(storageRef)
+                    .then((url) => {
+                        const xhr = new XMLHttpRequest();
+                        let blob = ''
+                        let fileURL = ''
+                        xhr.responseType = 'blob';
+                        xhr.onload = async (event) => {
 
-                    switch (itemType) {
-                        case 'Image':
-                            setPreviewImageURL(url)
-                            setPreviewTitle(storageRef.name)
-                            setShowImage(true)
-                            break;
-                        case 'Video':
-                            setPreviewVideoURL(url)
-                            setPreviewTitle(storageRef.name)
-                            setShowVideo(true)
-                            break;
-                        case 'Audio':
-                            setPreviewAudioURL(url)
-                            setPreviewTitle(storageRef.name)
-                            setShowAudio(true)
-                            break;
-                        case 'Pdf':
-                            blob = getBlob(storageRef)
-                            fileURL = URL.createObjectURL(await blob);
-                            window.open(fileURL);
-                            break;
-                        case 'Text':
-                            blob = getBlob(storageRef)
-                            fileURL = URL.createObjectURL(await blob);
-                            const reader = new FileReader();
-                            reader.onload = function (event) {
-                                setPreviewDocContent(event.target.result)
-                                setPreviewTitle(storageRef.name)
-                                setShowDoc(true)
+                            switch (itemType) {
+                                case 'Image':
+                                    setPreviewImageURL(url)
+                                    setPreviewTitle(storageRef.name)
+                                    setShowImage(true)
+                                    break;
+                                case 'Video':
+                                    setPreviewVideoURL(url)
+                                    setPreviewTitle(storageRef.name)
+                                    setShowVideo(true)
+                                    break;
+                                case 'Audio':
+                                    setPreviewAudioURL(url)
+                                    setPreviewTitle(storageRef.name)
+                                    setShowAudio(true)
+                                    break;
+                                case 'Pdf':
+                                    blob = getBlob(storageRef)
+                                    fileURL = URL.createObjectURL(await blob);
+                                    window.open(fileURL);
+                                    break;
+                                case 'Text':
+                                    blob = getBlob(storageRef)
+                                    fileURL = URL.createObjectURL(await blob);
+                                    const reader = new FileReader();
+                                    reader.onload = function (event) {
+                                        setPreviewDocContent(event.target.result)
+                                        setPreviewTitle(storageRef.name)
+                                        setShowDoc(true)
+                                    }
+                                    reader.readAsText(new File([await blob], {
+                                        type: "text/plain",
+                                    }))
+                                default:
+                                    break;
                             }
-                            reader.readAsText(new File([await blob], {
-                                type: "text/plain",
-                            }))
-                        default:
-                            break;
-                    }
-                };
-                xhr.open('GET', url);
-                xhr.send();
-            })
-            .then(() => {
-                //pdf type open in new tab
-                if (itemType !== 'Pdf') setOpenModal(true)
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-        }
-    })}
+                        };
+                        xhr.open('GET', url);
+                        xhr.send();
+                    })
+                    .then(() => {
+                        //pdf type open in new tab
+                        if (itemType !== 'Pdf') setOpenModal(true)
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    });
+            }
+        })
+    }
 
 
     const attachmentIcon = (filetype) => {
@@ -223,7 +229,7 @@ const ViewDefect = () => {
         if (filetype.includes('audio')) icon = <AudioFileIcon />
         if (filetype.includes('video')) icon = <VideoFileIcon />
         if (filetype.includes('text')) icon = <ArticleIcon />
-        if(filetype.includes('vnd.ms-excel')) icon = <ArticleIcon />
+        if (filetype.includes('vnd.ms-excel')) icon = <ArticleIcon />
         if (filetype.includes('zip') || filetype.includes('7z') || filetype.includes('gz')
             || filetype.includes('rar') || filetype.includes('tar')) icon = <FolderZipIcon />
 
@@ -259,27 +265,29 @@ const ViewDefect = () => {
     useEffect(() => {
         dispatch(getCommentByDefectIdPaginate({ page: page + 1, limit: rowsPerPage, defectId: defectId }))
         setCommented(false)
-    }, [page, rowsPerPage, commented])
+    }, [page, rowsPerPage])
 
     return (
         <Box>
             {currentDefect ?
-                <Box className='defect_container' mt={5} >
+                <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
 
-                    <Typography className='view-title' sx={viewTitleStyle}>Title:</Typography>
+                    <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography>
+                    <Typography className='defect-id-value' sx={{ ml: '1rem', fontSize: '1.2rem', color: 'darkblue' }}>{currentDefect.defectid}</Typography>
+
+                    <Box flexBasis={'100%'} mb={3}></Box>
+
+                    <Typography className='view-title' sx={viewTitleStyle}>Defect Summary:</Typography>
                     <Typography className='view-value' sx={viewValueStyle}>{currentDefect.title}</Typography>
-                    <Divider></Divider>
 
-                    <Typography className='view-title' sx={viewTitleStyle}>Defect ID:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.defectid}</Typography>
-                    <Divider></Divider>
+                    <Box flexBasis={'100%'}></Box>
                     <Typography className='view-title' sx={viewTitleStyle}>Status:</Typography>
                     <Typography className='view-value' sx={viewValueStyle}>{currentDefect.status}</Typography>
 
-                    <Divider></Divider>
+                    <Box flexBasis={'100%'}></Box>
                     <Typography className='view-title' sx={viewTitleStyle}>Project:</Typography>
                     <Typography className='view-value' sx={viewValueStyle}>{currentDefect.project}</Typography>
-                    <Divider></Divider>
+                    <Box flexBasis={'100%'}></Box>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Components:</Typography>
 
@@ -287,22 +295,24 @@ const ViewDefect = () => {
                         <Typography className='view-value' sx={viewValueStyle}>{currentDefect.components}</Typography>
                     </Tooltip>
 
-                    <Divider></Divider>
+                    <Box flexBasis={'100%'}></Box>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Server:</Typography>
                     <Typography className='view-value' sx={viewValueStyle}>{currentDefect.server}</Typography>
 
-                    <Divider></Divider>
+                    <Box flexBasis={'100%'}></Box>
                     <Typography className='view-title' sx={viewTitleStyle}>Issue Type:</Typography>
                     <Typography className='view-value' sx={viewValueStyle}>{currentDefect.issuetype}</Typography>
-                    <Divider></Divider>
+                    <Box flexBasis={'100%'}></Box>
 
                     <Typography className='view-title' sx={viewTitleStyle}>Severity:</Typography>
                     <Typography className='view-value' sx={viewValueStyle}>{currentDefect.severity}</Typography>
+                    <Box flexBasis={'100%'}></Box>
 
 
+                    <Typography mt={3} ml={4} fontWeight={300} fontSize={'1.2rem'}>Description: </Typography>
                     <Box sx={boxDescription}>
-                        <Typography>Description: </Typography>
+
                         <div className='defect-description' style={{ margin: '2rem' }}>
                             <div dangerouslySetInnerHTML={
                                 { __html: htmlDecode(currentDefect.description) }
@@ -311,15 +321,9 @@ const ViewDefect = () => {
                         </div>
                     </Box>
 
-                    <Typography className='view-title' sx={viewTitleStyle}>Created on:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}><Moment format="DD/MMM/YYYY HH:MMA">{currentDefect.createdDate}</Moment></Typography>
+                    <Box flexBasis={'100%'}></Box>
 
-
-                    <Typography className='view-title' sx={viewTitleStyle}>Created by:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.reporter}</Typography>
-
-
-                    <List className='card' sx={{ ml: 3, mt: 2 }}>
+                    <List className='card' sx={{ ml: 3, mb: 3, flexBasis: '100%' }}>
 
                         <ListItem>
                             <ListItemAvatar>
@@ -336,7 +340,7 @@ const ViewDefect = () => {
                                         label={item.username}
                                         color="primary"
                                         className='chip'
-                                        avatar={<Avatar alt={item.username} src={item.photoURL}/>}
+                                        avatar={<Avatar alt={item.username} src={item.photoURL} />}
                                         variant='outlined'
                                         sx={{ ml: 2 }}
                                     />
@@ -345,10 +349,36 @@ const ViewDefect = () => {
                         </ListItem>
                     </List>
 
-                    <Box sx={{ display: 'flex', maxHeight: '250px', overflow: 'auto' }}>
+
+                    <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
+                        <Typography className='view-title' sx={{ fontWeight: '300' }}>Created on:</Typography>
+
+                        <Typography className='view-value' sx={{
+                            marginLeft: '1rem',
+                            fontWeight: '600',
+                            overflowWrap: 'anywhere'
+                        }}><Moment format="DD/MMM/YYYY HH:MMA">{currentDefect.createdDate}</Moment></Typography>
+                    </Box>
+
+                    <Box className="createdBy" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
+                        <Typography className='view-title' sx={{ fontWeight: '300' }}>Created by:</Typography>
+                        <Typography className='view-value'
+                            sx={{
+                                marginLeft: '1rem',
+                                fontWeight: '600',
+                                overflowWrap: 'anywhere'
+                            }}>{currentDefect.reporter}</Typography>
+                    </Box>
+
+                    <Box flexBasis={'100%'}></Box>
+
+
+
+                    <Box sx={{ display: 'flex', maxHeight: '250px', overflow: 'auto', flexBasis: '100%' }}>
                         <List
                             className='attachment' sx={{ ml: 3, mt: 2 }}>
                             <Typography>Attachment: </Typography>
+                            {currentDefect.attachment.length ? "" : <Typography sx={{ fontWeight: '200', mt: 2 }}>No attachment</Typography>}
                             {currentDefect.attachment.map((item, index) => (
                                 <ListItem
                                     key={`${item.name}_${item.lastModified}`}
@@ -460,52 +490,62 @@ const ViewDefect = () => {
                     </Box>
 
                     <Typography mt={3} ml={3}>Comment:</Typography>
+
                     <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
-                        <TableContainer sx={{ maxHeight: 440 }}>
-                            <Table stickyHeader aria-label="sticky table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>User</TableCell>
-                                        <TableCell>Comment</TableCell>
-                                        <TableCell>Commented on</TableCell>
-
-                                    </TableRow>
-                                </TableHead>
-
-                                <TableBody>
-                                    {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
-                                        <TableRow key={'comment' + index}>
-                                            <TableCell key={item.user} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.user}</TableCell>
-                                            <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell>
-                                            <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell>
+                        {comments.comments.totalDocs < 1 ? <Typography sx={{ fontWeight: '200', mt: 2 }}>There are no comment yet</Typography> :
+                            <TableContainer sx={{ maxHeight: 440 }}>
+                                <Table stickyHeader aria-label="sticky table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>User</TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
+                                    </TableHead>
 
-                                <TableFooter>
-                                    <TableRow>
-                                        <TablePagination
-                                            rowsPerPageOptions={[3, 10]}
-                                            rowsPerPage={rowsPerPage}
-                                            colSpan={3}
-                                            count={comments.comments.totalDocs}
-                                            page={page}
-                                            onPageChange={handleChangePage}
-                                            onRowsPerPageChange={handleChangeRowsPerPage}
-                                        />
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
-                        </TableContainer>
+                                    <TableBody>
+                                        {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
+                                            <TableRow key={'comment' + index}>
+                                                <TableCell key={item.user[0].username} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '100px' }}>
+
+                                                    <Paper sx={{display:'flex',flexWrap:'wrap',p:'1rem'}}>
+                                                        <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
+                                                        <Typography sx={{m:'1rem'}}>{item.user[0].username}</Typography>
+                                                        
+                                                        <Typography sx={{m:'1rem'}}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></Typography>
+                                                        <Typography sx={{flexBasis:'100%',m:'2rem'}}>{item.comment}</Typography>
+                                                    </Paper>
+
+                                                </TableCell>
+                                                {/* <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell> */}
+                                                {/* <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell> */}
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+
+                                    <TableFooter>
+                                        <TableRow>
+                                            <TablePagination
+                                                rowsPerPageOptions={[3, 10]}
+                                                rowsPerPage={rowsPerPage}
+                                                colSpan={3}
+                                                count={comments.comments.totalDocs}
+                                                page={page}
+                                                onPageChange={handleChangePage}
+                                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                            />
+                                        </TableRow>
+                                    </TableFooter>
+                                </Table>
+                            </TableContainer>
+                        }
                     </Paper>
 
                     <Box
-                        className='addComment'
+                        className='commentSection'
                         component="form"
                         noValidate
                         autoComplete='off'
                         autoCorrect="true"
-                        mt={5}
+                        sx={{ display: 'flex', flexBasis: '100%', mt: '1rem', ml: '1rem' }}
 
                     >
                         <TextField className='commentTextArea'
@@ -519,7 +559,9 @@ const ViewDefect = () => {
                         >
 
                         </TextField>
+                    </Box>
 
+                    <Box className='addCommentBtn' sx={{ flexBasis: '100%' }}>
                         <Button
                             variant='outlined'
                             sx={{ float: 'right', width: '10rem', mt: 1 }}
@@ -555,7 +597,7 @@ const ViewDefect = () => {
 
 
 
-        </Box>
+        </Box >
     )
 }
 

@@ -64,6 +64,7 @@ const CreateDefect = () => {
 
     //WYSIWYG Blur state
     const [editorBlur, setEditorBlur] = useState(false);
+    const [editorContent, setEditorContent] = useState(null);
 
     //Modal
     const [openModal, setOpenModal] = useState(false);
@@ -85,6 +86,7 @@ const CreateDefect = () => {
 
     const handleEditorState = (state) => {
         formik.setFieldValue('description', state, true)
+        console.log(formik.values.description)
     }
 
     const handleEditorBlur = (blur) => {
@@ -194,7 +196,7 @@ const CreateDefect = () => {
                         <InputLabel>Select Project</InputLabel>
                         <Select
                             name='project'
-                            label='Project'
+                            label='Select Project'
                             disabled={enableSelectProject}
                             {...formik.getFieldProps('project')}
                         >
@@ -215,18 +217,18 @@ const CreateDefect = () => {
 
                         {errorHelperSelect(formik, 'project')}
                     </FormControl>
-                    
-                        <Tooltip title="Change Project">
-                            <IconButton
-                                color="primary"
-                                onClick={() => {
-                                    setOpenModal(true)
-                                }
-                                }
-                                sx={{ mt:'1rem',ml:'1rem' }}>
-                                <ModeEditIcon />
-                            </IconButton>
-                        </Tooltip>
+
+                    <Tooltip title="Change Project">
+                        <IconButton
+                            color="primary"
+                            onClick={() => {
+                                setOpenModal(true)
+                            }
+                            }
+                            sx={{ mt: '1rem', ml: '1rem' }}>
+                            <ModeEditIcon />
+                        </IconButton>
+                    </Tooltip>
 
                 </Box>
 
@@ -238,7 +240,7 @@ const CreateDefect = () => {
                     <Typography variant='body' mb={2}>Defect Details</Typography>
 
                     <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500} mt={5}>Project: {formik.values.project}</Typography>
-                    
+
                     <ModalComponent
                         open={openModal}
                         setOpenModal={setOpenModal}
@@ -255,10 +257,12 @@ const CreateDefect = () => {
                     <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
                     <InputLabel>Defect Summary: </InputLabel>
                     <FormGroup
-                        sx={{ mt:'1.5rem' }}>
+                        sx={{
+                            mt: '1rem', '& legend': { display: 'none' },
+                            '& fieldset': { top: 0 }
+                        }}>
                         <TextField
                             name='title'
-                            label='Summary'
                             variant='outlined'
                             {...formik.getFieldProps('title')}
                             {...errorHelper(formik, 'title')}
@@ -269,12 +273,6 @@ const CreateDefect = () => {
                     <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
 
-                    {/* TODO */}
-                    {/* To add generate template function, set description */}
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button>Generate Template</Button>
-                    </Box>
-
 
                     <InputLabel>Description: </InputLabel>
                     <FormControl
@@ -284,6 +282,8 @@ const CreateDefect = () => {
                             setEditorBlur={(blur) => handleEditorBlur(blur)}
                             onError={formik.errors.description}
                             editorBlur={editorBlur}
+                            editorContent={editorContent}
+                            showGenerateTemplate={true}
                         />
 
                         {formik.errors.description || (formik.errors.description && editorBlur)

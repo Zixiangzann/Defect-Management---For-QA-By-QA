@@ -6,10 +6,7 @@ export const commentSchema = mongoose.Schema({
     defectidComment:{
         type:Number
     },
-    user:{
-        type:String,
-        required:true
-    },
+    user:[{}],
     comment:{
         type:String,
         required: true

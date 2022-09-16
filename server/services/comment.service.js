@@ -7,15 +7,19 @@ import User from '../models/user.js'
 
 export const addComment = async (defectid, body, user) => {
     try {
-        //If it is a "user" account, account must be assigned to the project to comment on the defect.
+        //must have addComment permission to comment on defect
         const defectProject = (await Defect.find({ defectid: defectid }).select('project -_id').exec())[0].project;
-        if ((user.role !== 'admin' || user.role !=='owner') && !user.project.includes(defectProject)) {
+        if (!user.project.includes(defectProject) && !user.permission[0].addComment) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to add comment');
         }
 
         const comment = new Comment({
             defectidComment: defectid,
-            user: user.email,
+            user: {
+                email: user.email,
+                username: user.username,
+                photoURL: user.photoURL
+            },
             comment: body.comment
         })
 
@@ -28,7 +32,7 @@ export const addComment = async (defectid, body, user) => {
 }
 
 export const deleteComment = async (defectid, body, user) => {
-    //Only admin or the 1 who commented can delete comment.
+    //must have permission deleteOwnComment to delete own comment and deleteAllComment to delete all comment
     try {
 
     } catch (error) {
