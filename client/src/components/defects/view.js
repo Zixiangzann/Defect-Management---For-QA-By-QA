@@ -49,7 +49,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { borderBottom } from '@mui/system';
+import Grid from '@mui/material/Grid';
 
 const ViewDefect = () => {
 
@@ -57,14 +57,15 @@ const ViewDefect = () => {
         // display: 'inline-block',
         marginLeft: '2rem',
         width: 'max-content',
-        fontWeight: '300',
-        borderBottom: '1px dotted grey'
+        fontWeight: '600',
+        color: 'mediumblue'
+        // borderBottom: '1px dotted grey'
     }
 
     const viewValueStyle = {
         // display: 'inline-block',
         marginLeft: '1rem',
-        fontWeight: '600',
+        fontWeight: '400',
         overflowWrap: 'anywhere',
         width: 'max-content'
     }
@@ -271,46 +272,55 @@ const ViewDefect = () => {
         <Box>
             {currentDefect ?
                 <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
-
+                    
                     <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography>
                     <Typography className='defect-id-value' sx={{ ml: '1rem', fontSize: '1.2rem', color: 'darkblue' }}>{currentDefect.defectid}</Typography>
 
-                    <Box flexBasis={'100%'} mb={3}></Box>
+                    {/* <Typography className='view-title' sx={viewTitleStyle}>Defect Summary:</Typography> */}
 
-                    <Typography className='view-title' sx={viewTitleStyle}>Defect Summary:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.title}</Typography>
+                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '2rem' }}>{currentDefect.title}</Typography>
 
-                    <Box flexBasis={'100%'}></Box>
-                    <Typography className='view-title' sx={viewTitleStyle}>Status:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.status}</Typography>
+
 
                     <Box flexBasis={'100%'}></Box>
-                    <Typography className='view-title' sx={viewTitleStyle}>Project:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.project}</Typography>
-                    <Box flexBasis={'100%'}></Box>
+                    <Typography m={3} fontWeight={600} fontSize={'1.2rem'} flexBasis={'100%'} sx={{ color: 'darkmagenta' }}>Details: </Typography>
 
-                    <Typography className='view-title' sx={viewTitleStyle}>Components:</Typography>
+                    <Box flexBasis={'15%'} id="defectDetailsTitleViewLeft">
+                        <Typography className='view-title' sx={viewTitleStyle}>Type:</Typography>
+                        <Typography className='view-title' sx={viewTitleStyle}>Project:</Typography>
+                        <Typography className='view-title' sx={viewTitleStyle}>Components:</Typography>
+                    </Box>
 
-                    <Tooltip title={currentDefect.components}>
+
+                    <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
+                    id="defectDetailsValueViewLeft"
+                    >
+                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.issuetype}</Typography>
+                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.project}</Typography>
                         <Typography className='view-value' sx={viewValueStyle}>{currentDefect.components}</Typography>
-                    </Tooltip>
+                    </Box>
+                    <Box flexBasis={'20%'}></Box>
+
+                    <Box flexBasis={'15%'} id="defectDetailsTitleViewRight">
+                        <Typography className='view-title' sx={viewTitleStyle}>Status:</Typography>
+                        <Typography className='view-title' sx={viewTitleStyle}>Server:</Typography>
+                        <Typography className='view-title' sx={viewTitleStyle}>Severity:</Typography>
+                    </Box>
+
+
+                    <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
+                     id="defectDetailsValueViewRight"
+                    >
+                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.status}</Typography>
+                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.server}</Typography>
+                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.severity}</Typography>
+                    </Box>
+
+
 
                     <Box flexBasis={'100%'}></Box>
 
-                    <Typography className='view-title' sx={viewTitleStyle}>Server:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.server}</Typography>
-
-                    <Box flexBasis={'100%'}></Box>
-                    <Typography className='view-title' sx={viewTitleStyle}>Issue Type:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.issuetype}</Typography>
-                    <Box flexBasis={'100%'}></Box>
-
-                    <Typography className='view-title' sx={viewTitleStyle}>Severity:</Typography>
-                    <Typography className='view-value' sx={viewValueStyle}>{currentDefect.severity}</Typography>
-                    <Box flexBasis={'100%'}></Box>
-
-
-                    <Typography mt={3} ml={4} fontWeight={300} fontSize={'1.2rem'}>Description: </Typography>
+                    <Typography mt={8} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: 'darkmagenta' }}>Description: </Typography>
                     <Box sx={boxDescription}>
 
                         <div className='defect-description' style={{ margin: '2rem' }}>
@@ -377,7 +387,8 @@ const ViewDefect = () => {
                     <Box sx={{ display: 'flex', maxHeight: '250px', overflow: 'auto', flexBasis: '100%' }}>
                         <List
                             className='attachment' sx={{ ml: 3, mt: 2 }}>
-                            <Typography>Attachment: </Typography>
+
+                            <Typography fontWeight={600} fontSize={'1.2rem'} sx={{ color: 'darkmagenta' }}>Attachment:  </Typography>
                             {currentDefect.attachment.length ? "" : <Typography sx={{ fontWeight: '200', mt: 2 }}>No attachment</Typography>}
                             {currentDefect.attachment.map((item, index) => (
                                 <ListItem
@@ -489,15 +500,14 @@ const ViewDefect = () => {
                         </List>
                     </Box>
 
-                    <Typography mt={3} ml={3}>Comment:</Typography>
-
+                    <Typography mt={7} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: 'darkmagenta' }}>Comment:  </Typography>
                     <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
                         {comments.comments.totalDocs < 1 ? <Typography sx={{ fontWeight: '200', mt: 2 }}>There are no comment yet</Typography> :
                             <TableContainer sx={{ maxHeight: 440 }}>
                                 <Table stickyHeader aria-label="sticky table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>User</TableCell>
+                                            {/* <TableCell>User</TableCell> */}
                                         </TableRow>
                                     </TableHead>
 
@@ -506,12 +516,12 @@ const ViewDefect = () => {
                                             <TableRow key={'comment' + index}>
                                                 <TableCell key={item.user[0].username} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '100px' }}>
 
-                                                    <Paper sx={{display:'flex',flexWrap:'wrap',p:'1rem'}}>
+                                                    <Paper sx={{ display: 'flex', flexWrap: 'wrap', p: '1rem' }}>
                                                         <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
-                                                        <Typography sx={{m:'1rem'}}>{item.user[0].username}</Typography>
-                                                        
-                                                        <Typography sx={{m:'1rem'}}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></Typography>
-                                                        <Typography sx={{flexBasis:'100%',m:'2rem'}}>{item.comment}</Typography>
+                                                        <Typography sx={{ m: '1rem' }}>{item.user[0].username}</Typography>
+
+                                                        <Typography sx={{ m: '1rem' }}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></Typography>
+                                                        <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
                                                     </Paper>
 
                                                 </TableCell>

@@ -146,6 +146,22 @@
         flex-basis: 100%;
     }
 
+    #defectDetailsTitleViewLeft{
+        flex-basis: 35%;
+    }
+
+    #defectDetailsTitleViewRight{
+        flex-basis: 35%;
+    }
+
+    #defectDetailsValueViewLeft{
+        flex-basis: 35%;
+    }
+
+    #defectDetailsValueViewRight{
+        flex-basis: 35%;
+    }
+
   }
 
 
