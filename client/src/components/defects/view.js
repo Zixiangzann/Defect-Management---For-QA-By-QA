@@ -283,7 +283,7 @@ const ViewDefect = () => {
 
 
                     <Box flexBasis={'100%'}></Box>
-                    <Typography m={3} fontWeight={600} fontSize={'1.2rem'} flexBasis={'100%'} sx={{ color: 'darkmagenta' }}>Details: </Typography>
+                    <Typography m={3} fontWeight={600} fontSize={'1.2rem'} flexBasis={'100%'} sx={{ color: '#339e31' }}>Details: </Typography>
 
                     <Box flexBasis={'15%'} id="defectDetailsTitleViewLeft">
                         <Typography className='view-title' sx={viewTitleStyle}>Type:</Typography>
@@ -320,7 +320,7 @@ const ViewDefect = () => {
 
                     <Box flexBasis={'100%'}></Box>
 
-                    <Typography mt={8} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: 'darkmagenta' }}>Description: </Typography>
+                    <Typography mt={8} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: '#339e31' }}>Description: </Typography>
                     <Box sx={boxDescription}>
 
                         <div className='defect-description' style={{ margin: '2rem' }}>
@@ -388,7 +388,7 @@ const ViewDefect = () => {
                         <List
                             className='attachment' sx={{ ml: 3, mt: 2 }}>
 
-                            <Typography fontWeight={600} fontSize={'1.2rem'} sx={{ color: 'darkmagenta' }}>Attachment:  </Typography>
+                            <Typography fontWeight={600} fontSize={'1.2rem'} sx={{ color: '#339e31' }}>Attachment:  </Typography>
                             {currentDefect.attachment.length ? "" : <Typography sx={{ fontWeight: '200', mt: 2 }}>No attachment</Typography>}
                             {currentDefect.attachment.map((item, index) => (
                                 <ListItem
@@ -500,7 +500,7 @@ const ViewDefect = () => {
                         </List>
                     </Box>
 
-                    <Typography mt={7} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: 'darkmagenta' }}>Comment:  </Typography>
+                    <Typography mt={7} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: '#339e31' }}>Comment:  </Typography>
                     <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
                         {comments.comments.totalDocs < 1 ? <Typography sx={{ fontWeight: '200', mt: 2 }}>There are no comment yet</Typography> :
                             <TableContainer sx={{ maxHeight: 440 }}>
