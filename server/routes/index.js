@@ -7,6 +7,7 @@ import defectRoute from './defect.route.js';
 import adminRoute from './admin.route.js';
 import projectRoute from './project.route.js';
 import commentRoute from './comment.route.js';
+import historyRoute from './history.route.js';
 
 const routesIndex = [
     {
@@ -32,6 +33,10 @@ const routesIndex = [
     {
         path:'/comment',
         route:commentRoute
+    },
+    {
+        path:'/history',
+        route:historyRoute
     }
 ] 
 

@@ -7,9 +7,9 @@ import User from '../models/user.js'
 
 export const addComment = async (defectid, body, user) => {
     try {
-        //must have addComment permission to comment on defect
+        //must have addComment permission and must be assigned to the project to comment on defect, unless it is a admin or owner account
         const defectProject = (await Defect.find({ defectid: defectid }).select('project -_id').exec())[0].project;
-        if (!user.project.includes(defectProject) && !user.permission[0].addComment) {
+        if ((!user.project.includes(defectProject) && !user.permission[0].addComment) && (user.role !== 'admin' || user.role !== 'owner')) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to add comment');
         }
 
@@ -45,7 +45,7 @@ export const deleteComment = async (defectid, body, user) => {
 export const paginateComment = async (defectid,body, user) => {
 
     const sortby = body.sortby || "date";
-    const order = body.order || "desc";
+    const order = body.order || -1;
     const limit = body.limit || 15;
     const skip = body.skip || 0;
 
@@ -59,12 +59,18 @@ export const paginateComment = async (defectid,body, user) => {
         const options = {
             page: body.page,
             limit,
-            sortby
+            sortby,
+            order
         }
 
-        let aggQuery = Comment.aggregate([{$match:{defectidComment:parseInt(defectid)}}])
+        let aggQuery = Comment.aggregate(
+            [{$match:{defectidComment:parseInt(defectid)}},
+                { $sort: { [sortby]: order } }
+                ]
+                , { collation: { locale: "en", caseLevel: true } }
+            )
+
         const comments = Comment.aggregatePaginate(aggQuery, options)
-        // const comments = Comment.find({defectidComment:defectid})
         return comments;
     } catch (error) {
         throw error;

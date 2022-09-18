@@ -16,6 +16,7 @@ let grantsObject = {
         assignee:allRights,
         projects:allRights,
         comments:allRights,
+        history: allRights,
     },
     admin: {
         profile:allRights,
@@ -24,6 +25,7 @@ let grantsObject = {
         assignee:allRights,
         projects:allRights,
         comments:allRights,
+        history: allRights,
     },
     user: {
         profile:{
@@ -45,7 +47,11 @@ let grantsObject = {
             'create:any':['*'],
             'read:any':['*'],
             'delete:any':['*'],
-        }
+        },
+        history:{
+            'create:any':['*'],
+            'read:any':['*']
+        },
     }
 };
 

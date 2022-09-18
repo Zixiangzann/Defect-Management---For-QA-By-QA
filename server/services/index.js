@@ -5,3 +5,4 @@ export * as defectService from './defect.service.js';
 export * as adminService from './admin.service.js';
 export * as projectService from './project.service.js';
 export * as commentService from './comment.service.js';
+export * as historyService from './history.service.js';

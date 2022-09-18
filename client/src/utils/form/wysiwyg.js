@@ -31,7 +31,6 @@ const WYSIWYG = (props) => {
 
     /// edit
     useEffect(()=>{
-        console.log(props.editorContent)
         if(props.editorContent){
             const blockFromHtml = htmlToDraft(htmlDecode(props.editorContent));
             const { contentBlocks, entityMap } = blockFromHtml;
@@ -53,7 +52,6 @@ const WYSIWYG = (props) => {
 
     //generate template
     const generateTemplateBtn = (template) => {
-        console.log(defectTemplate)
         if(props.showGenerateTemplate){
             return(
                 <Box sx={{display:'flex', justifyContent:'flex-end'}}>

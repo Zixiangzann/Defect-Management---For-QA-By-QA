@@ -5,11 +5,15 @@ import { getAuthHeader } from '../../utils/tools'
 
 export const getCommentByDefectIdPaginate = createAsyncThunk(
     'defects/comments',
-    async({defectId,page=1,limit=3}) => {
+    async({
+        defectId,
+        page=1,
+        limit=3
+    }) => {
         try {
             const request = axios.post(`/api/comment/paginate/${defectId}`,{
                 page,
-                limit,
+                limit
             },getAuthHeader());
             return request
         } catch (error) {

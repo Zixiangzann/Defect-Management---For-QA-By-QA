@@ -45,6 +45,7 @@ import Chip from '@mui/material/Chip';
 //redux
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAssignee, getAllComponents, getAllProjects, createDefect, getDefectById, updateDefect, updateAttachment } from '../../store/actions/defects';
+import { addHistory } from '../../store/actions/history';
 
 
 const EditDefect = () => {
@@ -94,7 +95,13 @@ const EditDefect = () => {
     //TODO
     //Store all the initial value state, will be using this to compare to the current value.
     //If have differences, add it as a comment as a history log.
-    
+    // const [initialProject, setInitialProject] = useState("")
+    // const [initialStatus, setInitialStatus] = useState("")
+    // const [initialDescription, setInitialDescription] = useState("")
+    // const [initialFileAttachment, setInitialFileAttachment] = useState("")
+    // const [initialAssignee, setInitialAssignee] = useState("")
+
+
 
     //handler
     const handleEditorState = (state) => {
@@ -244,7 +251,6 @@ const EditDefect = () => {
             dispatch(getAllAssignee(currentDefect.project))
             dispatch(getAllProjects())
             setAssignee(currentAssignee)
-
             setSelectedProject(currentDefect.project)
             setSelectedComponents(currentDefect.components)
 
@@ -279,13 +285,13 @@ const EditDefect = () => {
             setEnableSelectProject(true)
             setAssignee([])
             setSelectedComponents("")
-            formik.setFieldValue("components","")
+            formik.setFieldValue("components", "")
             setAssigneeSelectTouched(false)
 
             setProjectChanging(false)
             // formik.resetForm()
         }
-       
+
     }, [projectChanging])
 
 
@@ -294,12 +300,34 @@ const EditDefect = () => {
         initialValues: formData,
         validationSchema: validation,
         onSubmit: (values) => {
-            //only want to save the assignee email
-            const assigneeEmail = []
-            assignee.map((item) => {
-                assigneeEmail.push(item.email)
-            })
-            formik.values.assignee = assigneeEmail
+            // compare initial defect value to edited value
+            // If have differences, add it as a comment as a history log.
+
+            if (currentDefect.status !== formik.values.status) {
+                // console.log(`Updated Defect Status from ${currentDefect.status} to ${formik.values.status}`)
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.status,
+                    to: formik.values.status,
+                    field: "status"
+                }))
+            }
+
+            if (currentDefect.description !== formik.values.description) {
+                console.log(`Updated Defect description from ${currentDefect.description} to ${formik.values.description}`)
+            }
+
+            //only want to save the assignee email. Only save the changes if there is changes.
+            if (currentAssignee !== assignee) {
+                const assigneeEmail = []
+                assignee.map((item) => {
+                    assigneeEmail.push(item.email)
+                })
+
+                formik.values.assignee = assigneeEmail
+            }
+
+
             dispatch(updateDefect({ values, defectId }))
                 .unwrap()
                 .then((response) => {
@@ -327,7 +355,7 @@ const EditDefect = () => {
                         <Select
                             name='project'
                             label='Select Project'
-                            value={selectedProject}
+                            value={defect.project ? selectedProject : ""}
                             //if enableSelectProject is true, set disabled to false
                             disabled={enableSelectProject ? false : true}
                             {...formik.getFieldProps('project')}
@@ -393,7 +421,7 @@ const EditDefect = () => {
                             <Select
                                 name='status'
                                 label='Status'
-                                sx={{ width: '190px',mb:'1rem' }}
+                                sx={{ width: '190px', mb: '1rem' }}
                                 {...formik.getFieldProps('status')}
                             >
 
@@ -415,8 +443,10 @@ const EditDefect = () => {
                         <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
                         <InputLabel>Defect Summary: </InputLabel>
                         <FormGroup
-                            sx={{ mt: '1rem','& legend': { display: 'none' },
-                            '& fieldset': { top: 0 }}}>
+                            sx={{
+                                mt: '1rem', '& legend': { display: 'none' },
+                                '& fieldset': { top: 0 }
+                            }}>
                             <TextField
                                 name='title'
                                 // label='Summary'
@@ -505,6 +535,8 @@ const EditDefect = () => {
                                                         // formik.values.assignee = assignee
                                                         formik.setFieldValue('assignee', [...assignee])
                                                     }}
+
+
                                                     required
                                                     renderValue={(selected) => (
                                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
