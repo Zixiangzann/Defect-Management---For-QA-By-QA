@@ -16,15 +16,73 @@ export const addHistory = async (defectid, body, user) => {
             from: body.from,
             to: body.to,
             field: body.field,
+            editdate: body.editdate,
             // date: body.date
         })
 
-        console.log(history)
         await history.save();
         return history;
     } catch (error) {
         throw (error)
 
+    }
+}
+
+export const getHistoryByDefectIdAndDate = async(defectid, body, user) =>{
+    try {
+
+        let from = (new Date(body.editDateFrom));
+        let to = (new Date(body.editDateTo));
+  
+        to = new Date(to.setDate(to.getDate()+1)).toISOString()
+
+        //if from and to same, include the day itself. 
+        if(from === to){
+            const history = await History.find({
+                defectid:defectid,
+                editdate:{
+                    $gte: from,
+                    $lte: to
+                }
+            }).sort({editdate:1})
+            return history
+        }else{
+            const history = await History.find({
+                defectid:defectid,
+                editdate:{
+                    $gte: from,
+                    $lte: to
+                }
+            }).sort({editdate:1})
+            return history
+        }
+
+        
+
+        
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getEditDateByDefectId = async(defectid,body,user) =>{
+    try {
+        const history = await History.find({
+            defectid:defectid
+        })
+
+        const allEditDate = []
+        
+        history.map((item)=>{
+            allEditDate.push(String(item.editdate.toISOString()).substring(0,10))
+        }) 
+
+        const uniqueEditDate = [...new Set(allEditDate)]
+
+        return uniqueEditDate;
+        
+    } catch (error) {
+        throw error;
     }
 }
 

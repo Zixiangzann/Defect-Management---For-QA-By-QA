@@ -9,16 +9,17 @@ export const historySchema = mongoose.Schema({
     },
     user:[{}],
     from:{
-        type:String,
-        required: true
+
     },
     to:{
-        type:String,
-        required: true
+
     },
     field:{
         type:String,
         required: true
+    },
+    editdate:{
+        type: Date
     },
     date:{
         type: Date,

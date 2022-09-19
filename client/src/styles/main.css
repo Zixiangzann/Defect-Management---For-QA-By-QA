@@ -52,6 +52,30 @@
     flex-direction: column;
 }
 
+.defectSubHeader{
+    font-weight: bolder !important;
+    font-size: 1.2rem !important;
+    color: #339e31;
+}
+
+.defectDetailsKey{
+    margin-left: 2rem !important;
+    width: max-content !important;
+    font-weight: 600 !important;
+    color: mediumblue;
+}
+
+.defectDetailsValue{
+    margin-left: 1rem !important;
+    font-weight: 400 !important;
+    overflow-wrap: anywhere !important;
+    width: max-content !important;
+}
+
+.defectDetailsSelectLabel{
+    color: mediumblue !important;
+}
+
 @media only screen and (max-width: 1000px) {
     .modal-box{
         width: 300px;

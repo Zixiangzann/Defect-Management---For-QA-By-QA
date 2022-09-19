@@ -8,6 +8,7 @@ import Project from "../models/project.js";
 import bcrypt from 'bcrypt'
 import Defect from "../models/defect.js";
 import Comment from "../models/comment.js";
+import History from "../models/history.js";
 
 
 
@@ -210,6 +211,8 @@ export const updateProfilePicture = async (req) => {
     //update user in comment collection
     const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.photoURL": userUpdatedPhotoURL},{ new: true });
     result.push(updateUser)
+    //update user in history collection
+    const updateUserInHistory = await History.updateMany({"user.email": userEmail},{"user.$.photoURL": userUpdatedPhotoURL},{ new: true });
 
     //firebase
     const uid = user.firebaseuid
@@ -227,6 +230,7 @@ export const updateProfilePicture = async (req) => {
     });
 
     result.push(updateUserInComment)
+    result.push(updateUserInHistory)
     return result;
 
 }
@@ -319,6 +323,7 @@ export const updateUserUserName = async (req) => {
     const updateUser = await User.findOneAndUpdate({ email: userEmail }, { username: userUpdatedUsername }, { new: true });
     //update in comment collection
     const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.username": userUpdatedUsername},{ new: true });
+    const updateUserInHistory = await History.updateMany({"user.email": userEmail},{"user.$.username": userUpdatedUsername},{ new: true });
     result.push(updateUser)
 
     //firebase
@@ -337,6 +342,7 @@ export const updateUserUserName = async (req) => {
     });
 
     result.push(updateUserInComment)
+    result.push(updateUserInHistory)
 
     return result;
 
@@ -421,11 +427,12 @@ export const updateUserEmail = async (req) => {
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    //need to update in User(email),Project(assignee),Defects(Reporter),Comments(email)
+    //need to update in User(email),Project(assignee),Defects(Reporter),Comments(email),History(email)
     const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
     const updatedUserProject = await Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
     const updatedUserDefect = await Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
     const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.email": userUpdatedEmail},{ new: true });
+    const updateUserInHistory =  await History.updateMany({"user.email": userEmail},{"user.$.email": userUpdatedEmail},{ new: true });
     
 
     // join the json and return as response
@@ -434,6 +441,7 @@ export const updateUserEmail = async (req) => {
     result.push(updatedUserProject)
     result.push(updatedUserDefect)
     result.push(updateUserInComment)
+    result.push(updateUserInHistory)
 
     //firebase
     const uid = user.firebaseuid

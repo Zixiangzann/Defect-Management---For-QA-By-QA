@@ -25,6 +25,25 @@ const historyController ={
         }
     },
 
+    async getHistoryByDefectIdAndDate(req,res,next){
+        try {
+            const defectid = req.params.defectId
+            const history = await historyService.getHistoryByDefectIdAndDate(defectid,req.body,req.user);
+            res.json(history)
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async getEditDateByDefectId(req,res,next){
+        try{
+            const defectid = req.params.defectId
+            const history = await historyService.getEditDateByDefectId(defectid,req.body,req.user);
+            res.json(history)
+        }catch(error) {
+            next(error)
+        }
+    }
 
 }
 

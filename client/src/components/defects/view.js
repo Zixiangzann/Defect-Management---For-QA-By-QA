@@ -9,6 +9,7 @@ import { htmlDecode } from '../../utils/tools';
 import { addComment, getCommentByDefectIdPaginate } from '../../store/actions/comments';
 import { getDefectById } from '../../store/actions/defects';
 import ModalComponent from '../../utils/modal/modal';
+import History from './history';
 
 
 
@@ -49,26 +50,12 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import moment from 'moment';
 
 const ViewDefect = () => {
 
-    const viewTitleStyle = {
-        // display: 'inline-block',
-        marginLeft: '2rem',
-        width: 'max-content',
-        fontWeight: '600',
-        color: 'mediumblue'
-        // borderBottom: '1px dotted grey'
-    }
-
-    const viewValueStyle = {
-        // display: 'inline-block',
-        marginLeft: '1rem',
-        fontWeight: '400',
-        overflowWrap: 'anywhere',
-        width: 'max-content'
-    }
 
     const boxDescription = {
         border: '1px dotted black',
@@ -78,9 +65,6 @@ const ViewDefect = () => {
         maxHeight: '500px',
         overflow: 'auto'
     }
-
-
-
 
     //paginate
     const [page, setPage] = useState(0);
@@ -108,6 +92,15 @@ const ViewDefect = () => {
 
     const [showDoc, setShowDoc] = useState(false);
     const [previewDocContent, setPreviewDocContent] = useState('');
+
+    //show/hide defect details
+    const [showDefectDetails, setShowDefectDetails] = useState(true);
+    const [showDescription, setShowDescription] = useState(true);
+    const [showAssignee, setShowAssignee] = useState(true);
+    const [showAttachment, setShowAttachment] = useState(true);
+    const [showIssueHistory, setShowIssueHistory] = useState(false);
+    const [showComment, setShowComment] = useState(true);
+
 
 
     const currentDefect = useSelector(state => state.defects.current.defect)
@@ -242,6 +235,104 @@ const ViewDefect = () => {
         )
     }
 
+    const calcuDateDiff = (isodate) => {
+        const createdDate = moment((isodate).substring(0, 10), 'YYYY-MM-DD')
+        const current = moment().startOf('days')
+        const secondsDifferent = moment.duration(current.diff(createdDate)).asSeconds()
+
+
+        if (secondsDifferent < 60) {
+
+            const secondsDifferent = moment.duration(current.diff(createdDate)).asSeconds()
+
+            if (secondsDifferent < 1) {
+                return (
+                    secondsDifferent + " second ago"
+                )
+            } else {
+                return (
+                    secondsDifferent + " seconds ago"
+                )
+            }
+            //if less than a hour
+        } else if (secondsDifferent > 60 && secondsDifferent < 3600) {
+
+            const minutesDifferent = moment.duration(current.diff(createdDate)).asMinutes()
+
+            if (minutesDifferent < 1) {
+                return (
+                    minutesDifferent + " minute ago"
+                )
+            } else {
+                return (
+                    minutesDifferent + " minutes ago"
+                )
+            }
+            //if more than a hour less than a day  
+        } else if (secondsDifferent > 3600 && secondsDifferent < 86400) {
+
+            const hoursDifferent = moment.duration(current.diff(createdDate)).asHours()
+
+            if (hoursDifferent < 1) {
+                return (
+                    hoursDifferent + " hour ago"
+                )
+            } else {
+                return (
+                    hoursDifferent + " hours ago"
+                )
+            }
+            //if more than a day less than a week 
+        } else if (secondsDifferent > 86400 && secondsDifferent < 604800) {
+            const daysDifferent = moment.duration(current.diff(createdDate)).asDays()
+
+            if (daysDifferent < 1) {
+                return (
+                    daysDifferent + " day ago"
+                )
+            } else {
+                return (
+                    daysDifferent + " days ago"
+                )
+            }
+            //if more than a week less than a month 
+        } else if (secondsDifferent > 604800 && secondsDifferent < 2628000) {
+
+            const weeksDifferent = moment.duration(current.diff(createdDate)).asWeeks()
+
+            if (weeksDifferent < 1) {
+                return (
+                    weeksDifferent + " week ago"
+                )
+            } else {
+                return (
+                    weeksDifferent + " weeks ago"
+                )
+            }
+
+            //if more than a month less than 3 month   
+        } else if (secondsDifferent > 2628000 && secondsDifferent < 7884000) {
+
+            const monthsDifferent = moment.duration(current.diff(createdDate)).asMonths()
+
+            if (monthsDifferent < 1) {
+                return (
+                    monthsDifferent + " month ago"
+                )
+            } else {
+                return (
+                    monthsDifferent + " months ago"
+                )
+            }
+            //anything else just show the date
+        } else {
+            return (
+                <Moment format="DD/MMM/YYYY HH:MMA">{isodate}</Moment>
+            )
+        }
+
+    }
+
     useEffect(() => {
 
         //clear preview state on modal close
@@ -268,286 +359,397 @@ const ViewDefect = () => {
         setCommented(false)
     }, [page, rowsPerPage])
 
+
     return (
         <Box>
             {currentDefect ?
                 <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    
+
                     <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography>
                     <Typography className='defect-id-value' sx={{ ml: '1rem', fontSize: '1.2rem', color: 'darkblue' }}>{currentDefect.defectid}</Typography>
 
-                    {/* <Typography className='view-title' sx={viewTitleStyle}>Defect Summary:</Typography> */}
+                    <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end'}}>
+
+                        {/* if it is not converted(showing iso date), use Created on */}
+                        {!String(calcuDateDiff(currentDefect.createdDate)).includes("ago") ?
+                            <Typography className='view-title' sx={{ fontWeight: '300' }}>Created on: </Typography>
+                            :
+                            <Typography className='view-title' sx={{ fontWeight: '300' }}>Created: </Typography>
+                        }
+
+                        <Typography className='view-value' sx={{
+                            fontWeight: '600',
+                            overflowWrap: 'anywhere'
+                        }}>&nbsp; {calcuDateDiff(currentDefect.createdDate)}</Typography>
+
+                        <Typography className='view-title' sx={{ fontWeight: '300' }}>&nbsp; by</Typography>
+                        <Typography className='view-value' sx={{ fontWeight: '600' }}>&nbsp;{currentDefect.reporter}</Typography>
+                    </Box>
+
 
                     <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '2rem' }}>{currentDefect.title}</Typography>
 
 
 
                     <Box flexBasis={'100%'}></Box>
-                    <Typography m={3} fontWeight={600} fontSize={'1.2rem'} flexBasis={'100%'} sx={{ color: '#339e31' }}>Details: </Typography>
+                    <Typography className="defectSubHeader" m={3} flexBasis={'100%'}>
+                        {showDefectDetails ?
+                            <Tooltip title="Hide defect details">
+                                <ArrowCircleDownIcon
+                                    onClick={() => setShowDefectDetails(false)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Show defect details">
+                                <ArrowCircleUpIcon
+                                    onClick={() => setShowDefectDetails(true)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                        }
+                        Details:
+                    </Typography>
 
-                    <Box flexBasis={'15%'} id="defectDetailsTitleViewLeft">
-                        <Typography className='view-title' sx={viewTitleStyle}>Type:</Typography>
-                        <Typography className='view-title' sx={viewTitleStyle}>Project:</Typography>
-                        <Typography className='view-title' sx={viewTitleStyle}>Components:</Typography>
-                    </Box>
+                    {showDefectDetails ?
+                        <Box className='defectViewDetails' sx={{ display: 'flex', flexBasis: '100%', flexWrap: 'wrap' }}>
+                            <Box flexBasis={'15%'} id="defectDetailsTitleViewLeft">
+                                <Typography className='defectDetailsKey'>Type:</Typography>
+                                <Typography className='defectDetailsKey'>Project:</Typography>
+                                <Typography className='defectDetailsKey'>Components:</Typography>
+                            </Box>
 
 
-                    <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
-                    id="defectDetailsValueViewLeft"
-                    >
-                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.issuetype}</Typography>
-                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.project}</Typography>
-                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.components}</Typography>
-                    </Box>
-                    <Box flexBasis={'20%'}></Box>
+                            <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
+                                id="defectDetailsValueViewLeft"
+                            >
+                                <Typography className='defectDetailsValue'>{currentDefect.issuetype}</Typography>
+                                <Typography className='defectDetailsValue'>{currentDefect.project}</Typography>
+                                <Typography className='defectDetailsValue'>{currentDefect.components}</Typography>
+                            </Box>
+                            <Box flexBasis={'20%'}></Box>
 
-                    <Box flexBasis={'15%'} id="defectDetailsTitleViewRight">
-                        <Typography className='view-title' sx={viewTitleStyle}>Status:</Typography>
-                        <Typography className='view-title' sx={viewTitleStyle}>Server:</Typography>
-                        <Typography className='view-title' sx={viewTitleStyle}>Severity:</Typography>
-                    </Box>
+                            <Box flexBasis={'15%'} id="defectDetailsTitleViewRight">
+                                <Typography className='defectDetailsKey'>Status:</Typography>
+                                <Typography className='defectDetailsKey'>Server:</Typography>
+                                <Typography className='defectDetailsKey'>Severity:</Typography>
+                            </Box>
 
 
-                    <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
-                     id="defectDetailsValueViewRight"
-                    >
-                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.status}</Typography>
-                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.server}</Typography>
-                        <Typography className='view-value' sx={viewValueStyle}>{currentDefect.severity}</Typography>
-                    </Box>
+                            <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
+                                id="defectDetailsValueViewRight"
+                            >
+                                <Typography className='defectDetailsValue'>{currentDefect.status}</Typography>
+                                <Typography className='defectDetailsValue'>{currentDefect.server}</Typography>
+                                <Typography className='defectDetailsValue'>{currentDefect.severity}</Typography>
+                            </Box>
+
+                        </Box>
+                        :
+                        null
+                    }
 
 
 
                     <Box flexBasis={'100%'}></Box>
 
-                    <Typography mt={8} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: '#339e31' }}>Description: </Typography>
-                    <Box sx={boxDescription}>
 
-                        <div className='defect-description' style={{ margin: '2rem' }}>
-                            <div dangerouslySetInnerHTML={
-                                { __html: htmlDecode(currentDefect.description) }
-                            }>
+
+                    <Typography className="defectSubHeader" mt={8} ml={3}>
+                        {showDescription ?
+                            <Tooltip title="Hide description">
+                                <ArrowCircleDownIcon
+                                    onClick={() => setShowDescription(false)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Show description">
+                                <ArrowCircleUpIcon
+                                    onClick={() => setShowDescription(true)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                        }
+                        Description: </Typography>
+
+
+
+                    {showDescription ?
+                        <Box sx={boxDescription}>
+                            <div className='defect-description' style={{ margin: '2rem' }}>
+                                <div dangerouslySetInnerHTML={
+                                    { __html: htmlDecode(currentDefect.description) }
+                                }>
+                                </div>
                             </div>
-                        </div>
-                    </Box>
+                        </Box>
+                        :
+                        null
+                    }
 
                     <Box flexBasis={'100%'}></Box>
 
-                    <List className='card' sx={{ ml: 3, mb: 3, flexBasis: '100%' }}>
-
-                        <ListItem>
-                            <ListItemAvatar>
-                                <Avatar>
-                                    <PersonIcon />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <Typography>Assignee:</Typography>
-                            <div>
-                                {currentAssignee.map((item, index) => (
-                                    <Chip
-                                        key={`${item.username + index}`}
-                                        item={item.username}
-                                        label={item.username}
-                                        color="primary"
-                                        className='chip'
-                                        avatar={<Avatar alt={item.username} src={item.photoURL} />}
-                                        variant='outlined'
-                                        sx={{ ml: 2 }}
-                                    />
-                                ))}
-                            </div>
-                        </ListItem>
-                    </List>
+                    <Typography className="defectSubHeader" mt={4} mb={2} ml={3}>
+                        {showAssignee ?
+                            <Tooltip title="Hide assignee">
+                                <ArrowCircleDownIcon
+                                    onClick={() => setShowAssignee(false)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Show assignee">
+                                <ArrowCircleUpIcon
+                                    onClick={() => setShowAssignee(true)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                        }
+                        Assignee: </Typography>
 
 
-                    <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
-                        <Typography className='view-title' sx={{ fontWeight: '300' }}>Created on:</Typography>
-
-                        <Typography className='view-value' sx={{
-                            marginLeft: '1rem',
-                            fontWeight: '600',
-                            overflowWrap: 'anywhere'
-                        }}><Moment format="DD/MMM/YYYY HH:MMA">{currentDefect.createdDate}</Moment></Typography>
-                    </Box>
-
-                    <Box className="createdBy" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
-                        <Typography className='view-title' sx={{ fontWeight: '300' }}>Created by:</Typography>
-                        <Typography className='view-value'
-                            sx={{
-                                marginLeft: '1rem',
-                                fontWeight: '600',
-                                overflowWrap: 'anywhere'
-                            }}>{currentDefect.reporter}</Typography>
-                    </Box>
-
-                    <Box flexBasis={'100%'}></Box>
-
-
-
-                    <Box sx={{ display: 'flex', maxHeight: '250px', overflow: 'auto', flexBasis: '100%' }}>
-                        <List
-                            className='attachment' sx={{ ml: 3, mt: 2 }}>
-
-                            <Typography fontWeight={600} fontSize={'1.2rem'} sx={{ color: '#339e31' }}>Attachment:  </Typography>
-                            {currentDefect.attachment.length ? "" : <Typography sx={{ fontWeight: '200', mt: 2 }}>No attachment</Typography>}
-                            {currentDefect.attachment.map((item, index) => (
-                                <ListItem
-                                    key={`${item.name}_${item.lastModified}`}
-                                    secondaryAction={
-                                        <Tooltip title="Download">
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="download"
-                                                color='primary'
-                                                onClick={() => {
-                                                    console.log(item.type)
-                                                    handleDownload(item.downloadURL)
-                                                }}
-                                            >
-                                                <FileDownloadIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    }
-                                >
-                                    {attachmentIcon(item.type)}
-                                    <ListItemText
-                                        primary={item.name}
-                                    />
-
-                                    {item.type.includes('image') ?
-                                        <Tooltip title="Preview image">
-                                            <IconButton
-                                                onClick={() => {
-                                                    handlePreview(item.downloadURL, 'Image')
-                                                }
-                                                }
-                                                sx={{ color: 'rebeccapurple' }}
-                                            >
-                                                <PreviewIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        :
-                                        null
-                                    }
-
-                                    {item.type.includes('video/mp4') ?
-                                        <Tooltip title="Preview video">
-                                            <IconButton
-                                                onClick={() => {
-                                                    handlePreview(item.downloadURL, 'Video')
-                                                }
-                                                }
-                                                sx={{ color: 'rebeccapurple' }}
-                                            >
-                                                <PreviewIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        :
-                                        null
-                                    }
-
-
-                                    {item.type.includes('audio') ?
-                                        <Tooltip title="Preview audio">
-                                            <IconButton
-                                                onClick={() => {
-                                                    handlePreview(item.downloadURL, 'Audio')
-                                                }
-                                                }
-                                                sx={{ color: 'rebeccapurple' }}
-                                            >
-                                                <PreviewIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        :
-                                        null
-                                    }
-
-                                    {item.type.includes('pdf') ?
-                                        <Tooltip title="Preview document">
-                                            <IconButton
-                                                onClick={() => {
-                                                    handlePreview(item.downloadURL, 'Pdf')
-                                                }
-                                                }
-                                                sx={{ color: 'rebeccapurple' }}
-                                            >
-                                                <PreviewIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        :
-                                        null
-                                    }
-
-                                    {item.type.includes('text') || item.type.includes('vnd.ms-excel') ?
-                                        <Tooltip title="Preview document">
-                                            <IconButton
-                                                onClick={() => {
-                                                    handlePreview(item.downloadURL, 'Text')
-                                                }
-                                                }
-                                                sx={{ color: 'rebeccapurple' }}
-                                            >
-                                                <PreviewIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        :
-                                        null
-                                    }
-
-                                </ListItem>
-                            ))}
+                    {showAssignee ?
+                        <List className='card' sx={{ ml: 3, mb: 3, flexBasis: '100%' }}>
+                            <ListItem>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <PersonIcon />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                {/* <Typography>Assignee:</Typography> */}
+                                <div>
+                                    {currentAssignee.map((item, index) => (
+                                        <Chip
+                                            key={`${item.username + index}`}
+                                            item={item.username}
+                                            label={item.username}
+                                            color="primary"
+                                            className='chip'
+                                            avatar={<Avatar alt={item.username} src={item.photoURL} />}
+                                            variant='outlined'
+                                            sx={{ ml: 2 }}
+                                        />
+                                    ))}
+                                </div>
+                            </ListItem>
                         </List>
-                    </Box>
+                        :
+                        null
+                    }
 
-                    <Typography mt={7} ml={3} fontWeight={600} fontSize={'1.2rem'} sx={{ color: '#339e31' }}>Comment:  </Typography>
+
+
+
+                    <Box flexBasis={'100%'}></Box>
+
+                    <Typography className="defectSubHeader" m={3} flexBasis={'100%'}>
+                        {showAttachment ?
+                            <Tooltip title="Hide attachment">
+                                <ArrowCircleDownIcon
+                                    onClick={() => setShowAttachment(false)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Show attachment">
+                                <ArrowCircleUpIcon
+                                    onClick={() => setShowAttachment(true)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                        }
+                        Attachment:
+                    </Typography>
+
+                    {showAttachment ?
+                        <Box sx={{ display: 'flex', maxHeight: '250px', overflow: 'auto', flexBasis: '100%' }}>
+                            <List
+                                className='attachment' sx={{ ml: 3, mt: 2 }}>
+
+
+
+                                {currentDefect.attachment.length ? "" : <Typography sx={{ fontWeight: '200', mt: 2 }}>No attachment</Typography>}
+                                {currentDefect.attachment.map((item, index) => (
+                                    <ListItem
+                                        key={`${item.name}_${item.lastModified}`}
+                                        secondaryAction={
+                                            <Tooltip title="Download">
+                                                <IconButton
+                                                    edge="end"
+                                                    aria-label="download"
+                                                    color='primary'
+                                                    onClick={() => {
+                                                        console.log(item.type)
+                                                        handleDownload(item.downloadURL)
+                                                    }}
+                                                >
+                                                    <FileDownloadIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        }
+                                    >
+                                        {attachmentIcon(item.type)}
+                                        <ListItemText
+                                            primary={item.name}
+                                        />
+
+                                        {item.type.includes('image') ?
+                                            <Tooltip title="Preview image">
+                                                <IconButton
+                                                    onClick={() => {
+                                                        handlePreview(item.downloadURL, 'Image')
+                                                    }
+                                                    }
+                                                    sx={{ color: 'rebeccapurple' }}
+                                                >
+                                                    <PreviewIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            :
+                                            null
+                                        }
+
+                                        {item.type.includes('video/mp4') ?
+                                            <Tooltip title="Preview video">
+                                                <IconButton
+                                                    onClick={() => {
+                                                        handlePreview(item.downloadURL, 'Video')
+                                                    }
+                                                    }
+                                                    sx={{ color: 'rebeccapurple' }}
+                                                >
+                                                    <PreviewIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            :
+                                            null
+                                        }
+
+
+                                        {item.type.includes('audio') ?
+                                            <Tooltip title="Preview audio">
+                                                <IconButton
+                                                    onClick={() => {
+                                                        handlePreview(item.downloadURL, 'Audio')
+                                                    }
+                                                    }
+                                                    sx={{ color: 'rebeccapurple' }}
+                                                >
+                                                    <PreviewIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            :
+                                            null
+                                        }
+
+                                        {item.type.includes('pdf') ?
+                                            <Tooltip title="Preview document">
+                                                <IconButton
+                                                    onClick={() => {
+                                                        handlePreview(item.downloadURL, 'Pdf')
+                                                    }
+                                                    }
+                                                    sx={{ color: 'rebeccapurple' }}
+                                                >
+                                                    <PreviewIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            :
+                                            null
+                                        }
+
+                                        {item.type.includes('text') || item.type.includes('vnd.ms-excel') ?
+                                            <Tooltip title="Preview document">
+                                                <IconButton
+                                                    onClick={() => {
+                                                        handlePreview(item.downloadURL, 'Text')
+                                                    }
+                                                    }
+                                                    sx={{ color: 'rebeccapurple' }}
+                                                >
+                                                    <PreviewIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            :
+                                            null
+                                        }
+
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Box>
+                        :
+                        null
+                    }
+
+
+
+                    <History></History>
+
+                    <Typography className="defectSubHeader" m={3} flexBasis={'100%'}>
+                        {showComment ?
+                            <Tooltip title="Hide comment">
+                                <ArrowCircleDownIcon
+                                    onClick={() => setShowComment(false)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Show comment">
+                                <ArrowCircleUpIcon
+                                    onClick={() => setShowComment(true)}
+                                    sx={{ marginTop: '1rem', marginRight: '1rem' }} />
+                            </Tooltip>
+                        }
+                        Comment:
+                    </Typography>
+
+                    {showComment ?
+                    <>
                     <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
                         {comments.comments.totalDocs < 1 ? <Typography sx={{ fontWeight: '200', mt: 2 }}>There are no comment yet</Typography> :
-                            <TableContainer sx={{ maxHeight: 440 }}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <TableHead>
-                                        <TableRow>
-                                            {/* <TableCell>User</TableCell> */}
-                                        </TableRow>
-                                    </TableHead>
-
-                                    <TableBody>
-                                        {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
-                                            <TableRow key={'comment' + index}>
-                                                <TableCell key={item.user[0].username} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '100px' }}>
-
-                                                    <Paper sx={{ display: 'flex', flexWrap: 'wrap', p: '1rem' }}>
-                                                        <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
-                                                        <Typography sx={{ m: '1rem' }}>{item.user[0].username}</Typography>
-
-                                                        <Typography sx={{ m: '1rem' }}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></Typography>
-                                                        <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
-                                                    </Paper>
-
-                                                </TableCell>
-                                                {/* <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell> */}
-                                                {/* <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell> */}
+                            <Box sx={{ width: '100%', overflow: 'hidden' }}>
+                                <TableContainer sx={{ maxHeight: 540 }}>
+                                    <Table stickyHeader aria-label="sticky table">
+                                        <TableHead>
+                                            <TableRow>
+                                                {/* <TableCell>User</TableCell> */}
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
+                                        </TableHead>
 
-                                    <TableFooter>
-                                        <TableRow>
-                                            <TablePagination
-                                                rowsPerPageOptions={[3, 10]}
-                                                rowsPerPage={rowsPerPage}
-                                                colSpan={3}
-                                                count={comments.comments.totalDocs}
-                                                page={page}
-                                                onPageChange={handleChangePage}
-                                                onRowsPerPageChange={handleChangeRowsPerPage}
-                                            />
-                                        </TableRow>
-                                    </TableFooter>
-                                </Table>
-                            </TableContainer>
+                                        <TableBody>
+                                            {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
+                                                <TableRow key={'comment' + index}>
+                                                    <TableCell key={item.user[0].username} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '100px' }}>
+
+                                                        <Paper sx={{ display: 'flex', flexWrap: 'wrap', p: '1rem' }}>
+                                                            <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
+                                                            <Typography sx={{ m: '1rem' }}>{item.user[0].username}</Typography>
+
+                                                            <Typography sx={{ m: '1rem' }}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></Typography>
+                                                            <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
+                                                        </Paper>
+
+                                                    </TableCell>
+                                                    {/* <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell> */}
+                                                    {/* <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell> */}
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+
+
+
+                                <TablePagination
+                                    component="div"
+                                    rowsPerPageOptions={[3, 10]}
+                                    rowsPerPage={rowsPerPage}
+                                    colSpan={3}
+                                    count={comments.comments.totalDocs}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+
+                            </Box>
+
                         }
                     </Paper>
+
+
 
                     <Box
                         className='commentSection'
@@ -579,11 +781,20 @@ const ViewDefect = () => {
                                 dispatch(addComment({ defectId, comment: commentTextArea }))
                                     .unwrap()
                                     .then(setCommented(true))
+                                    .then(() => {
+                                        dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
+                                    })
                                 setCommentTextArea('')
                             }}
                         >Add</Button>
 
+         
+
                     </Box>
+                    </>
+                        :
+                        null
+                    }
 
                     <ModalComponent
                         open={openModal}
@@ -601,8 +812,9 @@ const ViewDefect = () => {
                         titleColor="black"
                     >
                     </ModalComponent>
-
+                    
                 </Box>
+                
                 : null}
 
 

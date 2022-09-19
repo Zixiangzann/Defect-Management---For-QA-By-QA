@@ -193,7 +193,7 @@ const CreateDefect = () => {
                         fullWidth
                         sx={{ marginTop: '1rem', flexBasis: '50%' }}>
 
-                        <InputLabel>Select Project</InputLabel>
+                        <InputLabel sx={{ color: 'mediumblue' }}>Select Project</InputLabel>
                         <Select
                             name='project'
                             label='Select Project'
@@ -237,9 +237,12 @@ const CreateDefect = () => {
 
 
                 <Box id="defectDetails" sx={{ border: '1px dotted black', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant='body' mb={2}>Defect Details</Typography>
+                    {/* <Typography variant='body' mb={2}>Defect Details</Typography> */}
 
-                    <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500} mt={5}>Project: {formik.values.project}</Typography>
+                    <Box>
+                        <Typography display={'inline'} variant='overline' fontSize={'1.2rem'} fontWeight={500} color={'mediumblue'}>Project: </Typography>
+                        <Typography display={'inline'} variant='overline' fontSize={'1.2rem'} fontWeight={500} >{formik.values.project}</Typography>
+                    </Box>
 
                     <ModalComponent
                         open={openModal}
@@ -255,7 +258,7 @@ const CreateDefect = () => {
                     </ModalComponent>
 
                     <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
-                    <InputLabel>Defect Summary: </InputLabel>
+                    <Typography className="defectSubHeader">Defect Summary: </Typography>
                     <FormGroup
                         sx={{
                             mt: '1rem', '& legend': { display: 'none' },
@@ -274,7 +277,7 @@ const CreateDefect = () => {
 
 
 
-                    <InputLabel>Description: </InputLabel>
+                    <Typography className="defectSubHeader">Description: </Typography>
                     <FormControl
                         sx={{ marginTop: '1rem' }}>
                         <WYSIWYG
@@ -298,7 +301,7 @@ const CreateDefect = () => {
 
                     <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
-                    <InputLabel>Attach Files:</InputLabel>
+                    <Typography className='defectSubHeader'>Attachment: </Typography>
                     <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred' }}>Note: Max File size: 5MB</InputLabel>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
 
@@ -351,7 +354,7 @@ const CreateDefect = () => {
                                     <FormControl
                                         id="createDefectAssignee"
                                         sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-                                        <InputLabel>Assignee</InputLabel>
+                                        <InputLabel className='defectDetailsSelectLabel'>Assignee</InputLabel>
                                         <Select
                                             multiple
                                             name='assignee'
@@ -433,7 +436,7 @@ const CreateDefect = () => {
                             id="createDefectComponents"
                             sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                            <InputLabel>Components</InputLabel>
+                            <InputLabel className='defectDetailsSelectLabel'>Components</InputLabel>
 
                             <Select
                                 name='components'
@@ -459,7 +462,7 @@ const CreateDefect = () => {
                             id="createDefectServer"
                             sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                            <InputLabel>Server</InputLabel>
+                            <InputLabel className='defectDetailsSelectLabel'>Server</InputLabel>
                             <Select
                                 name='server'
                                 label='Server'
@@ -480,7 +483,7 @@ const CreateDefect = () => {
                             id="createDefectIssueType"
                             sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                            <InputLabel>Issue Type</InputLabel>
+                            <InputLabel className='defectDetailsSelectLabel'>Issue Type</InputLabel>
                             <Select
 
                                 name='issuetype'
@@ -500,7 +503,7 @@ const CreateDefect = () => {
                             id="createDefectSeverity"
                             sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                            <InputLabel>Severity</InputLabel>
+                            <InputLabel className='defectDetailsSelectLabel'>Severity</InputLabel>
                             <Select
                                 name='severity'
                                 label='severity'

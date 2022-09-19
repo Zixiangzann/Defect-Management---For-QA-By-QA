@@ -92,16 +92,10 @@ const EditDefect = () => {
     const [attachmentAction, setAttachmentAction] = useState('')
 
 
-    //TODO
-    //Store all the initial value state, will be using this to compare to the current value.
-    //If have differences, add it as a comment as a history log.
-    // const [initialProject, setInitialProject] = useState("")
-    // const [initialStatus, setInitialStatus] = useState("")
-    // const [initialDescription, setInitialDescription] = useState("")
-    // const [initialFileAttachment, setInitialFileAttachment] = useState("")
-    // const [initialAssignee, setInitialAssignee] = useState("")
-
-
+    //store after edit attachment to a array, to be use for history comparison
+    const afterEditAttachment = []
+    //store after edit assignee to a array, to be use for history comparison
+    const afterEditAssignee = []
 
     //handler
     const handleEditorState = (state) => {
@@ -151,7 +145,6 @@ const EditDefect = () => {
             console.log(filesArray)
             setAttachmentAction('uploadFile')
         }
-
     }
 
     //attachment components
@@ -159,7 +152,8 @@ const EditDefect = () => {
 
         return (
             <>
-                <InputLabel>Attach Files:</InputLabel>
+                <Typography className='defectSubHeader'>Attachment: </Typography>
+                {/* <InputLabel>Attach Files:</InputLabel> */}
                 <InputLabel sx={{ fontSize: '0.8rem', color: 'darkred' }}>Note: Max File size: 5MB</InputLabel>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
 
@@ -295,6 +289,21 @@ const EditDefect = () => {
     }, [projectChanging])
 
 
+    useEffect(() => {
+        //push attachment name to afterEditAttachment array. To be use for comparison and add history if different from before edit
+        filesArray.map((item) => {
+            afterEditAttachment.push(item.name)
+        })
+
+
+        //push assignee username to afterEditAssignee array. To be use for comparison and add history if different from before edit
+        assignee.map((item) => {
+            afterEditAssignee.push(item.username)
+        })
+    })
+
+
+
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: formData,
@@ -303,18 +312,120 @@ const EditDefect = () => {
             // compare initial defect value to edited value
             // If have differences, add it as a comment as a history log.
 
+            const editdate = Date.now()
+
             if (currentDefect.status !== formik.values.status) {
-                // console.log(`Updated Defect Status from ${currentDefect.status} to ${formik.values.status}`)
                 dispatch(addHistory({
                     defectId,
                     from: currentDefect.status,
                     to: formik.values.status,
-                    field: "status"
+                    field: "status",
+                    editdate: editdate
+                }))
+            }
+
+            if (currentDefect.title !== formik.values.title) {
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.title,
+                    to: formik.values.title,
+                    field: "title",
+                    editdate: editdate
                 }))
             }
 
             if (currentDefect.description !== formik.values.description) {
-                console.log(`Updated Defect description from ${currentDefect.description} to ${formik.values.description}`)
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.description,
+                    to: formik.values.description,
+                    field: "description",
+                    editdate: editdate
+                }))
+            }
+
+            if (currentDefect.project !== formik.values.project) {
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.project,
+                    to: formik.values.project,
+                    field: "project",
+                    editdate: editdate
+                }))
+            }
+
+            if (currentDefect.components !== formik.values.components) {
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.components,
+                    to: formik.values.components,
+                    field: "components",
+                    editdate: editdate
+                }))
+            }
+
+            if (currentDefect.server !== formik.values.server) {
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.server,
+                    to: formik.values.server,
+                    field: "server",
+                    editdate: editdate
+                }))
+            }
+
+            if (currentDefect.issuetype !== formik.values.issuetype) {
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.issuetype,
+                    to: formik.values.issuetype,
+                    field: "type",
+                    editdate: editdate
+                }))
+            }
+
+            if (currentDefect.severity !== formik.values.severity) {
+                dispatch(addHistory({
+                    defectId,
+                    from: currentDefect.severity,
+                    to: formik.values.severity,
+                    field: "severity",
+                    editdate: editdate
+                }))
+            }
+
+
+            const beforeEditAttachment = []
+
+            currentDefect.attachment.map((item) => {
+                beforeEditAttachment.push(item.name)
+            })
+
+
+            if (beforeEditAttachment.sort().toString() !== afterEditAttachment.sort().toString()) {
+                dispatch(addHistory({
+                    defectId,
+                    from: beforeEditAttachment,
+                    to: afterEditAttachment,
+                    field: "attachment",
+                    editdate: editdate
+                }))
+            }
+
+            const beforeEditAssignee = []
+            currentAssignee.map((item) => {
+                beforeEditAssignee.push(item.username)
+            })
+
+            //for more accurate, maybe need to order by the id first then compare.
+            if (beforeEditAssignee.sort().toString() !== afterEditAssignee.sort().toString()) {
+                dispatch(addHistory({
+                    defectId,
+                    from: beforeEditAssignee,
+                    to: afterEditAssignee,
+                    field: "assignee",
+                    editdate: editdate
+                }))
             }
 
             //only want to save the assignee email. Only save the changes if there is changes.
@@ -351,7 +462,7 @@ const EditDefect = () => {
                         fullWidth
                         sx={{ marginTop: '1rem', flexBasis: '50%' }}>
 
-                        <InputLabel>Select Project</InputLabel>
+                        <InputLabel sx={{ color: 'mediumblue' }}>Select Project</InputLabel>
                         <Select
                             name='project'
                             label='Select Project'
@@ -397,8 +508,10 @@ const EditDefect = () => {
 
                 {currentDefect ?
                     <Box id="defectDetails" sx={{ border: '1px dotted black', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant='body' mb={5}>Defect Details</Typography>
-                        <Typography variant='overline' fontSize={'1.2rem'} fontWeight={500}>Project: {formik.values.project}</Typography>
+                        <Box>
+                            <Typography display={'inline'} variant='overline' fontSize={'1.2rem'} fontWeight={500} color={'mediumblue'}>Project: </Typography>
+                            <Typography display={'inline'} variant='overline' fontSize={'1.2rem'} fontWeight={500} >{formik.values.project}</Typography>
+                        </Box>
                         <ModalComponent
                             open={openModal}
                             setOpenModal={setOpenModal}
@@ -417,7 +530,7 @@ const EditDefect = () => {
                             sx={{ margin: '1rem 1.5rem 0 0', textAlign: 'center' }}>
 
                             {/* <InputLabel sx={{}}>Status</InputLabel> */}
-                            <Typography variant='body' mb={1} alignSelf={'flex-start'} color={'rgba(0, 0, 0, 0.6)'} >Status: </Typography>
+                            <Typography variant='body' mb={1} alignSelf={'flex-start'} color={'mediumblue'} >Status: </Typography>
                             <Select
                                 name='status'
                                 label='Status'
@@ -441,7 +554,7 @@ const EditDefect = () => {
                         </FormControl>
 
                         <Divider sx={{ marginTop: '0.5rem', marginBottom: '2rem', width: '50%' }} />
-                        <InputLabel>Defect Summary: </InputLabel>
+                        <Typography className="defectSubHeader">Defect Summary: </Typography>
                         <FormGroup
                             sx={{
                                 mt: '1rem', '& legend': { display: 'none' },
@@ -459,7 +572,7 @@ const EditDefect = () => {
 
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
-                        <InputLabel>Description: </InputLabel>
+                        <Typography className="defectSubHeader">Description:  </Typography>
                         <FormControl
                             sx={{ marginTop: '1rem' }}>
                             <WYSIWYG
@@ -485,6 +598,7 @@ const EditDefect = () => {
                         <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
 
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                            <Typography className='defectSubHeader' flexBasis={'100%'} mb={1}>Additonal Information: </Typography>
 
                             {assignee ?
                                 <FormikProvider value={formik}>
@@ -494,7 +608,7 @@ const EditDefect = () => {
                                             <FormControl
                                                 id="createDefectAssignee"
                                                 sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-                                                <InputLabel>Assignee</InputLabel>
+                                                <InputLabel className='defectDetailsSelectLabel'>Assignee</InputLabel>
                                                 <Select
                                                     multiple
                                                     name='assignee'
@@ -602,7 +716,7 @@ const EditDefect = () => {
                                 id="createDefectComponents"
                                 sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                                <InputLabel>Components</InputLabel>
+                                <InputLabel className='defectDetailsSelectLabel'>Components</InputLabel>
 
                                 <Select
                                     name='components'
@@ -631,7 +745,7 @@ const EditDefect = () => {
                                 id="createDefectServer"
                                 sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                                <InputLabel>Server</InputLabel>
+                                <InputLabel className='defectDetailsSelectLabel'>Server</InputLabel>
                                 <Select
                                     name='server'
                                     label='Server'
@@ -652,7 +766,7 @@ const EditDefect = () => {
                                 id="createDefectIssueType"
                                 sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                                <InputLabel>Issue Type</InputLabel>
+                                <InputLabel className='defectDetailsSelectLabel'>Issue Type</InputLabel>
                                 <Select
                                     name='issuetype'
                                     label='Issue Type'
@@ -672,7 +786,7 @@ const EditDefect = () => {
                                 sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
 
-                                <InputLabel>Severity</InputLabel>
+                                <InputLabel className='defectDetailsSelectLabel'>Severity</InputLabel>
                                 <Select
                                     name='severity'
                                     label='severity'
