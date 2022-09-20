@@ -312,7 +312,7 @@ const EditDefect = () => {
             // compare initial defect value to edited value
             // If have differences, add it as a comment as a history log.
 
-            const editdate = Date.now()
+            const editdate = new Date()
 
             if (currentDefect.status !== formik.values.status) {
                 dispatch(addHistory({

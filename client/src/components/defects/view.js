@@ -11,6 +11,8 @@ import { getDefectById } from '../../store/actions/defects';
 import ModalComponent from '../../utils/modal/modal';
 import History from './history';
 
+//function
+import {calcuDateDiff} from '../../../src/utils/tools'
 
 
 //firebase
@@ -98,7 +100,6 @@ const ViewDefect = () => {
     const [showDescription, setShowDescription] = useState(true);
     const [showAssignee, setShowAssignee] = useState(true);
     const [showAttachment, setShowAttachment] = useState(true);
-    const [showIssueHistory, setShowIssueHistory] = useState(false);
     const [showComment, setShowComment] = useState(true);
 
 
@@ -233,104 +234,6 @@ const ViewDefect = () => {
                 {icon}
             </ListItemIcon>
         )
-    }
-
-    const calcuDateDiff = (isodate) => {
-        const createdDate = moment((isodate).substring(0, 10), 'YYYY-MM-DD')
-        const current = moment().startOf('days')
-        const secondsDifferent = moment.duration(current.diff(createdDate)).asSeconds()
-
-
-        if (secondsDifferent < 60) {
-
-            const secondsDifferent = moment.duration(current.diff(createdDate)).asSeconds()
-
-            if (secondsDifferent < 1) {
-                return (
-                    secondsDifferent + " second ago"
-                )
-            } else {
-                return (
-                    secondsDifferent + " seconds ago"
-                )
-            }
-            //if less than a hour
-        } else if (secondsDifferent > 60 && secondsDifferent < 3600) {
-
-            const minutesDifferent = moment.duration(current.diff(createdDate)).asMinutes()
-
-            if (minutesDifferent < 1) {
-                return (
-                    minutesDifferent + " minute ago"
-                )
-            } else {
-                return (
-                    minutesDifferent + " minutes ago"
-                )
-            }
-            //if more than a hour less than a day  
-        } else if (secondsDifferent > 3600 && secondsDifferent < 86400) {
-
-            const hoursDifferent = moment.duration(current.diff(createdDate)).asHours()
-
-            if (hoursDifferent < 1) {
-                return (
-                    hoursDifferent + " hour ago"
-                )
-            } else {
-                return (
-                    hoursDifferent + " hours ago"
-                )
-            }
-            //if more than a day less than a week 
-        } else if (secondsDifferent > 86400 && secondsDifferent < 604800) {
-            const daysDifferent = moment.duration(current.diff(createdDate)).asDays()
-
-            if (daysDifferent < 1) {
-                return (
-                    daysDifferent + " day ago"
-                )
-            } else {
-                return (
-                    daysDifferent + " days ago"
-                )
-            }
-            //if more than a week less than a month 
-        } else if (secondsDifferent > 604800 && secondsDifferent < 2628000) {
-
-            const weeksDifferent = moment.duration(current.diff(createdDate)).asWeeks()
-
-            if (weeksDifferent < 1) {
-                return (
-                    weeksDifferent + " week ago"
-                )
-            } else {
-                return (
-                    weeksDifferent + " weeks ago"
-                )
-            }
-
-            //if more than a month less than 3 month   
-        } else if (secondsDifferent > 2628000 && secondsDifferent < 7884000) {
-
-            const monthsDifferent = moment.duration(current.diff(createdDate)).asMonths()
-
-            if (monthsDifferent < 1) {
-                return (
-                    monthsDifferent + " month ago"
-                )
-            } else {
-                return (
-                    monthsDifferent + " months ago"
-                )
-            }
-            //anything else just show the date
-        } else {
-            return (
-                <Moment format="DD/MMM/YYYY HH:MMA">{isodate}</Moment>
-            )
-        }
-
     }
 
     useEffect(() => {
@@ -718,7 +621,7 @@ const ViewDefect = () => {
                                                             <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
                                                             <Typography sx={{ m: '1rem' }}>{item.user[0].username}</Typography>
 
-                                                            <Typography sx={{ m: '1rem' }}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></Typography>
+                                                            <Typography sx={{ m: '1rem' }}>{calcuDateDiff(item.date)}</Typography>
                                                             <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
                                                         </Paper>
 

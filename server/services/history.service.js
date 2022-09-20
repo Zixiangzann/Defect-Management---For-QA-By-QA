@@ -44,7 +44,7 @@ export const getHistoryByDefectIdAndDate = async(defectid, body, user) =>{
                     $gte: from,
                     $lte: to
                 }
-            }).sort({editdate:1})
+            }).sort({editdate:-1})
             return history
         }else{
             const history = await History.find({
@@ -53,7 +53,7 @@ export const getHistoryByDefectIdAndDate = async(defectid, body, user) =>{
                     $gte: from,
                     $lte: to
                 }
-            }).sort({editdate:1})
+            }).sort({editdate:-1})
             return history
         }
 

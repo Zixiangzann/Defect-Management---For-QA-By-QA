@@ -1,17 +1,23 @@
-
+//lib
 import { toast } from 'react-toastify'
 import cookie from 'react-cookies'
-import { Button, FormHelperText, Typography } from '@mui/material'
+import Moment from 'react-moment';
 import { useState, useEffect } from 'react'
+import moment from 'moment';
 
 
+//comp
 import AvatarEditor from 'react-avatar-editor'
 
 //mui
 import CirularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
-import { Avatar } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button'
+import FormHelperText from '@mui/material/FormHelperText'
+import Typography from '@mui/material/Typography'
+
 
 export const ProfilePicEditor = ({
     imageUrl,
@@ -175,3 +181,103 @@ export const htmlDecode = (input) => {
     const doc = new DOMParser().parseFromString(input, "text/html")
     return doc.documentElement.textContent;
 }
+
+export const calcuDateDiff = (isodate) => {
+    const createdDate = moment(isodate)
+    const current = moment()
+    const secondsDifferent = moment.duration(current.diff(createdDate)).asSeconds()
+
+    console.log(createdDate)
+    console.log(current)
+    console.log(secondsDifferent)
+
+
+    if (secondsDifferent < 60) {
+
+        if (secondsDifferent <= 1) {
+            return (
+                Math.round(secondsDifferent) + " second ago"
+            )
+        } else {
+            return (
+                Math.round(secondsDifferent) + " seconds ago"
+            )
+        }
+        //if less than a hour
+    } else if (secondsDifferent > 60 && secondsDifferent < 3600) {
+
+        const minutesDifferent = Math.round(moment.duration(current.diff(createdDate)).asMinutes())
+
+        if (minutesDifferent <= 1) {
+            return (
+                minutesDifferent + " minute ago"
+            )
+        } else {
+            return (
+                minutesDifferent + " minutes ago"
+            )
+        }
+        //if more than a hour less than a day  
+    } else if (secondsDifferent > 3600 && secondsDifferent < 86400) {
+
+        const hoursDifferent = Math.round(moment.duration(current.diff(createdDate)).asHours())
+
+        if (hoursDifferent <= 1) {
+            return (
+                hoursDifferent + " hour ago"
+            )
+        } else {
+            return (
+                hoursDifferent + " hours ago"
+            )
+        }
+        //if more than a day less than a week 
+    } else if (secondsDifferent > 86400 && secondsDifferent < 604800) {
+        const daysDifferent = Math.round(moment.duration(current.diff(createdDate)).asDays())
+
+        if (daysDifferent <= 1) {
+            return (
+                daysDifferent + " day ago"
+            )
+        } else {
+            return (
+                daysDifferent + " days ago"
+            )
+        }
+        //if more than a week less than a month 
+    } else if (secondsDifferent > 604800 && secondsDifferent < 2628000) {
+
+        const weeksDifferent = Math.round(moment.duration(current.diff(createdDate)).asWeeks())
+
+        if (weeksDifferent <= 1) {
+            return (
+                weeksDifferent + " week ago"
+            )
+        } else {
+            return (
+                weeksDifferent + " weeks ago"
+            )
+        }
+
+        //if more than a month less than 3 month   
+    } else if (secondsDifferent > 2628000 && secondsDifferent < 7884000) {
+
+        const monthsDifferent = Math.round(moment.duration(current.diff(createdDate)).asMonths())
+
+        if (monthsDifferent <= 1) {
+            return (
+                monthsDifferent + " month ago"
+            )
+        } else {
+            return (
+                monthsDifferent + " months ago"
+            )
+        }
+        //anything else just show the date
+    } else {
+        return (
+            <Moment format="DD/MMM/YYYY HH:mmA">{isodate}</Moment>
+        )
+    }
+
+} 

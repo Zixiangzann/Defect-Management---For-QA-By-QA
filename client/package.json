@@ -6,6 +6,7 @@
     "@cyntler/react-doc-viewer": "^1.5.1",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@gesdisc/react-diff-viewer": "^3.1.1",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.10.0",
     "@mui/x-date-pickers": "^5.0.2",
