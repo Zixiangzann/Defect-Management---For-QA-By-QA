@@ -61,7 +61,7 @@ const History = () => {
     const tableCellStyle = () => {
         return (
             {
-                width: '200px',
+                // width: '25%',
                 // p:'0.6rem'
             }
         )
@@ -91,7 +91,7 @@ const History = () => {
 
 
     return (
-        <Box className="history" sx={{ width: '100%', m: '1rem', mt: '2rem' }}>
+        <Box className="history" sx={{ m: '1rem', mt: '2rem',display:'flex',flexWrap:'wrap',flexBasis:'100%', overflow:'auto'}}>
 
             <Typography className="defectSubHeader" m={1} flexBasis={'100%'} display={'inline'}>
                 {showIssueHistory ?
@@ -116,7 +116,7 @@ const History = () => {
             {/* <HistoryIcon sx={{ display: 'inline', color: 'darkkhaki'}} /> */}
 
             {showIssueHistory ?
-                <Box className="dateRange" display={'block'} mt={5}>
+                <Box className="dateRange" display={'block'} flexBasis={'100%'} mt={5} >
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DesktopDatePicker
                             label="Date From: "
@@ -141,11 +141,11 @@ const History = () => {
 
 
                     {defectHistory.length ?
-                        <Box className="historyTable" mt={'2rem'} maxHeight={'500px'} overflow={'auto'}>
+                        <Box className="historyTable" mt={'2rem'} maxHeight={'500px'} overflow={'auto'} display={'flex'}>
 
-                            <Paper >
+                            <Paper sx={{ overflow: 'auto', flexBasis:'100%'}} >
                                 <TableContainer component={Paper}>
-                                    <Table  sx={{ minWidth: '100%', border: '1px dotted grey' }} size="small">
+                                    <Table  sx={{ border: '1px dotted grey' }} size="small">
                                         <TableHead >
                                             <TableRow >
                                                 <TableCell sx={tableCellStyle}>Date: </TableCell>
@@ -186,7 +186,7 @@ const History = () => {
 
                                                     {item.field === 'description' ?
                                                         <TableCell sx={tableCellStyle}>
-                                                            <Typography sx={{ textAlign: 'center', width: '350px' }}>
+                                                            <Typography sx={{ textAlign: 'center'}}>
                                                                 <Box overflow={'auto'}>
                                                                     <div className='defect-description' style={{ margin: '2rem'}}>
                                                                         <div dangerouslySetInnerHTML={{ __html: htmlDecode(item.to) }}>
@@ -202,24 +202,24 @@ const History = () => {
                                                                 [
                                                                     item.to.filter(x => !item.from.includes(x)).map((item)=>(
                                                                         <Box backgroundColor={'#52f78c'}>
-                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',width:'250px',textAlign:'left', p:'0.2rem'}}>- {item}</Typography>
+                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',textAlign:'left', p:'0.2rem'}}>- {item}</Typography>
                                                                         </Box>
                                                                     ))
                                                                     ,
                                                                     item.to.filter(x => item.from.includes(x)).map((item)=>(
                                                                         <Box backgroundColor={'mintcream'}>
-                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',width:'250px',textAlign:'left', p:'0.2rem'}}>- {item}</Typography>
+                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',textAlign:'left', p:'0.2rem'}}>- {item}</Typography>
                                                                         </Box>
                                                                     ))
                                                                     ,
                                                                     item.from.filter(x => !item.to.includes(x)).map((item)=>(
                                                                         <Box backgroundColor={'#fc7276'}>
-                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',width:'250px',textAlign:'left', p:'0.2rem', textDecoration:'line-through'}}>- {item}</Typography>
+                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',textAlign:'left', p:'0.2rem', textDecoration:'line-through'}}>- {item}</Typography>
                                                                         </Box>
                                                                     ))               
                                                                     ]
                                                                 :
-                                                                <Typography sx={{  textAlign: 'left', width: '250px' }}>{item.to}</Typography>
+                                                                <Typography sx={{  textAlign: 'left'}}>{item.to}</Typography>
                                                             }
                                                         </TableCell>
                                                     }

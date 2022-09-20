@@ -100,7 +100,7 @@ const ViewDefect = () => {
     const [showDescription, setShowDescription] = useState(true);
     const [showAssignee, setShowAssignee] = useState(true);
     const [showAttachment, setShowAttachment] = useState(true);
-    const [showComment, setShowComment] = useState(true);
+    const [showComment, setShowComment] = useState(false);
 
 
 
@@ -579,9 +579,9 @@ const ViewDefect = () => {
                     }
 
 
-
+                   
                     <History></History>
-
+                    
                     <Typography className="defectSubHeader" m={3} flexBasis={'100%'}>
                         {showComment ?
                             <Tooltip title="Hide comment">
