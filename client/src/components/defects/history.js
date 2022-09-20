@@ -61,7 +61,8 @@ const History = () => {
     const tableCellStyle = () => {
         return (
             {
-                width: '20%'
+                width: '200px',
+                // p:'0.6rem'
             }
         )
     }
@@ -150,9 +151,9 @@ const History = () => {
                                                 <TableCell sx={tableCellStyle}>Date: </TableCell>
                                                 {/* <TableCell sx={tableCellStyle}>Defect ID: </TableCell> */}
                                                 <TableCell sx={tableCellStyle}>Changed by: </TableCell>
-                                                <TableCell sx={tableCellStyle}>Field: </TableCell>
-                                                <TableCell sx={tableCellStyle}>Before: </TableCell>
-                                                <TableCell sx={tableCellStyle}>After: </TableCell>
+                                                <TableCell sx={tableCellStyle}>Action: </TableCell>
+                                                <TableCell sx={tableCellStyle}>Changes: </TableCell>
+                                                {/* <TableCell sx={tableCellStyle}>After: </TableCell> */}
 
                                             </TableRow>
                                         </TableHead>
@@ -161,36 +162,72 @@ const History = () => {
                                                 <TableRow >
                                                     <TableCell sx={tableCellStyle}>{calcuDateDiff(item.editdate)}</TableCell>
                                                     <TableCell sx={tableCellStyle}>{item.user[0].username}</TableCell>
-                                                    <TableCell sx={tableCellStyle} >{item.field}</TableCell>
+                                                    <TableCell sx={tableCellStyle}>
+                                                        {(()=>{
+                                                            if(item.field === "description" || item.field === "assignee" || item.field === "status"){
+                                                                return(
+                                                                    `changed ${item.field} to`
+                                                                    )
+                                                            }else if(item.field === "title"){
+                                                                return(
+                                                                    `changed defect summary to`
+                                                                )
+
+                                                            }else{
+                                                                return(
+                                                                `updated ${item.field} to`
+                                                                )
+                                                            }
+                                                        }
+                                                        )()}
+                                                    
+                                                    
+                                                    </TableCell>
+
                                                     {item.field === 'description' ?
                                                         <TableCell sx={tableCellStyle}>
-                                                            <Typography sx={{ backgroundColor: '#fc7276', textAlign: 'center', width: '250px' }}>
+                                                            <Typography sx={{ textAlign: 'center', width: '350px' }}>
                                                                 <Box overflow={'auto'}>
-                                                                    <div className='defect-description' style={{ margin: '2rem' }}>
-                                                                        <div dangerouslySetInnerHTML={{ __html: htmlDecode(item.from) }}>
+                                                                    <div className='defect-description' style={{ margin: '2rem'}}>
+                                                                        <div dangerouslySetInnerHTML={{ __html: htmlDecode(item.to) }}>
                                                                         </div>
                                                                     </div>
                                                                 </Box>
                                                             </Typography>
+                                                           
                                                         </TableCell>
                                                         :
                                                         <TableCell sx={tableCellStyle}>
                                                             {Array.isArray(item.from) ?
-                                                                (item.from).map((item,index)=>(
-                                                                    <Box backgroundColor={'#fc7276'}>
-                                                                    <Typography sx={{ textAlign: 'left',width:'250px',textAlign:'left'}}>{index+1}. {item}</Typography>
-                                                                    </Box>
-                                                                ))
+                                                                [
+                                                                    item.to.filter(x => !item.from.includes(x)).map((item)=>(
+                                                                        <Box backgroundColor={'#52f78c'}>
+                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',width:'250px',textAlign:'left', p:'0.2rem'}}>- {item}</Typography>
+                                                                        </Box>
+                                                                    ))
+                                                                    ,
+                                                                    item.to.filter(x => item.from.includes(x)).map((item)=>(
+                                                                        <Box backgroundColor={'mintcream'}>
+                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',width:'250px',textAlign:'left', p:'0.2rem'}}>- {item}</Typography>
+                                                                        </Box>
+                                                                    ))
+                                                                    ,
+                                                                    item.from.filter(x => !item.to.includes(x)).map((item)=>(
+                                                                        <Box backgroundColor={'#fc7276'}>
+                                                                        <Typography sx={{  fontWeight: '600', textAlign: 'left',width:'250px',textAlign:'left', p:'0.2rem', textDecoration:'line-through'}}>- {item}</Typography>
+                                                                        </Box>
+                                                                    ))               
+                                                                    ]
                                                                 :
-                                                                <Typography sx={{ backgroundColor: '#fc7276', textAlign: 'left', width: '250px' }}>{item.from}</Typography>
+                                                                <Typography sx={{  textAlign: 'left', width: '250px' }}>{item.to}</Typography>
                                                             }
                                                         </TableCell>
                                                     }
-                                                    {item.field === 'description' ?
+                                                    {/* {item.field === 'description' ?
                                                         <TableCell sx={tableCellStyle}>
                                                             <Typography sx={{ backgroundColor: '#52f78c', textAlign: 'center', width: '250px' }}>
                                                                 <Box overflow={'auto'}>
-                                                                    <div className='defect-description' style={{ margin: '2rem' }}>
+                                                                    <div className='defect-description' style={{ margin: '2rem' ,maxHeight:'250px'}}>
                                                                         <div dangerouslySetInnerHTML={{ __html: htmlDecode(item.to) }}>
                                                                         </div>
                                                                     </div>
@@ -212,7 +249,7 @@ const History = () => {
                                                                 <Typography sx={{ backgroundColor: '#52f78c', fontWeight: '600', textAlign: 'left'}}>{item.to}</Typography>
                                                             }
                                                         </TableCell>
-                                                    }
+                                                    } */}
                                                 </TableRow>
                                             ))}
                                         </TableBody>
