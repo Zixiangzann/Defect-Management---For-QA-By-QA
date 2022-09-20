@@ -332,9 +332,6 @@ const PaginateComponent = ({
 
                                 ))}
                             </TableBody>
-
-
-
                         </Table>
                     </TableContainer>
                     <TablePagination
