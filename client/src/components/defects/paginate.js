@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../store/actions/defects';
 import { setOrder, setSearch, setSortBy,resetFilterState } from '../../store/reducers/defects';
 import ModalComponent from '../../utils/modal/modal';
+import { StatusColorCode,SeverityColorCode } from '../../utils/tools';
 
 //MUI
 import Table from '@mui/material/Table'
@@ -323,8 +324,10 @@ const PaginateComponent = ({
                                         <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
                                         <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px' }}>{item.project}</TableCell>
                                         <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px'}}>{item.components}</TableCell>
-                                        <TableCell key={`${item.severity}-${index}`} sx={{ minWidth: '150px' }}>{item.severity}</TableCell>
-                                        <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>{item.status}</TableCell>
+                                        <TableCell key={`${item.severity}-${index}`} sx={{ minWidth: '150px' }}>{SeverityColorCode({severity: item.severity,textWidth:'9rem'})}</TableCell>
+                                        <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>
+                                            {StatusColorCode({status: item.status,textWidth:'6rem'})}
+                                            </TableCell>
                                         <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
                                         <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
                                         <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>

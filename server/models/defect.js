@@ -46,7 +46,7 @@ export const defectSchema = mongoose.Schema({
     status:{
         type:String,
         required: true,
-        enum:['New','Open','Fixed','Pending re-test','Verified','Closed','Deferred','Duplicate','Not a bug'],
+        enum:['New','Open','Fixed','Pending Retest','Verified','Closed','Deferred','Duplicated','Not a bug'],
         // default: 'New'
     },
     assignee:{

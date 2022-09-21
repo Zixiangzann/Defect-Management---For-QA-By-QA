@@ -8,6 +8,7 @@ import { errorHelper, errorHelperSelect, Loader } from '../../utils/tools'
 import { validation, formValues } from './validationSchema'
 import ModalComponent from '../../utils/modal/modal';
 import WYSIWYG from '../../utils/form/wysiwyg';
+import { SeverityColorCode } from '../../utils/tools';
 
 //MUI
 import Checkbox from '@mui/material/Checkbox';
@@ -510,10 +511,10 @@ const CreateDefect = () => {
                                 {...formik.getFieldProps('severity')}
                             >
 
-                                <MenuItem key="Low" value="Low">Low</MenuItem>
-                                <MenuItem key="Medium" value="Medium">Medium</MenuItem>
-                                <MenuItem key="High" value="High">High</MenuItem>
-                                <MenuItem key="Showstopper" value="Showstopper">Showstopper</MenuItem>
+                                <MenuItem key="Low" value="Low">{SeverityColorCode({ severity: "Low", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Medium" value="Medium">{SeverityColorCode({ severity: "Medium", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="High" value="High">{SeverityColorCode({ severity: "High", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({ severity: "Showstopper", textWidth: '10rem' })}</MenuItem>
                             </Select>
 
                             {errorHelperSelect(formik, 'severity')}

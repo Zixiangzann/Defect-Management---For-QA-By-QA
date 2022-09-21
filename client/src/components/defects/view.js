@@ -11,6 +11,7 @@ import { addComment, getCommentByDefectIdPaginate } from '../../store/actions/co
 import { getDefectById } from '../../store/actions/defects';
 import ModalComponent from '../../utils/modal/modal';
 import Activity from './activity';
+import { StatusColorCode,SeverityColorCode } from '../../utils/tools';
 
 //function
 import { calcuDateDiff } from '../../../src/utils/tools'
@@ -315,7 +316,12 @@ const ViewDefect = () => {
 
 
                     <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '2rem' }}>{currentDefect.title}</Typography>
-
+                    
+                    <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'}>
+                    <Typography mr={'1rem'}>{SeverityColorCode({severity: currentDefect.severity,textWidth:'9rem'})}</Typography>
+                    <Typography >{StatusColorCode({status: currentDefect.status, textWidth:'9rem'})}</Typography>
+                   
+                    </Box>
 
 
                     <Box flexBasis={'100%'}></Box>
@@ -342,6 +348,7 @@ const ViewDefect = () => {
                                 <Typography className='defectDetailsKey'>Type:</Typography>
                                 <Typography className='defectDetailsKey'>Project:</Typography>
                                 <Typography className='defectDetailsKey'>Components:</Typography>
+                                <Typography className='defectDetailsKey'>Server:</Typography>
                             </Box>
 
 
@@ -351,12 +358,12 @@ const ViewDefect = () => {
                                 <Typography className='defectDetailsValue'>{currentDefect.issuetype}</Typography>
                                 <Typography className='defectDetailsValue'>{currentDefect.project}</Typography>
                                 <Typography className='defectDetailsValue'>{currentDefect.components}</Typography>
+                                <Typography className='defectDetailsValue'>{currentDefect.server}</Typography>
                             </Box>
                             <Box flexBasis={'20%'}></Box>
-
+{/* 
                             <Box flexBasis={'15%'} id="defectDetailsTitleViewRight">
                                 <Typography className='defectDetailsKey'>Status:</Typography>
-                                <Typography className='defectDetailsKey'>Server:</Typography>
                                 <Typography className='defectDetailsKey'>Severity:</Typography>
                             </Box>
 
@@ -364,10 +371,9 @@ const ViewDefect = () => {
                             <Box flexBasis={'25%'} alignContent={'center'} display={'flex'} flexDirection={'column'}
                                 id="defectDetailsValueViewRight"
                             >
-                                <Typography className='defectDetailsValue'>{currentDefect.status}</Typography>
-                                <Typography className='defectDetailsValue'>{currentDefect.server}</Typography>
-                                <Typography className='defectDetailsValue'>{currentDefect.severity}</Typography>
-                            </Box>
+                                <Typography className='defectDetailsValue'>Status: {StatusColorCode({status: currentDefect.status, textWidth:'9rem'})}</Typography>
+                                <Typography className='defectDetailsValue' mt={'1rem'}>Severity: {SeverityColorCode({severity: currentDefect.severity,textWidth:'9rem'})}</Typography>
+                            </Box> */}
 
                         </Box>
                         :

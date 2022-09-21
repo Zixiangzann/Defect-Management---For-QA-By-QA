@@ -8,6 +8,7 @@ import { resetDataState, setFilterState } from '../../store/reducers/defects';
 
 //comp
 import { getAllAssignee, getAllComponents, getAllProjects,filterDefect } from '../../store/actions/defects';
+import { StatusColorCode,SeverityColorCode } from '../../utils/tools';
 
 //MUI
 import Container from '@mui/material/Container';
@@ -171,10 +172,10 @@ const DefectFilter = ({
                                 sx={{ width: '85%' }}
                             >
 
-                                <MenuItem key="Low" value="Low">Low</MenuItem>
-                                <MenuItem key="Medium" value="Medium">Medium</MenuItem>
-                                <MenuItem key="High" value="High">High</MenuItem>
-                                <MenuItem key="Showstopper" value="Showstopper">Showstopper</MenuItem>
+<MenuItem key="Low" value="Low">{SeverityColorCode({severity: "Low",textWidth:'10rem'})}</MenuItem>
+                                    <MenuItem key="Medium" value="Medium">{SeverityColorCode({severity: "Medium",textWidth:'10rem'})}</MenuItem>
+                                    <MenuItem key="High" value="High">{SeverityColorCode({severity: "High",textWidth:'10rem'})}</MenuItem>
+                                    <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({severity: "Showstopper",textWidth:'10rem'})}</MenuItem>
                             </Select>
                         </FormControl>
                         <br></br>
@@ -214,15 +215,15 @@ const DefectFilter = ({
                                 sx={{ width: '85%' }}
                             >
 
-                                <MenuItem key="New" value="New">New</MenuItem>
-                                <MenuItem key="Open" value="Open">Open</MenuItem>
-                                <MenuItem key="Fixed" value="Fixed">Fixed</MenuItem>
-                                <MenuItem key="Pending re-test" value="Pending re-test">Pending re-test</MenuItem>
-                                <MenuItem key="Verified" value="Verified">Verified</MenuItem>
-                                <MenuItem key="Closed" value="Closed">Closed</MenuItem>
-                                <MenuItem key="Deferred" value="Deferred">Deferred</MenuItem>
-                                <MenuItem key="Duplicate" value="Duplicate">Duplicate</MenuItem>
-                                <MenuItem key="Not a bug" value="Not a bug">Not a bug</MenuItem>
+<MenuItem key="New" value="New">{StatusColorCode({status: "New", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Open" value="Open">{StatusColorCode({status: "Open", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Fixed" value="Fixed">{StatusColorCode({status: "Fixed", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Pending Retest" value="Pending Retest">{StatusColorCode({status: "Pending Retest", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Verified" value="Verified">{StatusColorCode({status: "Verified", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Closed" value="Closed">{StatusColorCode({status: "Closed", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Deferred" value="Deferred">{StatusColorCode({status: "Deferred", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Duplicated" value="Duplicated">{StatusColorCode({status: "Duplicated", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="Not a bug" value="Not a bug">{StatusColorCode({status: "Not a bug", textWidth:'10rem'})}</MenuItem>
 
                             </Select>
                         </FormControl>

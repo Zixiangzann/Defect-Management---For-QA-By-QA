@@ -84,12 +84,12 @@ export const ProfilePicEditor = ({
 
                     :
                     <Avatar
-                    id="add-profile-picture"
-                    label="profile"
-                    alt="profile"
-                    src={imageUrl ? imageUrl : "https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/Profile-Picture%2Fno-profile-pic.png?alt=media&token=be97a0fa-2ac8-4fd6-9beb-018269fb8bea"}
-                    sx={{ width: 200, height: 200}}
-                    /> 
+                        id="add-profile-picture"
+                        label="profile"
+                        alt="profile"
+                        src={imageUrl ? imageUrl : "https://firebasestorage.googleapis.com/v0/b/forqabyqa.appspot.com/o/Profile-Picture%2Fno-profile-pic.png?alt=media&token=be97a0fa-2ac8-4fd6-9beb-018269fb8bea"}
+                        sx={{ width: 200, height: 200 }}
+                    />
                 }
 
                 {editingEnabled ?
@@ -275,4 +275,226 @@ export const calcuDateDiff = (isodate) => {
         )
     }
 
-} 
+}
+
+//TODO: plan in the further to be able to customize 
+export const StatusColorCode = ({
+    status,
+    textWidth
+}) => {
+    switch (status.toLowerCase()) {
+        case "new":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: 'rgb(37, 150, 180)',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "open":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#c45f5f',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "fixed":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#7DFE95',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'black',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "pending retest":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#d9d91b',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'black',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "verified":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#1bd941',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'black',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "closed":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#495149',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "deferred":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#C5D1C7',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'black',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "duplicated":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#41196c',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+        case "not a bug":
+            return (
+
+                <Typography
+                    sx={{
+                        backgroundColor: '#130720',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{status}</Typography>
+            )
+
+        default:
+            <Typography
+                sx={{
+                    // backgroundColor: '#130720',
+                    borderRadius: '1rem',
+                    textAlign: 'center',
+                    color: 'black',
+                    textTransform: 'uppercase',
+                    width: `${textWidth}`,
+                    padding: '0.5rem'
+                }}>{status}</Typography>
+            break;
+    }
+}
+
+export const SeverityColorCode = ({
+    severity,
+    textWidth
+}) => {
+    switch (severity.toLowerCase()) {
+        case "showstopper":
+            return (
+                <Typography
+                    sx={{
+                        backgroundColor: '#d50707',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{severity}</Typography>
+            )
+        case "high":
+            return (
+                <Typography
+                    sx={{
+                        backgroundColor: '#fac131',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{severity}</Typography>
+            )
+        case "medium":
+            return (
+                <Typography
+                    sx={{
+                        backgroundColor: '#316afa',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{severity}</Typography>
+            )
+        case "low":
+            return (
+                <Typography
+                    sx={{
+                        backgroundColor: '#42fa31',
+                        borderRadius: '1rem',
+                        textAlign: 'center',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        width: `${textWidth}`,
+                        padding: '0.5rem'
+                    }}>{severity}</Typography>
+            )
+        default:
+            <Typography
+                sx={{
+                    // backgroundColor: '#130720',
+                    borderRadius: '1rem',
+                    textAlign: 'center',
+                    color: 'black',
+                    textTransform: 'uppercase',
+                    width: `${textWidth}`,
+                    padding: '0.5rem'
+                }}>{severity}</Typography>
+            break;
+    }
+
+
+}

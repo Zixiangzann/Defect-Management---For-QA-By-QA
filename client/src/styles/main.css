@@ -186,6 +186,12 @@
         flex-basis: 35%;
     }
 
+    .createdOn{
+        justify-content: flex-start !important;
+        margin-left: 2rem;
+        margin-top: 1rem;
+    }
+
   }
 
 
