@@ -187,11 +187,6 @@ export const calcuDateDiff = (isodate) => {
     const current = moment()
     const secondsDifferent = moment.duration(current.diff(createdDate)).asSeconds()
 
-    console.log(createdDate)
-    console.log(current)
-    console.log(secondsDifferent)
-
-
     if (secondsDifferent < 60) {
 
         if (secondsDifferent <= 1) {

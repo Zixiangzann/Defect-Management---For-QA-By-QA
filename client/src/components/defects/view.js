@@ -4,15 +4,16 @@ import Moment from 'react-moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { htmlDecode } from '../../utils/tools';
+import moment from 'moment';
 
 //Comp
 import { addComment, getCommentByDefectIdPaginate } from '../../store/actions/comments';
 import { getDefectById } from '../../store/actions/defects';
 import ModalComponent from '../../utils/modal/modal';
-import History from './history';
+import Activity from './activity';
 
 //function
-import {calcuDateDiff} from '../../../src/utils/tools'
+import { calcuDateDiff } from '../../../src/utils/tools'
 
 
 //firebase
@@ -54,7 +55,9 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import moment from 'moment';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 const ViewDefect = () => {
 
@@ -94,6 +97,8 @@ const ViewDefect = () => {
 
     const [showDoc, setShowDoc] = useState(false);
     const [previewDocContent, setPreviewDocContent] = useState('');
+
+    const [loading, setLoading] = useState(true);
 
     //show/hide defect details
     const [showDefectDetails, setShowDefectDetails] = useState(true);
@@ -152,6 +157,8 @@ const ViewDefect = () => {
     }
 
     const handlePreview = async (downloadURL, itemType) => {
+
+        setLoading(true)
         const storage = getStorage();
         const storageRef = ref(storage, downloadURL)
         onAuthStateChanged(auth, (user) => {
@@ -213,6 +220,10 @@ const ViewDefect = () => {
                     });
             }
         })
+
+
+
+
     }
 
 
@@ -238,6 +249,9 @@ const ViewDefect = () => {
 
     useEffect(() => {
 
+        //set loading to false when loaded
+        setLoading(false)
+
         //clear preview state on modal close
         if (openModal === false) {
             setShowImage(false);
@@ -255,6 +269,7 @@ const ViewDefect = () => {
     useEffect(() => {
         dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
         dispatch(getDefectById(defectId))
+        setLoading(false)
     }, [defectId, dispatch])
 
     useEffect(() => {
@@ -265,13 +280,22 @@ const ViewDefect = () => {
 
     return (
         <Box>
-            {currentDefect ?
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}
+            // onClick={handleClose}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+
+
+            {currentDefect  ?
                 <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
 
                     <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography>
                     <Typography className='defect-id-value' sx={{ ml: '1rem', fontSize: '1.2rem', color: 'darkblue' }}>{currentDefect.defectid}</Typography>
 
-                    <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end'}}>
+                    <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
 
                         {/* if it is not converted(showing iso date), use Created on */}
                         {!String(calcuDateDiff(currentDefect.createdDate)).includes("ago") ?
@@ -570,6 +594,8 @@ const ViewDefect = () => {
                                             null
                                         }
 
+
+
                                     </ListItem>
                                 ))}
                             </List>
@@ -579,9 +605,9 @@ const ViewDefect = () => {
                     }
 
 
-                   
-                    <History></History>
-                    
+
+                    <Activity></Activity>
+
                     <Typography className="defectSubHeader" m={3} flexBasis={'100%'}>
                         {showComment ?
                             <Tooltip title="Hide comment">
@@ -600,101 +626,105 @@ const ViewDefect = () => {
                     </Typography>
 
                     {showComment ?
-                    <>
-                    <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
-                        {comments.comments.totalDocs < 1 ? <Typography sx={{ fontWeight: '200', mt: 2 }}>There are no comment yet</Typography> :
-                            <Box sx={{ width: '100%', overflow: 'hidden' }}>
-                                <TableContainer sx={{ maxHeight: 540 }}>
-                                    <Table stickyHeader aria-label="sticky table">
-                                        <TableHead>
-                                            <TableRow>
-                                                {/* <TableCell>User</TableCell> */}
-                                            </TableRow>
-                                        </TableHead>
+                        <>
+                            <Paper sx={{ width: '100%', overflow: 'hidden', mt: 3, ml: 3 }}>
+                                {comments.comments.totalDocs < 1 ? <Typography sx={{ fontWeight: '200', mt: 2 }}>There are no comment yet</Typography> :
+                                    <Box sx={{ width: '100%', overflow: 'hidden' }}>
+                                        <TableContainer sx={{ maxHeight: 540 }}>
+                                            <Table stickyHeader aria-label="sticky table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        {/* <TableCell>User</TableCell> */}
+                                                    </TableRow>
+                                                </TableHead>
 
-                                        <TableBody>
-                                            {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
-                                                <TableRow key={'comment' + index}>
-                                                    <TableCell key={item.user[0].username} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '100px' }}>
+                                                <TableBody>
+                                                    {!comments.comments.docs ? '' : comments.comments.docs.map((item, index) => (
+                                                        <TableRow key={'comment' + index}>
+                                                            <TableCell key={item.user[0].username} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '100px' }}>
 
-                                                        <Paper sx={{ display: 'flex', flexWrap: 'wrap', p: '1rem' }}>
-                                                            <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
-                                                            <Typography sx={{ m: '1rem' }}>{item.user[0].username}</Typography>
+                                                                <Paper sx={{ display: 'flex', flexWrap: 'wrap', p: '1rem' }}>
+                                                                    <Avatar alt={item.user[0].username} src={item.user[0].photoURL} sx={{ height: '50px', width: '50px' }} />
+                                                                    <Typography sx={{ m: '1rem' }}>{item.user[0].username}</Typography>
 
-                                                            <Typography sx={{ m: '1rem' }}>{calcuDateDiff(item.date)}</Typography>
-                                                            <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
-                                                        </Paper>
+                                                                    <Typography sx={{ m: '1rem' }}>{calcuDateDiff(item.date)}</Typography>
+                                                                    <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
 
-                                                    </TableCell>
-                                                    {/* <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell> */}
-                                                    {/* <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell> */}
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                                                    <Box sx={{display:'flex',justifyContent:'flex-end',flexBasis:'100%'}}>
+                                                                        <Button>Reply</Button>
+                                                                        </Box>
+                                                                </Paper>
+
+                                                            </TableCell>
+                                                            {/* <TableCell key={item.comment} sx={{ wordWrap: 'break-word', overflow: 'auto', maxWidth: '200px' }}>{item.comment}</TableCell> */}
+                                                            {/* <TableCell key={item.date}><Moment format="DD/MMM/YYYY , HH:MM:SS">{item.date}</Moment></TableCell> */}
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
 
 
 
-                                <TablePagination
-                                    component="div"
-                                    rowsPerPageOptions={[3, 10]}
-                                    rowsPerPage={rowsPerPage}
-                                    colSpan={3}
-                                    count={comments.comments.totalDocs}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                />
+                                        <TablePagination
+                                            component="div"
+                                            rowsPerPageOptions={[3, 10]}
+                                            rowsPerPage={rowsPerPage}
+                                            colSpan={3}
+                                            count={comments.comments.totalDocs}
+                                            page={page}
+                                            onPageChange={handleChangePage}
+                                            onRowsPerPageChange={handleChangeRowsPerPage}
+                                        />
 
+                                    </Box>
+
+                                }
+                            </Paper>
+
+
+
+                            <Box
+                                className='commentSection'
+                                component="form"
+                                noValidate
+                                autoComplete='off'
+                                autoCorrect="true"
+                                sx={{ display: 'flex', flexBasis: '100%', mt: '1rem', ml: '1rem' }}
+
+                            >
+                                <TextField className='commentTextArea'
+                                    placeholder='Add a comment'
+                                    value={commentTextArea}
+                                    label="Comment"
+                                    multiline
+                                    rows={2}
+                                    sx={{ width: '100%' }}
+                                    onChange={(e) => handleCommentTextArea(e)}
+                                >
+
+                                </TextField>
                             </Box>
 
-                        }
-                    </Paper>
+                            <Box className='addCommentBtn' sx={{ flexBasis: '100%' }}>
+                                <Button
+                                    variant='outlined'
+                                    sx={{ float: 'right', width: '10rem', mt: 1 }}
+                                    onClick={() => {
+                                        dispatch(addComment({ defectId, comment: commentTextArea }))
+                                            .unwrap()
+                                            .then(setCommented(true))
+                                            .then(() => {
+                                                dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
+                                            })
+                                        setCommentTextArea('')
+                                    }}
+                                >Add</Button>
 
 
 
-                    <Box
-                        className='commentSection'
-                        component="form"
-                        noValidate
-                        autoComplete='off'
-                        autoCorrect="true"
-                        sx={{ display: 'flex', flexBasis: '100%', mt: '1rem', ml: '1rem' }}
-
-                    >
-                        <TextField className='commentTextArea'
-                            placeholder='Add a comment'
-                            value={commentTextArea}
-                            label="Comment"
-                            multiline
-                            rows={2}
-                            sx={{ width: '100%' }}
-                            onChange={(e) => handleCommentTextArea(e)}
-                        >
-
-                        </TextField>
-                    </Box>
-
-                    <Box className='addCommentBtn' sx={{ flexBasis: '100%' }}>
-                        <Button
-                            variant='outlined'
-                            sx={{ float: 'right', width: '10rem', mt: 1 }}
-                            onClick={() => {
-                                dispatch(addComment({ defectId, comment: commentTextArea }))
-                                    .unwrap()
-                                    .then(setCommented(true))
-                                    .then(() => {
-                                        dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
-                                    })
-                                setCommentTextArea('')
-                            }}
-                        >Add</Button>
-
-         
-
-                    </Box>
-                    </>
+                            </Box>
+                        </>
                         :
                         null
                     }
@@ -715,9 +745,9 @@ const ViewDefect = () => {
                         titleColor="black"
                     >
                     </ModalComponent>
-                    
+
                 </Box>
-                
+
                 : null}
 
 
