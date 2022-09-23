@@ -28,7 +28,7 @@ let DEFAULT_DEFECT_STATE = {
     severity: null,
     status: null,
     assignee: null,
-    attachment:[]
+    attachment: []
   },
   filter: {
     filtered: false,
@@ -37,6 +37,18 @@ let DEFAULT_DEFECT_STATE = {
     severity: null,
     status: null,
     search: '',
+    showColumn:{
+      menu:true,
+      defectId:true,
+      summary:true,
+      project:true,
+      components:true,
+      severity:true,
+      status:true,
+      server:false,
+      reporter:false,
+      createdDate:false
+    }
   },
   sort: {
     order: -1,
@@ -57,6 +69,7 @@ export const defectsSlice = createSlice({
     },
     resetFilterState: (state, action) => {
       state.filter = DEFAULT_DEFECT_STATE.filter
+      state.data.components = ""
     },
     setFilterState: (state, action) => {
       state.filter = action.payload
@@ -65,7 +78,7 @@ export const defectsSlice = createSlice({
       state.filter.search = action.payload
       if (state.filter.search !== '' || state.filter.project !== null || state.filter.components !== null || state.filter.severity !== null || state.filter.status !== null) {
         state.filter.filtered = true;
-      }else{
+      } else {
         state.filter.filtered = false;
       }
     },
@@ -74,6 +87,9 @@ export const defectsSlice = createSlice({
     },
     setSortBy: (state, action) => {
       state.sort.sortby = action.payload
+    },
+    setShowColumn: (state, action) => {
+      state.filter.showColumn = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -101,9 +117,9 @@ export const defectsSlice = createSlice({
       .addCase(filterDefect.fulfilled, (state, action) => {
         state.loading = false
         state.defectLists = action.payload
-        if(state.filter.search !== '' || state.filter.project !== null || state.filter.components !== null || state.filter.severity !== null || state.filter.status !== null){
+        if (state.filter.search !== '' || state.filter.project !== null || state.filter.components !== null || state.filter.severity !== null || state.filter.status !== null) {
           state.filter.filtered = true;
-        }else{
+        } else {
           state.filter.filtered = false;
         }
       })
@@ -117,5 +133,5 @@ export const defectsSlice = createSlice({
   }
 })
 
-export const { resetDataState, resetFilterState, setFilterState, setSearch, setOrder, setSortBy } = defectsSlice.actions;
+export const { resetDataState, resetFilterState, setFilterState, setSearch, setOrder, setSortBy, setShowColumn } = defectsSlice.actions;
 export default defectsSlice.reducer;

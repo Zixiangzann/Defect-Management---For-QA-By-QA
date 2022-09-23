@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 //comp
 import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../store/actions/defects';
-import { setOrder, setSearch, setSortBy,resetFilterState } from '../../store/reducers/defects';
+import { setOrder, setSearch, setSortBy, resetFilterState } from '../../store/reducers/defects';
 import ModalComponent from '../../utils/modal/modal';
-import { StatusColorCode,SeverityColorCode } from '../../utils/tools';
+import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
+
 
 //MUI
 import Table from '@mui/material/Table'
@@ -43,6 +44,7 @@ const PaginateComponent = ({
 }) => {
 
     const users = useSelector(state => state.users)
+    const showColumn = useSelector(state => state.defects.filter.showColumn)
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [toRemove, setToRemove] = useState(null);
 
@@ -50,16 +52,27 @@ const PaginateComponent = ({
 
     //Table
     const tableHeader = [
-        'Defect ID',
-        'Title',
-        'Project',
-        'Components',
-        'Severity',
-        'Status',
-        'Server',
-        'Reporter',
-        'Created Date'
+        'defectId',
+        'summary',
+        'project',
+        'components',
+        'severity',
+        'status',
+        'server',
+        'reporter',
+        'createdDate'
     ]
+
+    const changeHeaderText = (header) => {
+        if (header === "defectId") {
+            return "Defect ID"
+        } else if (header === "createdDate") {
+            return "Created Date"
+        } else {
+            return header.charAt(0).toUpperCase() + header.slice(1);
+        }
+
+    }
 
     //Table sorting
 
@@ -107,17 +120,17 @@ const PaginateComponent = ({
         navigate(`/defect/view/${id}`)
     }
 
-    const EditMenuComponent = ({defect}) => {
+    const EditMenuComponent = ({ defect }) => {
 
 
-        if((users.data.permission[0].editOwnDefect && defect.reporter === users.data.email) || users.data.permission[0].editAllDefect){
-            return(
+        if ((users.data.permission[0].editOwnDefect && defect.reporter === users.data.email) || users.data.permission[0].editAllDefect) {
+            return (
                 <MenuItem
-                onClick={() => handleEdit(defect.defectid)}>
+                    onClick={() => handleEdit(defect.defectid)}>
                     <Tooltip title="Edit">
                         <Button
-                            sx={{ minHeight: 0, minWidth: 0, padding: 0.5, color: 'darkorange',mr:1  }}
-                            
+                            sx={{ minHeight: 0, minWidth: 0, padding: 0.5, color: 'darkorange', mr: 1 }}
+
                         >
                             <ModeEditIcon />
                         </Button>
@@ -126,36 +139,36 @@ const PaginateComponent = ({
                 </MenuItem>
             )
         }
- 
+
         return null
     }
 
-    const DeleteMenuComponent = ({defect}) =>{
-        if(users.data.permission[0].deleteAllDefect){
-            return(
-            <MenuItem
-            onClick={() => {
-                setOpenModal(true)
-                //close menu item
-                setShowMenu(false)
-                setToRemove(defect.defectid)
-            }}>
-                <Tooltip title="Delete">
-                    <Button
-                        sx={{ minHeight: 0, minWidth: 0, padding: 0.5,mr:1  }}
+    const DeleteMenuComponent = ({ defect }) => {
+        if (users.data.permission[0].deleteAllDefect) {
+            return (
+                <MenuItem
+                    onClick={() => {
+                        setOpenModal(true)
+                        //close menu item
+                        setShowMenu(false)
+                        setToRemove(defect.defectid)
+                    }}>
+                    <Tooltip title="Delete">
+                        <Button
+                            sx={{ minHeight: 0, minWidth: 0, padding: 0.5, mr: 1 }}
 
-                    >
-                        <DeleteForeverIcon color='error' />
-                    </Button>
-                </Tooltip>
-                Delete
-            </MenuItem>
+                        >
+                            <DeleteForeverIcon color='error' />
+                        </Button>
+                    </Tooltip>
+                    Delete
+                </MenuItem>
             )
         }
         return null
     }
 
-//Defect Menu
+    //Defect Menu
 
     const [defectItem, setDefectItem] = useState({})
     const [showMenu, setShowMenu] = useState(false)
@@ -171,26 +184,26 @@ const PaginateComponent = ({
                     open={showMenu}
                     onClose={() => setShowMenu(false)}
                     anchorEl={anchorEl}
-                    >
+                >
                     <MenuItem
-                    onClick={() => handleView(defect.defectid)}>
+                        onClick={() => handleView(defect.defectid)}>
                         <Tooltip title="View">
                             <Button
-                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5,mr:1 }}
-                                
+                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5, mr: 1 }}
+
                             >
                                 <OpenInNewIcon />
                             </Button>
                         </Tooltip>
                         View</MenuItem>
 
-                        <EditMenuComponent 
+                    <EditMenuComponent
                         defect={defect}
-                        />
+                    />
 
-                        <DeleteMenuComponent
+                    <DeleteMenuComponent
                         defect={defect}
-                        />
+                    />
 
                 </Menu>
             </>
@@ -247,10 +260,14 @@ const PaginateComponent = ({
         }
     }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.search]);
 
-    useEffect(()=>{
+    useEffect(() => {
         //reset filter state on load
         dispatch(resetFilterState())
-    },[])
+    }, [])
+
+    useEffect(() => {
+        console.log(showColumn)
+    }, [showColumn])
 
 
 
@@ -267,7 +284,8 @@ const PaginateComponent = ({
                         sx={{ float: 'right', mb: 3, mt: 1, mr: 1, overflow: 'hidden' }}
                     />
                     <TableContainer
-                        sx={{ mt: 2, minWidth: 650, maxHeight: 750 }}
+                        className='defectListTableContainer'
+                        sx={{ mt: 2, minWidth: '100%', maxHeight: 750 }}
 
                     >
                         <Table
@@ -278,59 +296,114 @@ const PaginateComponent = ({
 
                             <TableHead sx={{ whiteSpace: 'nowrap' }}>
                                 <TableRow key={'header'}>
-                                    <TableCell>Menu</TableCell>
+
+                                    {showColumn.menu ?
+                                        <TableCell>Menu</TableCell>
+                                        :
+                                        null
+                                    }
+
                                     {tableHeader.map((header) => (
-                                        <TableCell
-                                            key={`table-${header}`}
-                                            
-                                            >
-                                            <TableSortLabel
-                                                active={sortActive === header}
-                                                direction={sortActive === header ? orderActive : 'desc'}
-                                                onClick={() => {
-                                                    handleOrder()
-                                                    handleSort(header)
-                                                }}
-                                            >{header}
-                                                {sortActive === header ? (
-                                                    <Box component="span" sx={visuallyHidden}>
-                                                        {orderActive === -1 ? 'sorted descending' : 'sorted ascending'}
-                                                    </Box>
-                                                ) : null}
-                                            </TableSortLabel>
-                                        </TableCell>
+                                        <>
+                                            {showColumn[header] ?
+                                                <TableCell
+                                                    key={`table-${header}`}
+
+                                                >
+                                                    <TableSortLabel
+                                                        active={sortActive === header}
+                                                        direction={sortActive === header ? orderActive : 'desc'}
+                                                        onClick={() => {
+                                                            handleOrder()
+                                                            handleSort(header)
+                                                        }}
+                                                    >{changeHeaderText(header)}
+                                                        {sortActive === header ? (
+                                                            <Box component="span" sx={visuallyHidden}>
+                                                                {orderActive === -1 ? 'sorted descending' : 'sorted ascending'}
+                                                            </Box>
+                                                        ) : null}
+                                                    </TableSortLabel>
+                                                </TableCell>
+                                                :
+                                                null
+                                            }
+                                        </>
                                     ))}
                                 </TableRow>
                             </TableHead>
-
                             <TableBody
                             >
                                 {defects.docs.map((item, index) => (
                                     <TableRow key={item._id}
                                     >
-                                        
-                                        <TableCell 
-                                        key={`menu-${index}`} 
-                                        sx={{textAlign:'center',cursor: 'pointer'}}
-                                        onClick={(e)=>{
-                                            setDefectItem(item)
-                                            setShowMenu(true)
-                                            setAnchorEl(e.currentTarget)
-                                        }}
-                                        >
-                                        <MenuIcon color='secondary'/></TableCell>
-                                      
-                                        <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px',textAlign:'center'}}>{item.defectid}</TableCell>
-                                        <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
-                                        <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px' }}>{item.project}</TableCell>
-                                        <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px'}}>{item.components}</TableCell>
-                                        <TableCell key={`${item.severity}-${index}`} sx={{ minWidth: '150px' }}>{SeverityColorCode({severity: item.severity,textWidth:'9rem'})}</TableCell>
-                                        <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>
-                                            {StatusColorCode({status: item.status,textWidth:'6rem'})}
+                                        {showColumn.menu ?
+                                            <TableCell
+                                                key={`menu-${index}`}
+                                                sx={{ textAlign: 'center', cursor: 'pointer' }}
+                                                onClick={(e) => {
+                                                    setDefectItem(item)
+                                                    setShowMenu(true)
+                                                    setAnchorEl(e.currentTarget)
+                                                }}
+                                            >
+                                                <MenuIcon color='secondary' /></TableCell>
+                                            :
+                                            null
+                                        }
+
+
+                                        {showColumn.defectId ?
+                                            <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}>{item.defectid}</TableCell>
+                                            :
+                                            null
+                                        }
+
+                                        {showColumn.summary ?
+                                            <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
+                                            :
+                                            null
+                                        }
+
+                                        {showColumn.project ?
+                                            <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px' }}>{item.project}</TableCell>
+                                            :
+                                            null
+                                        }
+
+                                        {showColumn.components ?
+                                            <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px' }}>{item.components}</TableCell>
+                                            :
+                                            null
+                                        }
+
+                                        {showColumn.severity ?
+                                            <TableCell key={`${item.severity}-${index}`} sx={{ minWidth: '150px' }}>{SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}</TableCell>
+                                            :
+                                            null
+                                        }
+                                        {showColumn.status ?
+                                            <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>
+                                                {StatusColorCode({ status: item.status, textWidth: '6rem' })}
                                             </TableCell>
-                                        <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
-                                        <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
-                                        <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
+                                            :
+                                            null
+                                        }
+                                        {showColumn.server ?
+                                            <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
+                                        :
+                                        null
+                                        }
+                                        {showColumn.reporter ?
+                                            <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                        :
+                                        null
+                                        }
+                                        {showColumn.createdDate ?
+                                            <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
+                                        :
+                                        null
+                                        }
                                     </TableRow>
 
                                 ))}

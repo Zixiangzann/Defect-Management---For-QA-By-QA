@@ -192,6 +192,23 @@
         margin-top: 1rem;
     }
 
+    .columnFilterBtn{
+        flex-basis: 20% !important;
+        margin-right: 0px !important;
+    }
+
+    .defectFilterBtn{
+        flex-basis: 20% !important;
+    }
+
+    .createNewDefectBtn{
+        flex-basis: 45% !important;
+    }
+
+    .defectListActionContainer{
+        justify-content: flex-start !important;
+    }
+
   }
 
 
@@ -206,6 +223,23 @@
 @media only screen and (max-width:500px) {
     #updatePhoneContainer{
         width: 120px
+    }
+
+    .columnFilterBtn{
+        flex-basis: 30% !important;
+        margin-right: 0.5rem !important;
+    }
+
+    .defectFilterBtn{
+        flex-basis: 30% !important;
+    }
+
+    .createNewDefectBtn{
+        flex-basis: 70% !important;
+    }
+
+    .defectListActionContainer{
+        justify-content: flex-start !important;
     }
 
 }

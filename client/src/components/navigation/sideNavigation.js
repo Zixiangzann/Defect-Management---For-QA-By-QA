@@ -25,6 +25,8 @@ import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlin
 import FilterVintageOutlinedIcon from '@mui/icons-material/FilterVintageOutlined';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import HiveIcon from '@mui/icons-material/Hive';
+import { Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 
 
@@ -38,11 +40,14 @@ const SideDrawer = ({ users }) => {
             <DehazeIcon className='drawer_btn' onClick={() => setState(true)} />
             <Drawer anchor={"right"} open={state} onClose={() => setState(false)}>
                 <Box sx={{ width: 300, zIndex: '999999' }}>
+                        
                     <List>
 
                         {/* still deciding if there should be any homepage for user that not logged in. Likely not  */}
+                        
                         {users.auth ?
-                            <ListItem
+                         <>
+                         <Typography variant='h6' sx={{ textAlign: 'center', m: '1rem' }}>Home <HomeIcon /></Typography><ListItem
                                 key="sideNavigation-Home"
                                 button
                                 component={RouterLink}
@@ -54,6 +59,7 @@ const SideDrawer = ({ users }) => {
                                 </ListItemIcon>
                                 <ListItemText primary="Home" />
                             </ListItem>
+                            </>
                             :
                             null
                         }
@@ -91,9 +97,11 @@ const SideDrawer = ({ users }) => {
                         }
                         {users.auth ?
                             <>
+                           
                                 <Divider />
+                                <Typography variant='h6' sx={{textAlign:'center',m:'1rem'}} >Defect <BugReportIcon /></Typography>
                                 <ListItem
-                                    key="sideNavigation-Defect"
+                                    key="sideNavigation-Defect-List"
                                     button
                                     component={RouterLink}
                                     to="/defect"
@@ -102,8 +110,21 @@ const SideDrawer = ({ users }) => {
                                     <ListItemIcon>
                                         <BugReportIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Defect" />
+                                    <ListItemText primary="Defect List" />
                                 </ListItem>
+                                <ListItem
+                                    key="sideNavigation-Defect-CreateNew"
+                                    button
+                                    component={RouterLink}
+                                    to="/defect/create"
+                                    onClick={() => setState(false)}
+                                >
+                                    <ListItemIcon>
+                                        <AddIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Create New Defect" />
+                                </ListItem>
+
                                 {/* not ready */}
                                 {/* <ListItem
                                 key="sideNavigation-Projects"
@@ -148,6 +169,8 @@ const SideDrawer = ({ users }) => {
                                 <Divider />
 
                                 {users.data.role === 'admin' || users.data.role === 'owner' ?
+                                <Box>
+                                <Typography variant='h6' sx={{textAlign:'center',m:'1rem'}} >Management <ManageAccountsOutlinedIcon /></Typography>
                                     <ListItem
                                         key="sideNavigation-UserManagement"
                                         button
@@ -160,9 +183,11 @@ const SideDrawer = ({ users }) => {
                                         </ListItemIcon>
                                         <ListItemText primary="User Management" />
                                     </ListItem>
+                                    </Box>
                                     : null}
 
                                 {users.data.role === 'admin' || users.data.role === 'owner' ?
+                                 <Box>
                                     <ListItem
                                         key="sideNavigation-ProjectManagement"
                                         button
@@ -175,6 +200,7 @@ const SideDrawer = ({ users }) => {
                                         </ListItemIcon>
                                         <ListItemText primary="Project Management" />
                                     </ListItem>
+                                    </Box>
                                     : null}
 
 
