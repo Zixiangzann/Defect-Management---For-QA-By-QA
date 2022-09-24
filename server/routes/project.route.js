@@ -12,6 +12,8 @@ router.post('/all',auth('readAny','projects'),projectController.getAllProjects)
 router.post('/add',auth('createAny','projects'),projectController.createProject)
 router.patch('/update',auth('updateAny','projects'),projectController.updateProjectByTitle)
 router.delete('/delete',auth('deleteAny','projects'),projectController.deleteProjectByTitle)
+
+router.post('/getallusersforassign',auth('readAny','projects'),projectController.getAllUsersForAssign)
 router.patch('/assign',auth('updateAny','projects'),projectController.assignProject)
 router.patch('/removefromproject',auth('updateAny','projects'),projectController.removeAssigneeFromProject)
 router.patch('/components',auth('updateAny','projects'),projectController.addComponentsToProject)

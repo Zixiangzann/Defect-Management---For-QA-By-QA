@@ -703,21 +703,21 @@ export const getAllUsersEmail = async (req) => {
 
 
 //might remove
-export const getAllUsers = async (req) => {
+// export const getAllUsers = async (req) => {
 
-    // only system owner allowed to perform this action
-    if (req.user.role !== 'owner') {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
-    }
+//     // only system owner and admin allowed to perform this action
+//     if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+//         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+//     }
 
-    try {
-        const users = User.find({}).select('-password')
-        if (!users) {
-            throw new ApiError(httpStatus.NOT_FOUND, 'Unable to fetch users')
-        }
-        return users;
-    } catch (error) {
-        throw error
-    }
-}
+//     try {
+//         const users = User.find({}).select('-password')
+//         if (!users) {
+//             throw new ApiError(httpStatus.NOT_FOUND, 'Unable to fetch users')
+//         }
+//         return users;
+//     } catch (error) {
+//         throw error
+//     }
+// }
 

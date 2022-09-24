@@ -6,7 +6,7 @@ const projectController = {
 
     async createProject(req, res, next) {
         try {
-            const project = await projectService.createProject(req.body);
+            const project = await projectService.createProject(req);
             res.json(project)
         } catch (error) {
             next(error)
@@ -46,6 +46,15 @@ const projectController = {
             const projectTitle = req.query.title;
             const project = await projectService.updateProjectByTitle(projectTitle, req.body)
             res.json(project);
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async getAllUsersForAssign(req, res, next) {
+        try {
+            const users = await projectService.getAllUsersForAssign(req)
+            res.json(users)
         } catch (error) {
             next(error)
         }

@@ -1,7 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-import EditDefect from '../../components/defects/edit'
-import { showToast } from '../../utils/tools';
+import { createSlice } from '@reduxjs/toolkit'
+
 import {
   createDefect,
   deleteDefect,

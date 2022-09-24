@@ -7,6 +7,7 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 export const projectSchema = mongoose.Schema({
     title: {
         type: String,
+        maxLength: 20,
         required: true,
         unique: true
     },
@@ -15,12 +16,10 @@ export const projectSchema = mongoose.Schema({
         required: true
     },
     components: {
-        type: [],
-        unique: true
+        type: [{type:String, maxLength: 20}]
     },
     assignee: {
-        type: [],
-        unique: true
+        type: [{type:String}]
     },
     date: {
         type: Date,

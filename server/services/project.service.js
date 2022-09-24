@@ -5,13 +5,25 @@ import Defect from '../models/defect.js'
 import User from "../models/user.js"
 import { userService } from "./index.js";
 
-export const createProject = async (body) => {
+export const createProject = async (req) => {
+    
+    //require addProject permission.
+    if(!req.user.permission[0].addProject) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to create project');
+    
+    if(req.body.title.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for project name is: 20');
+    
+    req.body.components.map((e)=>{
+        if(e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
+    })
+
+    //remove any duplicate in assignee/components before adding project
+    //front end will also validate this. but just in case somehow it get to backend with duplicate.
     try {
         const project = new Project({
-            title: body.title,
-            description: body.description,
-            assignee: body.assignee,
-            components: body.components
+            title: req.body.title,
+            description: req.body.description,
+            assignee: [... new Set(req.body.assignee)],
+            components: [... new Set(req.body.components)]
         })
         await project.save();
         return project;
@@ -69,6 +81,25 @@ export const updateProjectByTitle = async (title, body) => {
             }
         }, { new: true }).exec();
         return (newProjectDetail);
+    } catch (error) {
+        throw error
+    }
+}
+
+//get all users for assigning
+export const getAllUsersForAssign = async (req) => {
+
+    // only system owner and admin allowed to perform this action
+    if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+    }
+
+    try {
+        const users = await User.find({}).select("username email photoURL")
+        
+        if (!users) throw new ApiError(httpStatus.NOT_FOUND, 'Unable to fetch users')
+        return users
+
     } catch (error) {
         throw error
     }

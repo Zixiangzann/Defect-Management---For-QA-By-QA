@@ -38,16 +38,24 @@ const SideDrawer = ({ users }) => {
     return (
         <>
             <DehazeIcon className='drawer_btn' onClick={() => setState(true)} />
-            <Drawer anchor={"right"} open={state} onClose={() => setState(false)}>
-                <Box sx={{ width: 300, zIndex: '999999' }}>
+            <Drawer 
+            anchor={"right"} 
+            open={state} 
+            onClose={() => setState(false)}
+            sx={{'& .MuiPaper-root':{backgroundColor:'#d3eaf2'}}}
+            >
+                <Box sx={{ width: 300, zIndex: '999999'}}>
                         
-                    <List>
-
+                    <List 
+                    sx={{'& .MuiButtonBase-root':{backgroundColor:'#d7e8ee'},'& .MuiButtonBase-root:hover':{backgroundColor: '#b0d8e5'}}}>
+                    
                         {/* still deciding if there should be any homepage for user that not logged in. Likely not  */}
                         
                         {users.auth ?
                          <>
-                         <Typography variant='h6' sx={{ textAlign: 'center', m: '1rem' }}>Home <HomeIcon /></Typography><ListItem
+                         <Typography variant='h6' sx={{ textAlign: 'center', m: '1rem',color:'#2710d7',fontWeight:'500'}}>Home <HomeIcon sx={{color:'black'}}/></Typography>
+                         <Divider />
+                         <ListItem
                                 key="sideNavigation-Home"
                                 button
                                 component={RouterLink}
@@ -65,6 +73,7 @@ const SideDrawer = ({ users }) => {
                         }
 
                         {!users.auth ?
+                        
                             <ListItem
                                 key="sideNavigation-SignIn"
                                 button
@@ -99,7 +108,8 @@ const SideDrawer = ({ users }) => {
                             <>
                            
                                 <Divider />
-                                <Typography variant='h6' sx={{textAlign:'center',m:'1rem'}} >Defect <BugReportIcon /></Typography>
+                                <Typography variant='h6' sx={{textAlign:'center',m:'1rem',color:'#2710d7'}} >Defect <BugReportIcon sx={{color:'firebrick'}} /></Typography>
+                                <Divider />
                                 <ListItem
                                     key="sideNavigation-Defect-List"
                                     button
@@ -170,7 +180,8 @@ const SideDrawer = ({ users }) => {
 
                                 {users.data.role === 'admin' || users.data.role === 'owner' ?
                                 <Box>
-                                <Typography variant='h6' sx={{textAlign:'center',m:'1rem'}} >Management <ManageAccountsOutlinedIcon /></Typography>
+                                <Typography variant='h6' sx={{textAlign:'center',m:'1rem',color:'#2710d7'}} >Management <ManageAccountsOutlinedIcon sx={{color:'purple'}} /></Typography>
+                                <Divider />
                                     <ListItem
                                         key="sideNavigation-UserManagement"
                                         button

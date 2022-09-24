@@ -1,6 +1,10 @@
 //lib
 import { useState } from 'react';
 
+//comp
+import AddProject from './addProject';
+import ManageProject from './manageProject';
+
 //mui
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -36,7 +40,7 @@ const ProjectManagement = () => {
                                     color: (activeTab === 0 ? 'blue' : 'black')
                                 }}
 
-                                primary="Add New Project"
+                                primary="Project Management"
                             />
                         </ListItemButton>
                     </ListItem>
@@ -54,7 +58,7 @@ const ProjectManagement = () => {
                                     textAlign: 'center',
                                     color: (activeTab === 1 ? 'blue' : 'black')
                                 }}
-                                primary="Add Components to Project"
+                                primary="Add Project"
                             />
                         </ListItemButton>
                     </ListItem>
@@ -65,9 +69,17 @@ const ProjectManagement = () => {
                 {
                     (() => {
                         if (activeTab === 0)
-                            return <span>One</span>
+                            return(
+                                <ManageProject>
+                                    
+                                </ManageProject>
+                            )
                         if (activeTab === 1)
-                            return <span>Two</span>
+                            return (
+                            <AddProject>
+                                    
+                            </AddProject>
+                            )
                     })()
                 }
             </Box>

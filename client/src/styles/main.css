@@ -209,6 +209,14 @@
         justify-content: flex-start !important;
     }
 
+    #addProject{
+        flex-basis: 30%;
+    }
+
+    #addProjectComponentsForm{
+        flex-basis: 100%;
+    }
+
   }
 
 
@@ -224,6 +232,13 @@
     #updatePhoneContainer{
         width: 120px
     }
+
+
+    #addProject{
+        flex-basis: 50%;
+    }
+
+
 
     .columnFilterBtn{
         flex-basis: 30% !important;
