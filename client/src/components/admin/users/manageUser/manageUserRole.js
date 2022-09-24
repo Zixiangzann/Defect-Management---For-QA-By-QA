@@ -12,7 +12,8 @@ const ManageUserRole = ({
     users,
     role,
     handleChangeRole,
-    handleEditConfirm
+    handleEditConfirm,
+    setConfirmChanges
 }) => {
     return(
         <Box flexBasis='100%'>
@@ -50,7 +51,7 @@ const ManageUserRole = ({
                                 color='primary'
                                 // disabled={userDetails.role === role}
                                 sx={{ flexBasis: '30%', mt: 2}}
-                                onClick={()=> handleEditConfirm("confirmRole")}
+                                onClick={()=>  setConfirmChanges("confirmRole")}
                             >Change User Role</Button>
                         </Box>
 

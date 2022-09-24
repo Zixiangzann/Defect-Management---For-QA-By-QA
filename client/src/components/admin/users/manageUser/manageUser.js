@@ -570,6 +570,14 @@ const ManageUser = () => {
                 handleProfilePicToBlob()
                 setOpenModal(true)
                 break;
+            case "confirmPermission":
+                //no trimming required
+                setOpenModal(true)
+                break;
+            case "confirmRole":
+                //no trimming required
+                setOpenModal(true)
+                break;        
             default:
                 break;
         }
@@ -878,6 +886,7 @@ const ManageUser = () => {
                         role={role}
                         handleChangeRole={handleChangeRole}
                         handleEditConfirm={handleEditConfirm}
+                        setConfirmChanges={setConfirmChanges}
                     >
                     </ManageUserRole>
                     :
@@ -896,6 +905,7 @@ const ManageUser = () => {
                         handlePermission={handlePermission}
                         handleEditState={handleEditState}
                         handleEditConfirm={handleEditConfirm}
+                        setConfirmChanges={setConfirmChanges}
                     >
                     </ManageUserPermission>
                     :

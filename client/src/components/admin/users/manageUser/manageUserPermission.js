@@ -14,7 +14,8 @@ const ManageUserPermission = ({
     userPermission,
     permissionChangedCheck,
     handlePermission,
-    handleEditConfirm
+    handleEditConfirm,
+    setConfirmChanges
 }) => {
 
 
@@ -84,7 +85,9 @@ return(
                         color='primary'
                         sx={{ flexBasis: '30%', mt: 1 ,mt:5}}
                         // disabled={permissionChanged}
-                        onClick={(e) => handleEditConfirm("confirmPermission")}
+                        onClick={(e) => {
+                            setConfirmChanges("confirmPermission")
+                        }}
                         >
                             Update Permission</Button>
                         </Box>
