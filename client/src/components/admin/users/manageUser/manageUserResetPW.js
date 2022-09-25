@@ -13,7 +13,7 @@ const ManageUserResetPW = ({
             {userDetails.email  && users.data.permission[0].resetUserPassword ?
                 <Box>
                     <Box flexBasis='100%'>
-                        <Typography variant='h5' mb={5} mt={5} flexBasis='60%'>Reset Password</Typography>
+                        <Typography className="adminHeader" variant='h5' mb={5} mt={5} flexBasis='60%'>Reset Password</Typography>
                         <Box sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-start' }}>
 
                             <Button

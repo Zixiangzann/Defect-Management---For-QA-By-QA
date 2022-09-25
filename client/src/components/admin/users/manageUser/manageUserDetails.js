@@ -104,7 +104,7 @@ const ManageUserDetails = ({
             {userDetails.email ?
                 <Box>
 
-                    <Typography variant='h5' mb={5} mt={5} flexBasis='60%'>User Details</Typography>
+                    <Typography className="adminHeader" variant='h5' mb={5} mt={5} flexBasis='60%'>User Details</Typography>
 
 
 

@@ -137,7 +137,6 @@ const ManageUser = () => {
     })
 
     // project
-    const [project, setProject] = useState('');
     const [selectProject, setSelectProject] = useState('');
     const [removeUserProject, setRemoveUserProject] = useState('')
     const [assignUserProject, setAssignUserProject] = useState('')
@@ -710,11 +709,12 @@ const ManageUser = () => {
                     id='searchUser'
                     sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor='searchUser'
+                    sx={{color:'mediumblue'}}
                     >{searchUser === "" ? "Select User" : "Selected User"}</InputLabel>
                     <Select
                         id="selectuser"
                         value={searchUser}
-                        label="usersEmails"
+                        label={searchUser === "" ? "Select User" : "Selected User"}
                         onChange={handleSelectUsers}
                         MenuProps={{ sx: { maxHeight: '18rem' } }}
                     >

@@ -18,6 +18,7 @@ router.patch('/assign',auth('updateAny','projects'),projectController.assignProj
 router.patch('/removefromproject',auth('updateAny','projects'),projectController.removeAssigneeFromProject)
 router.patch('/components',auth('updateAny','projects'),projectController.addComponentsToProject)
 
+//not using yet
 router.post('/paginate',auth('readAny','projects'),projectController.projectsListPaginate)
 router.post('/more',auth('readAny','projects'),projectController.getMoreProjects)
 

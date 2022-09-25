@@ -33,7 +33,8 @@ const ColumnFilter = ({
         status: true,
         server: false,
         reporter: false,
-        createdDate: false
+        createdDate: false,
+        updatedDate: false,
     });
 
     const handleChange = (event) => {
@@ -162,6 +163,15 @@ const ColumnFilter = ({
                             />}
                         onClick={handleChange}
                         label={'Created Date'} />
+
+<FormControlLabel
+                        name="updatedDate"
+                        control={
+                            <Checkbox
+                                checked={state.updatedDate}
+                            />}
+                        onClick={handleChange}
+                        label={'Updated Date'} />
 
 
                 </FormGroup>

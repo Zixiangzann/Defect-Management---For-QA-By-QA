@@ -23,7 +23,7 @@ const ManageUserRole = ({
         
         <Box flexBasis='100%'>
 
-        <Typography variant='h5' mb={3} mt={5} flexBasis='60%'>Change Role</Typography>
+        <Typography className="adminHeader" variant='h5' mb={3} mt={5} flexBasis='60%'>Change Role</Typography>
         {users.data.role === 'owner' ? null : <Typography mb={3}>Only Super Admin can manage account Role</Typography>}
 
             <FormControl>

@@ -105,17 +105,12 @@ const AddProject = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(projectName)
-        console.log(projectDescription)
-
+     
         //only want to store the email
         const assigneeEmail = []
         assignee.map((a)=>{
             assigneeEmail.push(a.email)
         })
-
-        console.log(assigneeEmail)
-        console.log(components)
 
         dispatch(addProject({
             title: projectName,
@@ -129,6 +124,8 @@ const AddProject = () => {
             setProjectDescription('')
             setAssignee([])
             setComponents([])
+            setComponentErrorMessage('')
+            setComponentAddError('')
         })
     }
 

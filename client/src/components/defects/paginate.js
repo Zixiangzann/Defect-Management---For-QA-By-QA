@@ -60,7 +60,8 @@ const PaginateComponent = ({
         'status',
         'server',
         'reporter',
-        'createdDate'
+        'createdDate',
+        'updatedDate'
     ]
 
     const changeHeaderText = (header) => {
@@ -68,6 +69,8 @@ const PaginateComponent = ({
             return "Defect ID"
         } else if (header === "createdDate") {
             return "Created Date"
+        } else if (header === "updatedDate") {
+            return "Updated Date"
         } else {
             return header.charAt(0).toUpperCase() + header.slice(1);
         }
@@ -391,18 +394,23 @@ const PaginateComponent = ({
                                         }
                                         {showColumn.server ?
                                             <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
-                                        :
-                                        null
+                                            :
+                                            null
                                         }
                                         {showColumn.reporter ?
                                             <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
-                                        :
-                                        null
+                                            :
+                                            null
                                         }
                                         {showColumn.createdDate ?
                                             <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
-                                        :
-                                        null
+                                            :
+                                            null
+                                        }
+                                        {showColumn.updatedDate ?
+                                            <TableCell key={`${item.lastUpdatedDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.lastUpdatedDate}</Moment></TableCell>
+                                            :
+                                            null
                                         }
                                     </TableRow>
 

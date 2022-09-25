@@ -76,6 +76,10 @@
     color: mediumblue !important;
 }
 
+.adminHeader{
+    color: #07078e;
+}
+
 @media only screen and (max-width: 1000px) {
     .modal-box{
         width: 300px;

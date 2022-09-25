@@ -16,17 +16,37 @@ export const createProject = async (req) => {
         if(e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
     })
 
+    const title = req.body.title
+    const description = req.body.description
     //remove any duplicate in assignee/components before adding project
     //front end will also validate this. but just in case somehow it get to backend with duplicate.
+    const assignee = [... new Set(req.body.assignee)]
+    const components = [... new Set(req.body.components)]
+
+    
     try {
-        const project = new Project({
-            title: req.body.title,
-            description: req.body.description,
-            assignee: [... new Set(req.body.assignee)],
-            components: [... new Set(req.body.components)]
+        const createdProject = new Project({
+            title: title,
+            description: description,
+            assignee: assignee,
+            components: components
         })
-        await project.save();
-        return project;
+        await createdProject.save();
+
+    //after create project, assign project to user
+    //find user by the assignee email and add the project
+    const updatedUser = await User.updateMany({email:assignee},{ $push: { project: title } }, { new: true })
+
+    const result = new Array();
+    result.push(createdProject)
+    result.push({
+        "email": assignee,
+        "project": title,
+        "action": "assigned user to project"
+    })
+
+    
+    return result;
     } catch (error) {
         throw error
     }
@@ -56,16 +76,16 @@ export const getAllProjects = async (req) => {
     }
 }
 
-export const deleteProjectByTitle = async (title) => {
-    try {
-        const project = await Project.findOne({ title: title }).exec()
-        if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-        Project.findOneAndDelete({ title: title }).exec();
-        return project;
-    } catch (error) {
-        throw error;
-    }
-}
+// export const deleteProjectByTitle = async (title) => {
+//     try {
+//         const project = await Project.findOne({ title: title }).exec()
+//         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+//         Project.findOneAndDelete({ title: title }).exec();
+//         return project;
+//     } catch (error) {
+//         throw error;
+//     }
+// }
 
 export const updateProjectByTitle = async (title, body) => {
     try {
