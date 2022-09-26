@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import { ApiError } from "../middleware/apiError.js";
 import { projectService } from "../services/index.js";
+import { defectListOfToBeRemovedComponents, defectListOfToBeRemovedUser } from "../services/project.service.js";
 
 const projectController = {
 
@@ -77,33 +78,59 @@ const projectController = {
             next(error)
         }
     },
+
+    async defectListOfToBeRemovedUser(req, res, next) {
+        try {
+            const project = await projectService.defectListOfToBeRemovedUser(req)
+            res.json(project);
+        } catch (error) {
+            next(error)
+        }
+    },
     
     async addComponentsToProject(req, res, next) {
         try {
-            const projectTitle = req.query.title;
-            const project = await projectService.addComponentsToProject(projectTitle, req.body.components)
+            const project = await projectService.addComponentsToProject(req)
             res.json(project);
         } catch (error) {
             next(error)
         }
     },
 
-    async projectsListPaginate(req, res, next) {
+    async removeComponentsFromProject(req, res, next) {
         try {
-            const projects = await projectService.paginateProjectsList(req)
-            res.json(projects);
+            const project = await projectService.removeComponentsFromProject(req)
+            res.json(project);
         } catch (error) {
-            next(error);
+            next(error)
         }
     },
-    async getMoreProjects(req, res, next) {
+
+    async defectListOfToBeRemovedComponents(req, res, next) {
         try {
-            const projects = await projectService.getMoreProjects(req);
-            res.json(projects);
+            const project = await projectService.defectListOfToBeRemovedComponents(req)
+            res.json(project);
         } catch (error) {
-            next(error);
+            next(error)
         }
-    }
+    },
+
+    // async projectsListPaginate(req, res, next) {
+    //     try {
+    //         const projects = await projectService.paginateProjectsList(req)
+    //         res.json(projects);
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // },
+    // async getMoreProjects(req, res, next) {
+    //     try {
+    //         const projects = await projectService.getMoreProjects(req);
+    //         res.json(projects);
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // }
 }
 
 export default projectController;

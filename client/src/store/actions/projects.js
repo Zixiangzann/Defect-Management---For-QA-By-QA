@@ -44,3 +44,51 @@ export const addProject = createAsyncThunk(
         }
     }
 )
+
+export const defectListOfUserToBeRemoved = createAsyncThunk(
+    'projects/defectListOfUserToBeRemoved',
+    async({
+        projectTitle,
+        userEmail
+    },{rejectWithValue}) => {
+        try {
+            const request = await axios.post('/api/project/assignee/defectlist',{
+                projectTitle,
+                userEmail
+            },getAuthHeader())
+
+            return request.data
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+
+            return rejectWithValue(error.response)
+
+        }
+    }
+)
+
+export const defectListOfComponentToBeRemoved = createAsyncThunk(
+    'projects/defectListOfComponentToBeRemoved',
+    async({
+        title,
+        componentToBeRemove
+    },{rejectWithValue}) => {
+        try {
+            const request = await axios.post('/api/project/components/defectlist',{
+                title,
+                componentToBeRemove
+            },getAuthHeader())
+
+            return request.data
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+
+            return rejectWithValue(error.response)
+
+        }
+    }
+)

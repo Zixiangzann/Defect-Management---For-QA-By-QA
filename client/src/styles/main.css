@@ -242,6 +242,50 @@
         flex-basis: 50%;
     }
 
+    #addprojectNameForm{
+        flex-basis: 100%;
+    }
+
+    #editProjectTitleForm{
+        flex-basis: 100%;
+    }
+
+    #project-select{
+        flex-basis: 100%;
+    }
+
+    #userManagementInnerTab{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-content: center;
+ 
+    }
+
+    .userManagementInnerTabItem{
+        width:100% !important;
+        }
+
+    .BoxAvatarLayout{
+        display:flex;
+        flex-basis: 100%;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .projectManagementDetailsValue{
+        flex-basis: 100%;
+        margin-left: 16px !important;
+    }
+
+    .projectManagementDetailsSubject{
+        flex-basis: 100%;
+    }
+    
+    .assignProjectBtnContainer{
+        justify-content: center !important;
+    }
+
 
 
     .columnFilterBtn{

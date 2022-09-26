@@ -246,13 +246,17 @@ const AddProject = () => {
                     <Typography ml={2} fontWeight={'600'} color={'#9f2f9f'}>Added Components</Typography>
 
 
-                    <ListItem>
-                        <ListItemAvatar>
+                    <ListItem
+                                sx={{ flexWrap: 'wrap' }}>
+                                <ListItemAvatar
+                                 className="BoxAvatarLayout"
+                                >
                             <Avatar>
                                 <GridViewIcon />
                             </Avatar>
 
                         </ListItemAvatar>
+                        <Box sx={{width:'90%'}}>
                         {components.map((component, index) => (
                             <Chip
                                 key={`${component + index}`}
@@ -267,9 +271,10 @@ const AddProject = () => {
                                     </Tooltip>
                                 }
                                 onDelete={()=>handleRemoveComponent(component)}
-                                sx={{ ml: 2 }}
+                                sx={{ m: 1 }}
                             />
                         ))}
+                        </Box>
 
 
                     </ListItem>

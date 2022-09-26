@@ -6,14 +6,14 @@ import User from "../models/user.js"
 import { userService } from "./index.js";
 
 export const createProject = async (req) => {
-    
+
     //require addProject permission.
-    if(!req.user.permission[0].addProject) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to create project');
-    
-    if(req.body.title.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for project name is: 20');
-    
-    req.body.components.map((e)=>{
-        if(e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
+    if (!req.user.permission[0].addProject) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to create project');
+
+    if (req.body.title.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for project name is: 20');
+
+    req.body.components.map((e) => {
+        if (e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
     })
 
     const title = req.body.title
@@ -23,7 +23,7 @@ export const createProject = async (req) => {
     const assignee = [... new Set(req.body.assignee)]
     const components = [... new Set(req.body.components)]
 
-    
+
     try {
         const createdProject = new Project({
             title: title,
@@ -33,20 +33,20 @@ export const createProject = async (req) => {
         })
         await createdProject.save();
 
-    //after create project, assign project to user
-    //find user by the assignee email and add the project
-    const updatedUser = await User.updateMany({email:assignee},{ $push: { project: title } }, { new: true })
+        //after create project, assign project to user
+        //find user by the assignee email and add the project
+        const updatedUser = await User.updateMany({ email: assignee }, { $push: { project: title } }, { new: true })
 
-    const result = new Array();
-    result.push(createdProject)
-    result.push({
-        "email": assignee,
-        "project": title,
-        "action": "assigned user to project"
-    })
+        const result = new Array();
+        result.push(createdProject)
+        result.push({
+            "email": assignee,
+            "project": title,
+            "action": "assigned user to project"
+        })
 
-    
-    return result;
+
+        return result;
     } catch (error) {
         throw error
     }
@@ -76,35 +76,6 @@ export const getAllProjects = async (req) => {
     }
 }
 
-// export const deleteProjectByTitle = async (title) => {
-//     try {
-//         const project = await Project.findOne({ title: title }).exec()
-//         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-//         Project.findOneAndDelete({ title: title }).exec();
-//         return project;
-//     } catch (error) {
-//         throw error;
-//     }
-// }
-
-export const updateProjectByTitle = async (title, body) => {
-    try {
-        const project = await Project.findOne({ title: title }).exec()
-        if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
-
-        const newProjectDetail = Project.findOneAndUpdate({ title: title }, {
-            "$set": {
-                title: body.title,
-                description: body.description
-            }, "$push": {
-                assignee: body.assignee
-            }
-        }, { new: true }).exec();
-        return (newProjectDetail);
-    } catch (error) {
-        throw error
-    }
-}
 
 //get all users for assigning
 export const getAllUsersForAssign = async (req) => {
@@ -116,7 +87,7 @@ export const getAllUsersForAssign = async (req) => {
 
     try {
         const users = await User.find({}).select("username email photoURL")
-        
+
         if (!users) throw new ApiError(httpStatus.NOT_FOUND, 'Unable to fetch users')
         return users
 
@@ -127,8 +98,8 @@ export const getAllUsersForAssign = async (req) => {
 
 export const assignProject = async (req) => {
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const projectTitle = req.body.projectTitle
 
@@ -138,10 +109,10 @@ export const assignProject = async (req) => {
     }
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -176,8 +147,7 @@ export const assignProject = async (req) => {
 // removing assignee from project
 export const removeAssigneeFromProject = async (req) => {
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+
     const userEmail = req.body.userEmail
     const projectTitle = req.body.projectTitle
 
@@ -186,11 +156,6 @@ export const removeAssigneeFromProject = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -200,12 +165,15 @@ export const removeAssigneeFromProject = async (req) => {
     const project = await Project.findOne({ title: projectTitle });
     if (!project) throw new ApiError(httpStatus.BAD_REQUEST, 'Project not found');
 
+    //to check if there is any defect assigned to this user
+    const defect = await Defect.find({ project: projectTitle, assignee: userEmail })
+    if (defect.length > 0) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Unable to remove user from this project as there are defect/s assigned to this user');
+
     //update in Project collection
     const updatedProject = await Project.findOneAndUpdate({ title: projectTitle }, { $pull: { assignee: userEmail } }, { new: true })
 
     //update in user collection
     const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { $pull: { project: projectTitle } }, { new: true })
-
 
     const result = new Array();
     result.push(await updatedProject)
@@ -218,19 +186,59 @@ export const removeAssigneeFromProject = async (req) => {
 
 }
 
-export const addComponentsToProject = async (title, req) => {
+//get defects that are assigned to the user to be removed
+export const defectListOfToBeRemovedUser = async (req) => {
     try {
+        const userEmail = req.body.userEmail
+        const projectTitle = req.body.projectTitle
+
+
+        //check account permission
+        if (!req.user.permission[0].assignProject) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+        }
+
+        //check if user exist
+        //check if user email is found
+        const user = await User.findOne({ email: userEmail });
+        if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
+
+        //to check if there is any defect assigned to this user
+        const defect = await Defect.find({ project: projectTitle, assignee: userEmail })
+        return defect
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const addComponentsToProject = async (req) => {
+
+    try {
+
+        //require addComponent permission.
+        if (!req.user.permission[0].addComponent) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to add new component');
+
+        req.body.components.map((e) => {
+            if (e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
+        })
+
+        const title = req.body.title
+        //remove any duplicate in components before adding project
+        //front end will also validate this. but just in case somehow it get to backend with duplicate.
+        const components = [... new Set(req.body.components)]
+
+
         const project = await Project.findOne({ title: title }).exec()
         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
-        const uniqueReq = !req.some((v, i) => req.indexOf(v) < i);
+        //check the component to be added does not already exist in project
+        components.map((component) => {
+            if (project.components.includes(component)) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'The component/s you are trying to add is already exist in this project');
+        })
 
-        //check adding components should not be duplicated and should not exist.
-        if (!project.components.includes(...req) && uniqueReq) {
-            project.components.push(...req)
-            project.save();
-        } else {
-            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Duplicated components not allowed');
-        }
+        project.components.push(...components);
+        project.save();
 
         return project;
     } catch (error) {
@@ -238,49 +246,136 @@ export const addComponentsToProject = async (title, req) => {
     }
 }
 
-export const paginateProjectsList = async (req, user) => {
-    const sortby = req.body.sortby || "title";
-    const order = req.body.order || "desc";
-    const limit = req.body.limit || 15;
-    const skip = req.body.skip || 0;
+//remove components
+export const removeComponentsFromProject = async (req) => {
 
     try {
-        let aggQuery = Project.aggregate();
+        const title = req.body.title
+        const componentToBeRemove = req.body.componentToBeRemove
 
-        if (req.body.keywords && req.body.keywords != '') {
-            const re = new RegExp(`${req.body.keywords}`, 'gi')
-            aggQuery = Project.aggregate([
-                { $match: { title: { $regex: re } } }])
-        }
+        //require deleteComponent permission.
+        if (!req.user.permission[0].deleteComponent) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to remove component');
 
-        const options = {
-            page: req.body.page,
-            limit,
-            sortby
-        }
-        const projects = Project.aggregatePaginate(aggQuery, options);
-        return projects;
+        //check if component exist
+        const project = await Project.findOne({ title: title })
+        if (!project.components.includes(componentToBeRemove)) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'The component/s you are trying to remove does not exist');
+
+        //to check if there is any defect assigned to this components
+        const defect = await Defect.find({ project: title, components: componentToBeRemove })
+        if (defect.length > 0) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Unable to remove component as there are defect/s assigned to this component');
+
+        const updatedProject = await Project.findOneAndUpdate({ title: title }, { $pull: { components: componentToBeRemove } }, { new: true })
+
+        return updatedProject;
+    } catch (error) {
+        throw error
+    }
+
+}
+
+//get defect list of the components to be deleted
+export const defectListOfToBeRemovedComponents = async (req) => {
+    try {
+        const title = req.body.title
+        const componentToBeRemove = req.body.componentToBeRemove
+
+        //require deleteComponent permission.
+        if (!req.user.permission[0].deleteComponent) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to remove component');
+
+        //check if component exist
+        const project = await Project.findOne({ title: title })
+        if (!project.components.includes(componentToBeRemove)) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'The component/s you are trying to remove does not exist');
+
+        //to check if there is any defect assigned to this components
+        const defect = await Defect.find({ project: title, components: componentToBeRemove })
+        return defect
+
     } catch (error) {
         throw error
     }
 }
 
 
-export const getMoreProjects = async (req, user) => {
-    const sortby = req.body.sortby || "title";
-    const order = req.body.order || "desc";
-    const limit = req.body.limit || 15;
-    const skip = req.body.skip || 0;
 
-    let projects = Project.find({})
-    try {
-        projects
-            .sort([[sortby, order]])
-            .skip(skip)
-            .limit(parseInt(limit));
-        return projects
-    } catch (error) {
-        throw error
-    }
 
-}
+//not using yet
+
+// export const deleteProjectByTitle = async (title) => {
+//     try {
+//         const project = await Project.findOne({ title: title }).exec()
+//         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+//         Project.findOneAndDelete({ title: title }).exec();
+//         return project;
+//     } catch (error) {
+//         throw error;
+//     }
+// }
+
+// export const updateProjectByTitle = async (title, body) => {
+//     try {
+//         const project = await Project.findOne({ title: title }).exec()
+//         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
+
+//         const newProjectDetail = Project.findOneAndUpdate({ title: title }, {
+//             "$set": {
+//                 title: body.title,
+//                 description: body.description
+//             }, "$push": {
+//                 assignee: body.assignee
+//             }
+//         }, { new: true }).exec();
+//         return (newProjectDetail);
+//     } catch (error) {
+//         throw error
+//     }
+// }
+
+
+//not using yet
+
+// export const paginateProjectsList = async (req, user) => {
+//     const sortby = req.body.sortby || "title";
+//     const order = req.body.order || "desc";
+//     const limit = req.body.limit || 15;
+//     const skip = req.body.skip || 0;
+
+//     try {
+//         let aggQuery = Project.aggregate();
+
+//         if (req.body.keywords && req.body.keywords != '') {
+//             const re = new RegExp(`${req.body.keywords}`, 'gi')
+//             aggQuery = Project.aggregate([
+//                 { $match: { title: { $regex: re } } }])
+//         }
+
+//         const options = {
+//             page: req.body.page,
+//             limit,
+//             sortby
+//         }
+//         const projects = Project.aggregatePaginate(aggQuery, options);
+//         return projects;
+//     } catch (error) {
+//         throw error
+//     }
+// }
+
+
+// export const getMoreProjects = async (req, user) => {
+//     const sortby = req.body.sortby || "title";
+//     const order = req.body.order || "desc";
+//     const limit = req.body.limit || 15;
+//     const skip = req.body.skip || 0;
+
+//     let projects = Project.find({})
+//     try {
+//         projects
+//             .sort([[sortby, order]])
+//             .skip(skip)
+//             .limit(parseInt(limit));
+//         return projects
+//     } catch (error) {
+//         throw error
+//     }
+
+// }

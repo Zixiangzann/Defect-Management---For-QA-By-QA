@@ -12,7 +12,6 @@ import Defect from './components/defects';
 import CreateDefect from './components/defects/create';
 import EditDefect from './components/defects/edit';
 import UserManagement from './components/admin';
-import AdminAssignProject from './components/admin/assign';
 import ProjectManagement from './components/admin/projects';
 import Projects from './components/Projects';
 import Auth from './components/auth';

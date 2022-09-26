@@ -9,6 +9,7 @@ import { getAllUsersEmail } from '../../../store/actions/admin';
 import { getAllProjects } from '../../../store/actions/admin';
 import ModalComponent from '../../../utils/modal/modal';
 
+
 //MUI
 import { Divider, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
@@ -32,6 +33,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InputAdornment from '@mui/material/InputAdornment';
+import FormHelperText from '@mui/material/FormHelperText';
+import TextField from '@mui/material/TextField';
+import { resetState } from '../../../store/reducers/projects';
+
 
 const ManageProject = () => {
 
@@ -49,8 +54,13 @@ const ManageProject = () => {
     //project details
     const [projectTitle, setProjectTitle] = useState('')
     const [projectDescription, setProjectDescription] = useState('')
+
     const [projectComponents, setProjectComponents] = useState([])
+    const [removeProjectComponent, setRemoveProjectComponent] = useState('')
+
+
     const [projectAssignee, setProjectAssignee] = useState([])
+    const [removeProjectAssignee, setRemoveProjectAssignee] = useState([])
 
     //selected project
     const [selectProject, setSelectProject] = useState('')
@@ -60,7 +70,8 @@ const ManageProject = () => {
     const [confirmChanges, setConfirmChanges] = useState('')
 
     const defaultEditState = {
-        editProjectTitle: false
+        editProjectTitle: false,
+        editProjectDescription: false
     }
     const [editEnabled, setEditEnabled] = useState({
         defaultEditState
@@ -78,25 +89,22 @@ const ManageProject = () => {
 
     const handleModalConfirm = async () => {
 
-        // const adminPassword = modalInput
-        // const userEmail = searchUser
-
         switch (editingField) {
             case "confirmProfilePicture":
-                // dispatch(updateProfilePicture({
-                //     adminPassword,
-                //     userEmail,
-                //     uploadProfilePicture: uploadProfilePicture
-                // }))
-                //     .unwrap()
-                //     .then(() => {
-                //         setEditEnabled({ ...editEnabled, "editProfilePicture": false })
-                //         setUploadProfilePicture("")
-                //     })
-                //     .then(() => {
-                //         dispatch(getUserByEmail({ email: searchUser }))
-                //     })
-                // break;
+            // dispatch(updateProfilePicture({
+            //     adminPassword,
+            //     userEmail,
+            //     uploadProfilePicture: uploadProfilePicture
+            // }))
+            //     .unwrap()
+            //     .then(() => {
+            //         setEditEnabled({ ...editEnabled, "editProfilePicture": false })
+            //         setUploadProfilePicture("")
+            //     })
+            //     .then(() => {
+            //         dispatch(getUserByEmail({ email: searchUser }))
+            //     })
+            // break;
             default:
                 break;
         }
@@ -131,6 +139,28 @@ const ManageProject = () => {
 
     }
 
+    const handleProjectDescription = (event) => {
+        setProjectDescription(event.target.value)
+    }
+
+    //Project handle
+    const handleComponentsDelete = (component) => {
+        setRemoveProjectComponent(component)
+        setEditingField('removeComponentFromProject')
+        setOpenModal(true)
+        setModalDescription(`You are about to remove component: "${component}" from this project`)
+        setModalInput('')
+    }
+
+    //Project handle
+    const handleAssigneeDelete = (assignee) => {
+        setRemoveProjectAssignee(assignee)
+        setEditingField('removeAssigneeFromProject')
+        setOpenModal(true)
+        setModalDescription(`You are about to remove user: "${assignee}" from this project`)
+        setModalInput('')
+    }
+
     //trimming when click confirm
     useEffect(() => {
         switch (confirmChanges) {
@@ -144,6 +174,7 @@ const ManageProject = () => {
     }, [confirmChanges])
 
 
+    //get project details when selected project
     useEffect(() => {
         if (selectProject !== "") {
             dispatch(getProjectByTitle({
@@ -152,12 +183,16 @@ const ManageProject = () => {
         }
     }, [selectProject])
 
-    useEffect(()=>{
+    //set selectedProjectDetails to state
+    useEffect(() => {
         setProjectTitle(projects.selectedProjectDetails.title)
-
-    },[projects.selectedProjectDetails])
+        setProjectDescription(htmlDecode(projects.selectedProjectDetails.description))
+        setProjectComponents(projects.selectedProjectDetails.components)
+        setProjectAssignee(projects.selectedProjectDetails.assignee)
+    }, [projects.selectedProjectDetails])
 
     useEffect(() => {
+        dispatch(resetState())
         dispatch(getAllUsersEmail({}))
         dispatch(getAllProjects({}))
     }, [])
@@ -178,7 +213,7 @@ const ManageProject = () => {
 
                 <FormControl
                     id='project-select'
-                    sx={{ m: 1, flexBasis: '45%' }}>
+                    sx={{ m: 3, flexBasis: '45%' }}>
                     <InputLabel htmlFor='project-select'
                         sx={{ color: 'mediumblue' }}
                     >{selectProject === "" ? "Select Project" : "Selected Project"}</InputLabel>
@@ -196,12 +231,14 @@ const ManageProject = () => {
                     </Select>
                 </FormControl>
 
-                {projectTitle  ?
+                <Box flexBasis={'100%'}></Box>
+
+                {projectTitle ?
                     <FormControl
                         id='editProjectTitleForm'
-                        sx={{ m: 1, width: '80%' }}>
+                        sx={{ m: 3, width: '45%' }}>
                         <InputLabel htmlFor='projectTitle'
-                            sx={{ color: '#1a1ad2' }}
+                            sx={{ color: '#9a239a' }}
                         >Project Title</InputLabel>
                         <OutlinedInput
                             required
@@ -213,6 +250,7 @@ const ManageProject = () => {
                             onChange={handleProjectTitle}
                             fullWidth
                             disabled={!editEnabled.editProjectTitle}
+                            inputProps={{ maxLength: 20 }}
                             endAdornment={users.data.permission[0].addProject ?
                                 <InputAdornment position='end'>
                                     <Tooltip title="Confirm changes">
@@ -250,12 +288,164 @@ const ManageProject = () => {
                                 null
                             }
                         />
+                        <FormHelperText sx={{ textAlign: 'end' }}>Max Length: 20</FormHelperText>
                     </FormControl>
                     :
                     null
                 }
 
-                <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                {projectTitle ?
+                    <FormControl
+                        id='editProjectDescriptionForm'
+                        sx={{ m: 3, width: '100%' }}>
+                        <InputLabel htmlFor='projectDescription'
+                            sx={{ color: '#9a239a' }}
+                        >Project Description</InputLabel>
+                        <OutlinedInput
+                            // required
+                            multiline={true}
+                            minRows={4}
+                            name="projectDescription"
+                            id="projectDescription"
+                            text="text"
+                            value={projectDescription}
+                            label="Project Description"
+                            onChange={handleProjectDescription}
+                            fullWidth
+                            disabled={!editEnabled.editProjectDescription}
+                            endAdornment={users.data.permission[0].addProject ?
+                                <InputAdornment position='end'>
+                                    <Tooltip title="Confirm changes">
+                                        <span>
+                                            <IconButton
+                                                aria-label="confirmProjectDescription"
+                                                edge="end"
+                                                onClick={(e) => {
+                                                    setConfirmChanges("confirmProjectDescription")
+                                                }}
+                                                disabled={editEnabled.editProjectDescription && projects.selectedProjectDetails.description !== projectDescription.trim() ? false : true}
+                                                sx={{ color: 'green' }}
+                                            >
+                                                {<CheckCircleIcon />}
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>
+
+                                    <Tooltip title="Edit field">
+                                        <IconButton
+                                            name="editProjectDescription"
+                                            aria-label="edit-projectDescription"
+                                            edge="end"
+                                            onClick={(e) => handleEditState("editProjectDescription", true)}
+                                            sx={{ color: 'blue' }}
+                                        >
+                                            {<EditIcon
+
+                                            />}
+                                        </IconButton>
+                                    </Tooltip>
+
+                                </InputAdornment>
+                                :
+                                null
+                            }
+                        />
+                    </FormControl>
+                    :
+                    null
+                }
+{projectAssignee ?
+                <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
+                    
+                        <Typography ml={2} fontWeight={'600'} color={'#0288d1'}>{projectAssignee.length <= 1 ? "User assigned to this project " : "Users assigned to this project: "}</Typography>
+                        
+
+                    <ListItem
+                        sx={{ flexWrap: 'wrap' }}>
+                        <ListItemAvatar
+                            className="BoxAvatarLayout"
+                        >
+                            <Avatar>
+                                <PersonIcon />
+                            </Avatar>
+
+                        </ListItemAvatar>
+
+                        {projectAssignee ? projectAssignee.map((assignee, index) => (
+                            <Chip
+                                key={`${assignee + index}`}
+                                item={assignee}
+                                label={assignee}
+                                color="info"
+                                className='chip'
+                                variant='filled'
+                                deleteIcon={
+                                    <Tooltip title="remove assignee">
+                                        <RemoveCircleOutlineIcon />
+                                    </Tooltip>
+                                }
+                                onDelete={() => handleAssigneeDelete(assignee)}
+                                sx={{ m: 1 }}
+                            />
+                        ))
+                            :
+                            null}
+
+
+                    </ListItem>
+                </List>
+                :
+                null}
+
+                {projectComponents ?
+                    <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
+                        <Typography ml={2} fontWeight={'600'} color={'#9f2f9f'}>{projectComponents.length <= 1 ? "Project Component: " : "Project Components: "} </Typography>
+
+                        <ListItem
+                            sx={{ flexWrap: 'wrap' }}>
+                            <ListItemAvatar
+                                className="BoxAvatarLayout"
+                            >
+                                <Avatar>
+                                    <PersonIcon />
+                                </Avatar>
+
+                            </ListItemAvatar>
+
+                            {projectComponents ? projectComponents.map((component, index) => (
+                                <Chip
+                                    key={`${component + index}`}
+                                    item={component}
+                                    label={component}
+                                    color="secondary"
+                                    className='chip'
+                                    variant='filled'
+                                    deleteIcon={
+                                        <Tooltip title="remove component">
+                                            <RemoveCircleOutlineIcon />
+                                        </Tooltip>
+                                    }
+                                    onDelete={() => handleComponentsDelete(component)}
+                                    sx={{ m: 1 }}
+                                />
+                            ))
+                                :
+                                null}
+
+
+                        </ListItem>
+                    </List>
+                    :
+                    null
+                }
+
+
+
+
+
+
+
+                {/* <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                         id="saveProjectChanges"
                         variant='contained'
@@ -264,18 +454,18 @@ const ManageProject = () => {
                     >
                         Save changes
                     </Button>
-                </Box>
+                </Box> */}
 
                 <ModalComponent
                     open={openModal}
                     setOpenModal={setOpenModal}
                     title="Warning"
                     description={modalDescription}
-                    warn={"Enter your password and click on confirm to make changes"}
-                    input={true}
+                    warn={"Are you sure you want to continue"}
+                    // input={true}
                     inputValue={modalInput}
-                    inputLabel={"Password"}
-                    inputType={"password"}
+                    // inputLabel={"Password"}
+                    // inputType={"password"}
                     handleModalInput={handleModalInput}
                     handleModalConfirm={handleModalConfirm}
                     button1="Confirm"

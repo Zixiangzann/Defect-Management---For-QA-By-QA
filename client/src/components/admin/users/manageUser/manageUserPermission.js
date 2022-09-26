@@ -27,7 +27,7 @@ return(
                     <Box flexBasis='100%'>
 
                         {/* Standard user control */}
-                        <Typography className="adminHeader" variant='h4' sx={{ flexBasis: '100%', mt: 2 }}>Account Permission</Typography>
+                        <Typography className="adminHeader" variant='h5' sx={{ flexBasis: '100%', mt: 2 }}>Account Permission</Typography>
                         <Typography sx={{ flexBasis: '100%', mt: 2, mb: 2, fontSize: '1.2rem', fontWeight: '600' }}>Standard User</Typography>
 
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>

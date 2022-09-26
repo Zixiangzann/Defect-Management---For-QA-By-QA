@@ -5,6 +5,8 @@ import { getProjectByTitle } from '../actions/defects';
 
 import { 
     addProject,
+    defectListOfComponentToBeRemoved,
+    defectListOfUserToBeRemoved,
     getAllUsersForAssign 
 } from '../actions/projects'
 
@@ -16,6 +18,8 @@ let DEFAULT_PROJECTS_STATE = {
     },
     projectList:[],
     selectedProjectDetails:{},
+    defectListUserToBeRemoved: {},
+    defectListComponentToBeRemoved: {}
 
 }
 
@@ -23,7 +27,9 @@ export const projectsSlice = createSlice({
     name:'projects',
     initialState: DEFAULT_PROJECTS_STATE,
     reducers:{
-
+        resetState: (state, action) => {
+            state.selectedProjectDetails = {}
+          },
     },
     extraReducers: (builder) => {
         builder
@@ -42,7 +48,14 @@ export const projectsSlice = createSlice({
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project
         })
+        .addCase(defectListOfComponentToBeRemoved.fulfilled,(state,action)=>{
+            state.defectListComponentToBeRemoved = action.payload
+        })
+        .addCase(defectListOfUserToBeRemoved.fulfilled,(state,action)=>{
+            state.defectListUserToBeRemoved = action.payload
+        })
     }
 })
 
+export const {resetState} = projectsSlice.actions
 export default projectsSlice.reducer;

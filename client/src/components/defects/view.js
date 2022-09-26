@@ -438,27 +438,31 @@ const ViewDefect = () => {
 
                     {showAssignee ?
                         <List className='card' sx={{ ml: 3, mb: 3, flexBasis: '100%' }}>
-                            <ListItem>
-                                <ListItemAvatar>
+                             <ListItem
+                                sx={{ flexWrap: 'wrap' }}>
+                                <ListItemAvatar
+                                 className="BoxAvatarLayout"
+                                >
                                     <Avatar>
                                         <PersonIcon />
                                     </Avatar>
                                 </ListItemAvatar>
                                 {/* <Typography>Assignee:</Typography> */}
-                                <div>
+                                 <Box sx={{width:'90%'}}>
                                     {currentAssignee.map((item, index) => (
                                         <Chip
                                             key={`${item.username + index}`}
                                             item={item.username}
                                             label={item.username}
-                                            color="primary"
+                                            color="info"
+                                           
                                             className='chip'
                                             avatar={<Avatar alt={item.username} src={item.photoURL} />}
                                             variant='outlined'
-                                            sx={{ ml: 2 }}
+                                            sx={{ m: 1 }}
                                         />
                                     ))}
-                                </div>
+                                </Box>
                             </ListItem>
                         </List>
                         :

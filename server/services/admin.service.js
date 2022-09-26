@@ -184,8 +184,8 @@ export const updateProfilePicture = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedPhotoURL = req.body.userNewPhotoURL
@@ -198,10 +198,10 @@ export const updateProfilePicture = async (req) => {
     }
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -243,17 +243,17 @@ export const updateUserFirstName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedFirstName = req.body.userNewFirstName
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -271,17 +271,17 @@ export const updateUserLastName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedLastName = req.body.userNewLastName
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -301,8 +301,8 @@ export const updateUserUserName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedUsername = req.body.userNewUsername
@@ -310,10 +310,10 @@ export const updateUserUserName = async (req) => {
     if (await User.usernameTaken(userUpdatedUsername)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Username taken');
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -357,8 +357,8 @@ export const updateUserPhone = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedPhone = req.body.userNewPhone
@@ -367,10 +367,10 @@ export const updateUserPhone = async (req) => {
     if (await User.phoneTaken(userUpdatedPhone)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Phone number has been registered with another account.');
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -408,8 +408,8 @@ export const updateUserEmail = async (req) => {
     }
 
     //update in user collection
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedEmail = req.body.userNewEmail
@@ -418,10 +418,10 @@ export const updateUserEmail = async (req) => {
     if (await User.emailTaken(userUpdatedEmail)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Email taken')
 
     //check if admin email and password is correct
-    const adminCredentials = await userService.findUserByEmail(adminEmail);
-    if (!(await adminCredentials.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const adminCredentials = await userService.findUserByEmail(adminEmail);
+    // if (!(await adminCredentials.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -472,16 +472,16 @@ export const updateUserJobTitle = async (req) => {
     }
 
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const userUpdatedJobTitle = req.body.userNewJobTitle
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -502,16 +502,16 @@ export const resetUserPassword = async (req) => {
     }
 
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const userNewPassword = req.body.userNewPassword
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -570,16 +570,16 @@ export const updateUserRole = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const userNewRole = req.body.userNewRole
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -637,15 +637,15 @@ export const updateUserRole = async (req) => {
 export const updateUserPermission = async (req) => {
 
 
-    const adminEmail = req.user.email
-    const adminPassword = req.body.adminPassword
+    // const adminEmail = req.user.email
+    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     let userNewPermission
 
     // only owner and admin allowed to change permission
-    if (req.user.role !== 'owner' && req.user.role !== 'admin') {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
-    }
+    // if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
+    // }
 
     //Only owner account can give all type of permission 
     if (req.user.role === 'owner') {
@@ -662,10 +662,10 @@ export const updateUserPermission = async (req) => {
     }
 
     //check if admin email and password is correct
-    const admin = await userService.findUserByEmail(adminEmail);
-    if (!(await admin.comparePassword(adminPassword))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    }
+    // const admin = await userService.findUserByEmail(adminEmail);
+    // if (!(await admin.comparePassword(adminPassword))) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
+    // }
 
     const updatedUser = await User.findOneAndUpdate(
         { email: userEmail },

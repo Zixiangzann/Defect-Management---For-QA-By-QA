@@ -8,7 +8,8 @@ import { isAuth } from '../../../../store/actions/users';
 import ManageUserProject from './manageUserProject';
 import ModalComponent from '../../../../utils/modal/modal';
 import ManageUserResetPW from './manageUserResetPW';
-
+import ReallocateUserPrompt from '../../reallocatePrompt/reallocateUserPrompt';
+import { defectListOfUserToBeRemoved } from '../../../../store/actions/projects';
 
 //lib
 import { useDispatch, useSelector } from 'react-redux';
@@ -71,6 +72,7 @@ const ManageUser = () => {
     const userDetails = useSelector(state => state.admin.userDetails)
     const userPermission = useSelector(state => state.admin.userPermission[0])
     const userProject = useSelector(state => state.admin.userProject)
+    const defectListUser = useSelector(state => state.projects.defectListUserToBeRemoved)
 
     //User Field state
     const [profilePictureSample, setProfilePictureSample] = useState('');
@@ -93,6 +95,10 @@ const ManageUser = () => {
     const [modalDescription, setModalDescription] = useState('');
     const [modalType, setModalType] = useState('');
     const [modalInput, setModalInput] = useState('');
+
+    //Modal state for remove user from project prompt
+    const [openReallocatePrompt, setOpenReallocatePrompt] = useState(false);
+
 
     //reset password state
     const [newPassword, setNewPassword] = useState('')
@@ -283,13 +289,13 @@ const ManageUser = () => {
     //Modal handle
     const handleModalConfirm = async () => {
 
-        const adminPassword = modalInput
+        // const adminPassword = modalInput
         const userEmail = searchUser
 
         switch (editingField) {
             case "confirmProfilePicture":
                 dispatch(updateProfilePicture({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     uploadProfilePicture: uploadProfilePicture
                 }))
@@ -304,7 +310,7 @@ const ManageUser = () => {
                 break;
             case "confirmFirstname":
                 dispatch(updateFirstname({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewFirstName: firstname
                 }))
@@ -319,7 +325,7 @@ const ManageUser = () => {
                 break;
             case "confirmLastname":
                 dispatch(updateLastname({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewLastName: lastname
                 }))
@@ -334,7 +340,7 @@ const ManageUser = () => {
                 break;
             case "confirmPhone": {
                 dispatch(updatePhone({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewPhone: phone
                 }))
@@ -349,7 +355,7 @@ const ManageUser = () => {
             }
             case "confirmUsername":
                 dispatch(updateUsername({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewUsername: username
                 }))
@@ -364,7 +370,7 @@ const ManageUser = () => {
                 break;
             case "confirmEmail":
                 dispatch(updateEmail({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewEmail: email
                 }))
@@ -374,16 +380,16 @@ const ManageUser = () => {
                         handleEditState("editEmail", false)
                         dispatch(getUserByEmail({ email: email }))
                         dispatch(getAllUsersEmail({}))
-                        .unwrap()
-                        .then(()=>{
-                            setSearchUser(email)
-                        })
-                        
+                            .unwrap()
+                            .then(() => {
+                                setSearchUser(email)
+                            })
+
                     })
                 break;
             case "confirmJobtitle":
                 dispatch(updateJobtitle({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewJobTitle: jobtitle
                 }))
@@ -398,7 +404,7 @@ const ManageUser = () => {
                 break;
             case "confirmRole":
                 dispatch(updateRole({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewRole: role
                 }))
@@ -417,7 +423,7 @@ const ManageUser = () => {
 
             case "confirmUpdatePermission":
                 dispatch(updateUserPermission({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewPermission: permission
                 }))
@@ -440,7 +446,7 @@ const ManageUser = () => {
                 console.log(userNewPassword)
 
                 dispatch(resetUserPassword({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     userNewPassword
                 }))
@@ -458,7 +464,7 @@ const ManageUser = () => {
             case "removeFromProject":
                 const projectTitle = removeUserProject
                 dispatch(removeFromProject({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     projectTitle
                 }))
@@ -473,7 +479,7 @@ const ManageUser = () => {
                 //assign the selected project    
                 const toAssign = selectProject
                 dispatch(assignProject({
-                    adminPassword,
+                    // adminPassword,
                     userEmail,
                     projectTitle: toAssign
                 }))
@@ -576,7 +582,7 @@ const ManageUser = () => {
             case "confirmRole":
                 //no trimming required
                 setOpenModal(true)
-                break;        
+                break;
             default:
                 break;
         }
@@ -660,10 +666,35 @@ const ManageUser = () => {
     const handleProjectDelete = (title) => {
         setRemoveUserProject(title)
         setEditingField('removeFromProject')
-        setOpenModal(true)
-        setModalDescription(`You are about to remove user from project: "${title}"`)
-        setModalInput('')
     }
+
+    useEffect(() => {
+        if (removeUserProject && searchUser) {
+            dispatch(defectListOfUserToBeRemoved({
+                projectTitle: removeUserProject,
+                userEmail: searchUser
+            }))
+        }
+    }, [removeUserProject])
+
+
+    useEffect(() => {
+
+        if (removeUserProject !== "") {
+
+            if (defectListUser.length > 0) {
+                setOpenReallocatePrompt(true)
+                setEditingField('')
+                setRemoveUserProject('')
+            } else {
+                setOpenModal(true)
+                setModalDescription(`You are about to remove user from project: "${removeUserProject}"`)
+                setEditingField('')
+            }
+        }
+
+    }, [defectListUser])
+
 
     const handleProjectAssign = () => {
         setAssignUserProject(selectProject)
@@ -695,6 +726,8 @@ const ManageUser = () => {
     }, [])
 
 
+
+
     return (
         <Box mt={5} sx={{ overflow: 'auto', maxHeight: '650px' }} >
 
@@ -709,7 +742,7 @@ const ManageUser = () => {
                     id='searchUser'
                     sx={{ m: 1, flexBasis: '45%' }}>
                     <InputLabel htmlFor='searchUser'
-                    sx={{color:'mediumblue'}}
+                        sx={{ color: 'mediumblue' }}
                     >{searchUser === "" ? "Select User" : "Selected User"}</InputLabel>
                     <Select
                         id="selectuser"
@@ -731,7 +764,7 @@ const ManageUser = () => {
                         sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}
                     >
                         {userDetails.email ?
-                            <ListItem className='tab-userdetails'
+                            <ListItem className='userManagementInnerTabItem'
                                 sx={{ width: 'max-content' }}>
                                 <ListItemButton
                                     sx={{
@@ -749,7 +782,7 @@ const ManageUser = () => {
                             : null}
 
                         {userDetails.email && users.data.permission[0].resetUserPassword ?
-                            <ListItem className='tab-resetpassword'
+                            <ListItem className='userManagementInnerTabItem'
                                 sx={{ width: 'max-content' }}>
                                 <ListItemButton
                                     sx={{
@@ -769,7 +802,7 @@ const ManageUser = () => {
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
                             <ListItem
-                                className='tab-managerole'
+                                className='userManagementInnerTabItem'
                                 sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
@@ -789,7 +822,7 @@ const ManageUser = () => {
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
                             <ListItem
-                                className='tab-managepermission'
+                                className='userManagementInnerTabItem'
                                 sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
@@ -809,7 +842,7 @@ const ManageUser = () => {
 
                         {userDetails.email && users.data.permission[0].assignProject ?
                             <ListItem
-                                className='tab-assignproject'
+                                className='userManagementInnerTabItem'
                                 sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
@@ -915,8 +948,10 @@ const ManageUser = () => {
                 {tab === 4 ?
                     <ManageUserProject
                         admin={admin}
+                        searchUser={searchUser}
                         userProject={userProject}
                         selectProject={selectProject}
+                        removeUserProject={removeUserProject}
                         handleSelectProject={handleSelectProject}
                         handleProjectDelete={handleProjectDelete}
                         handleProjectAssign={handleProjectAssign}
@@ -931,11 +966,11 @@ const ManageUser = () => {
                     setOpenModal={setOpenModal}
                     title="Warning"
                     description={modalDescription}
-                    warn={"Enter your password and click on confirm to make changes"}
-                    input={true}
-                    inputValue={modalInput}
-                    inputLabel={"Password"}
-                    inputType={"password"}
+                    warn={"Are you sure you want to continue"}
+                    // input={true}
+                    // inputValue={modalInput}
+                    // inputLabel={"Password"}
+                    // inputType={"password"}
                     handleModalInput={handleModalInput}
                     handleModalConfirm={handleModalConfirm}
                     button1="Confirm"
@@ -943,6 +978,15 @@ const ManageUser = () => {
                     titleColor="darkred"
                 >
                 </ModalComponent>
+
+                <ReallocateUserPrompt
+                    open={openReallocatePrompt}
+                    setOpen={setOpenReallocatePrompt}
+                    user={searchUser}
+                    defectListUser={defectListUser}
+                >
+
+                </ReallocateUserPrompt>
 
                 <ModalComponent
                     open={copyPasswordModalOpen}
@@ -956,6 +1000,12 @@ const ManageUser = () => {
                     titleColor="blue"
                 >
                 </ModalComponent>
+
+                <ReallocateUserPrompt
+                    user={searchUser}
+                    project={removeUserProject}
+                >
+                </ReallocateUserPrompt>
 
             </form>
         </Box>
