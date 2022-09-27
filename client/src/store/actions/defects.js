@@ -226,10 +226,19 @@ export const getAllDefectPaginate = createAsyncThunk(
 
 export const updateDefect = createAsyncThunk(
     'defects/updateDefect',
-    async ({ values, defectId }, { dispatch }) => {
+    async ({ values, assignee, components, defectId }, { dispatch }) => {
         try {
+            //update assignee only
+            if(assignee){
+                const request = await axios.patch(`/api/defect/update/${defectId}`, {assignee}, getAuthHeader());
+                dispatch(successGlobal(<div>Assignee updated<br /> Defect ID: {defectId}</div>));
+            }else if(components){
+                const request = await axios.patch(`/api/defect/update/${defectId}`, {components}, getAuthHeader());
+                dispatch(successGlobal(<div>Component updated<br /> Defect ID: {defectId}</div>));
+            }else{
             const request = await axios.patch(`/api/defect/update/${defectId}`, values, getAuthHeader());
             dispatch(successGlobal(<div>Defect updated<br /> Defect ID: {defectId}</div>));
+            }
             return true;
         } catch (error) {
             dispatch(errorGlobal(error.response.data.message))

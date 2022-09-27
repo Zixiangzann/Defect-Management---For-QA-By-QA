@@ -8,8 +8,9 @@ import { isAuth } from '../../../../store/actions/users';
 import ManageUserProject from './manageUserProject';
 import ModalComponent from '../../../../utils/modal/modal';
 import ManageUserResetPW from './manageUserResetPW';
-import ReallocateUserPrompt from '../../reallocatePrompt/reallocateUserPrompt';
+import ReallocateUserPrompt from '../../reallocate/reallocateUserPrompt';
 import { defectListOfUserToBeRemoved } from '../../../../store/actions/projects';
+import { getAllAssignee } from '../../../../store/actions/defects';
 
 //lib
 import { useDispatch, useSelector } from 'react-redux';
@@ -69,10 +70,12 @@ const ManageUser = () => {
     const dispatch = useDispatch();
     const admin = useSelector(state => state.admin)
     const users = useSelector(state => state.users)
+    const defects = useSelector(state => state.defects);
     const userDetails = useSelector(state => state.admin.userDetails)
     const userPermission = useSelector(state => state.admin.userPermission[0])
     const userProject = useSelector(state => state.admin.userProject)
     const defectListUser = useSelector(state => state.projects.defectListUserToBeRemoved)
+    
 
     //User Field state
     const [profilePictureSample, setProfilePictureSample] = useState('');
@@ -145,7 +148,11 @@ const ManageUser = () => {
     // project
     const [selectProject, setSelectProject] = useState('');
     const [removeUserProject, setRemoveUserProject] = useState('')
+    const [removeUserProjectClicked, setRemoveUserProjectClicked] = useState(false)
     const [assignUserProject, setAssignUserProject] = useState('')
+
+    //get list of users available for reassign
+    const [projectAvailableAssignee, setProjectAvailableAssignee] = useState([])
 
 
     //Handle
@@ -201,6 +208,7 @@ const ManageUser = () => {
             setPhoneCheck(false)
             setEmailCheck(false)
             dispatch(resetState())
+            setSelectProject("")
         }
     }, [searchUser])
 
@@ -472,6 +480,7 @@ const ManageUser = () => {
                     .then(() => {
                         dispatch(getUserByEmail({ email: searchUser }))
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
+                        dispatch(getAllAssignee(selectProject))
                         // dispatch(isAuth())
                     })
                 break;
@@ -588,9 +597,6 @@ const ManageUser = () => {
         }
     }, [confirmChanges])
 
-    useEffect(() => {
-        handleEditConfirm()
-    }, [openModal])
 
     const handleEditConfirm = () => {
 
@@ -664,37 +670,52 @@ const ManageUser = () => {
 
     //Project handle
     const handleProjectDelete = (title) => {
+        setRemoveUserProjectClicked(true)
         setRemoveUserProject(title)
         setEditingField('removeFromProject')
     }
 
+
+    // Reassign of user 
     useEffect(() => {
+
         if (removeUserProject && searchUser) {
             dispatch(defectListOfUserToBeRemoved({
                 projectTitle: removeUserProject,
                 userEmail: searchUser
             }))
         }
-    }, [removeUserProject])
 
+    }, [removeUserProjectClicked])
 
     useEffect(() => {
 
-        if (removeUserProject !== "") {
+        if (removeUserProjectClicked) {
 
             if (defectListUser.length > 0) {
                 setOpenReallocatePrompt(true)
-                setEditingField('')
-                setRemoveUserProject('')
             } else {
                 setOpenModal(true)
+                setOpenReallocatePrompt(false)
                 setModalDescription(`You are about to remove user from project: "${removeUserProject}"`)
-                setEditingField('')
             }
         }
 
     }, [defectListUser])
 
+  
+    //on user reallocate prompt close
+    useEffect(() => {
+        if (openReallocatePrompt === false) {
+            setRemoveUserProjectClicked(false)
+        }
+    }, [openReallocatePrompt])
+
+    //on modal state change
+    useEffect(() => {
+        handleEditConfirm()
+        setRemoveUserProjectClicked(false)
+    }, [openModal])
 
     const handleProjectAssign = () => {
         setAssignUserProject(selectProject)
@@ -710,8 +731,20 @@ const ManageUser = () => {
 
     }
 
-    //use effect
+    useEffect(() => {
 
+        if(removeUserProject){
+        dispatch(getAllAssignee(removeUserProject))
+        }
+    }, [removeUserProjectClicked])
+
+    useEffect(()=>{
+        if(defects.data.assignee){
+        setProjectAvailableAssignee([...defects.data.assignee])
+        }
+    },[defects])
+
+  
     useEffect(() => {
 
         if (userDetails) setPermissionChanged(permissionChangedCheck)
@@ -983,6 +1016,8 @@ const ManageUser = () => {
                     open={openReallocatePrompt}
                     setOpen={setOpenReallocatePrompt}
                     user={searchUser}
+                    project={removeUserProject}
+                    projectAvailableAssignee={projectAvailableAssignee}
                     defectListUser={defectListUser}
                 >
 
@@ -1001,11 +1036,7 @@ const ManageUser = () => {
                 >
                 </ModalComponent>
 
-                <ReallocateUserPrompt
-                    user={searchUser}
-                    project={removeUserProject}
-                >
-                </ReallocateUserPrompt>
+              
 
             </form>
         </Box>

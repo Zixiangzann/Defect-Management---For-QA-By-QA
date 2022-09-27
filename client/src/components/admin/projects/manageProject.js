@@ -4,10 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { htmlDecode } from '../../../utils/tools';
 import Moment from 'react-moment';
 
-import { getProjectByTitle } from '../../../store/actions/defects';
-import { getAllUsersEmail } from '../../../store/actions/admin';
-import { getAllProjects } from '../../../store/actions/admin';
+//comp
+import { getProjectByTitle,getAllAssignee, getAllComponents } from '../../../store/actions/defects';
+import { getAllUsersEmail,getAllProjects } from '../../../store/actions/admin';
 import ModalComponent from '../../../utils/modal/modal';
+import ReallocateUserPrompt from '../reallocate/reallocateUserPrompt';
+import { defectListOfUserToBeRemoved,defectListOfComponentToBeRemoved } from '../../../store/actions/projects';
+import { resetState } from '../../../store/reducers/projects';
+import { removeFromProject } from '../../../store/actions/admin';
+import ReallocateComponentPrompt from '../reallocate/reallocateComponentPrompt';
 
 
 //MUI
@@ -35,7 +40,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
-import { resetState } from '../../../store/reducers/projects';
+
+
 
 
 const ManageProject = () => {
@@ -43,6 +49,10 @@ const ManageProject = () => {
     //redux
     const dispatch = useDispatch()
     const projects = useSelector(state => state.projects)
+    //Defects that are assigned to the about to be removed user/component
+    const defectListUser = useSelector(state => state.projects.defectListUserToBeRemoved)
+    const defectListComponent = useSelector(state => state.projects.defectListComponentToBeRemoved)
+    const defects = useSelector(state => state.defects);
     const users = useSelector(state => state.users)
 
     //Modal state
@@ -55,12 +65,6 @@ const ManageProject = () => {
     const [projectTitle, setProjectTitle] = useState('')
     const [projectDescription, setProjectDescription] = useState('')
 
-    const [projectComponents, setProjectComponents] = useState([])
-    const [removeProjectComponent, setRemoveProjectComponent] = useState('')
-
-
-    const [projectAssignee, setProjectAssignee] = useState([])
-    const [removeProjectAssignee, setRemoveProjectAssignee] = useState([])
 
     //selected project
     const [selectProject, setSelectProject] = useState('')
@@ -68,6 +72,27 @@ const ManageProject = () => {
     //editing state
     const [editingField, setEditingField] = useState('')
     const [confirmChanges, setConfirmChanges] = useState('')
+
+    //state for remove user from project
+    const [projectAssignee, setProjectAssignee] = useState([])
+    const [removeProjectAssignee, setRemoveProjectAssignee] = useState('')
+    const [openReallocatePromptUser, setOpenReallocatePromptUser] = useState(false);
+    const [removeProjectAssigneeClicked, setRemoveProjectAssigneeClicked] = useState(false)
+
+    //get list of users available for reassign
+    const [projectAvailableAssignee, setProjectAvailableAssignee] = useState([])
+
+    //state for remove component from project
+    const [projectComponents, setProjectComponents] = useState([])
+    const [removeProjectComponent, setRemoveProjectComponent] = useState('')
+    const [openReallocatePromptComponent, setOpenReallocatePromptComponent] = useState(false);
+    const [removeProjectComponentClicked, setRemoveProjectComponentClicked] = useState(false)
+
+    // //list of components available to be reassign
+    const [projectAvailableComponent, setProjectAvailableComponent] = useState([])
+
+    
+
 
     const defaultEditState = {
         editProjectTitle: false,
@@ -90,21 +115,25 @@ const ManageProject = () => {
     const handleModalConfirm = async () => {
 
         switch (editingField) {
-            case "confirmProfilePicture":
-            // dispatch(updateProfilePicture({
-            //     adminPassword,
-            //     userEmail,
-            //     uploadProfilePicture: uploadProfilePicture
-            // }))
-            //     .unwrap()
-            //     .then(() => {
-            //         setEditEnabled({ ...editEnabled, "editProfilePicture": false })
-            //         setUploadProfilePicture("")
-            //     })
-            //     .then(() => {
-            //         dispatch(getUserByEmail({ email: searchUser }))
-            //     })
-            // break;
+            case "removeAssigneeFromProject":
+                const userEmail = removeProjectAssignee
+                const projectTitle = selectProject
+                dispatch(removeFromProject({
+                    userEmail,
+                    projectTitle
+                }))
+                    .unwrap()
+                    .then(() => {
+                        dispatch(getProjectByTitle({projectTitle}))
+                        //get the assignee again
+                        dispatch(getAllAssignee(selectProject))
+                    })
+                break;
+            case "removeComponentFromProject":
+                // const component = removeProjectComponent
+                // const projectTitle = selectProject
+                // dispatch(remove)
+                break;
             default:
                 break;
         }
@@ -145,21 +174,119 @@ const ManageProject = () => {
 
     //Project handle
     const handleComponentsDelete = (component) => {
+        setRemoveProjectComponentClicked(true)
         setRemoveProjectComponent(component)
         setEditingField('removeComponentFromProject')
-        setOpenModal(true)
-        setModalDescription(`You are about to remove component: "${component}" from this project`)
-        setModalInput('')
     }
 
     //Project handle
     const handleAssigneeDelete = (assignee) => {
+        setRemoveProjectAssigneeClicked(true)
         setRemoveProjectAssignee(assignee)
         setEditingField('removeAssigneeFromProject')
-        setOpenModal(true)
-        setModalDescription(`You are about to remove user: "${assignee}" from this project`)
-        setModalInput('')
     }
+
+
+    useEffect(() => {
+
+        if (selectProject && removeProjectAssignee && removeProjectAssigneeClicked) {
+            dispatch(defectListOfUserToBeRemoved({
+                projectTitle: selectProject,
+                userEmail: removeProjectAssignee
+            }))
+            .unwrap()
+            .catch(()=>{
+                setRemoveProjectAssigneeClicked(false)
+            })
+        }
+
+        if(selectProject && removeProjectComponent && removeProjectComponentClicked){
+            dispatch(defectListOfComponentToBeRemoved({
+                title: selectProject,
+                componentToBeRemove: removeProjectComponent
+            }))
+            .unwrap()
+            .catch(()=>{
+                setRemoveProjectComponentClicked(false)
+            })
+        }
+
+    }, [removeProjectAssigneeClicked,removeProjectComponentClicked])
+
+    useEffect(() => {
+
+        if (removeProjectAssigneeClicked) {
+
+            if (defectListUser.length > 0) {
+                setOpenReallocatePromptUser(true)
+            } else {
+                setOpenModal(true)
+                setOpenReallocatePromptUser(false)
+                setModalDescription(
+                    <Box>
+                    <Typography display={'inline'}>You are about to remove user: </Typography> 
+                    <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{removeProjectAssignee}" </Typography> 
+                    <Typography display={'inline'}>from this project: </Typography>
+                    <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{selectProject}"</Typography>
+                    </Box>)
+            }
+        }
+
+        if (removeProjectComponentClicked) {
+            if(defectListComponent.length > 0){
+                setOpenReallocatePromptComponent(true)
+            } else {
+                setOpenModal(true)
+                setOpenReallocatePromptComponent(false)
+                setModalDescription(
+                <Box>
+                <Typography display={'inline'}>You are about to remove component: </Typography> 
+                <Typography display={'inline'} color={"#9c27b0"} fontWeight={'600'}>"{removeProjectComponent}" </Typography> 
+                <Typography display={'inline'}>from this project: </Typography>
+                <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{selectProject}"</Typography>
+                </Box>)
+            }
+        }
+
+    }, [defectListUser,defectListComponent])
+
+
+    //use effect for assignee and component reassigning
+    //on user reallocate prompt close
+    useEffect(() => {
+        if (openReallocatePromptUser === false) {
+            setRemoveProjectAssigneeClicked(false)
+        }
+        if (openReallocatePromptComponent === false){
+            setRemoveProjectComponentClicked(false)
+        }
+    }, [openReallocatePromptUser,openReallocatePromptComponent])
+
+    //on modal state change
+    useEffect(() => {
+        handleEditConfirm()
+        setRemoveProjectAssigneeClicked(false)
+        setRemoveProjectComponentClicked(false)
+    }, [openModal])
+
+    useEffect(() => {
+
+        if(selectProject){
+        dispatch(getAllAssignee(selectProject))
+        dispatch(getAllComponents(selectProject))
+        }
+    }, [selectProject])
+
+    useEffect(()=>{
+        if(defects.data.assignee){
+        setProjectAvailableAssignee([...defects.data.assignee])
+        }
+        if(defects.data.components){
+            setProjectAvailableComponent([...defects.data.components])
+        }
+    },[defects])
+
+
 
     //trimming when click confirm
     useEffect(() => {
@@ -183,6 +310,7 @@ const ManageProject = () => {
         }
     }, [selectProject])
 
+    //initial
     //set selectedProjectDetails to state
     useEffect(() => {
         setProjectTitle(projects.selectedProjectDetails.title)
@@ -232,7 +360,12 @@ const ManageProject = () => {
                 </FormControl>
 
                 <Box flexBasis={'100%'}></Box>
-
+                
+                {selectProject ?
+                <Typography className="adminHeader" variant='h5' sx={{flexBasis:'100%',margin:'2rem'}}>Project Details:</Typography>
+                :
+                null
+                }
                 {projectTitle ?
                     <FormControl
                         id='editProjectTitleForm'
@@ -354,48 +487,48 @@ const ManageProject = () => {
                     :
                     null
                 }
-{projectAssignee ?
-                <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
-                    
+                {projectAssignee ?
+                    <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
+
                         <Typography ml={2} fontWeight={'600'} color={'#0288d1'}>{projectAssignee.length <= 1 ? "User assigned to this project " : "Users assigned to this project: "}</Typography>
-                        
-
-                    <ListItem
-                        sx={{ flexWrap: 'wrap' }}>
-                        <ListItemAvatar
-                            className="BoxAvatarLayout"
-                        >
-                            <Avatar>
-                                <PersonIcon />
-                            </Avatar>
-
-                        </ListItemAvatar>
-
-                        {projectAssignee ? projectAssignee.map((assignee, index) => (
-                            <Chip
-                                key={`${assignee + index}`}
-                                item={assignee}
-                                label={assignee}
-                                color="info"
-                                className='chip'
-                                variant='filled'
-                                deleteIcon={
-                                    <Tooltip title="remove assignee">
-                                        <RemoveCircleOutlineIcon />
-                                    </Tooltip>
-                                }
-                                onDelete={() => handleAssigneeDelete(assignee)}
-                                sx={{ m: 1 }}
-                            />
-                        ))
-                            :
-                            null}
 
 
-                    </ListItem>
-                </List>
-                :
-                null}
+                        <ListItem
+                            sx={{ flexWrap: 'wrap' }}>
+                            <ListItemAvatar
+                                className="BoxAvatarLayout"
+                            >
+                                <Avatar>
+                                    <PersonIcon />
+                                </Avatar>
+
+                            </ListItemAvatar>
+
+                            {projectAssignee ? projectAssignee.map((assignee, index) => (
+                                <Chip
+                                    key={`${assignee + index}`}
+                                    item={assignee}
+                                    label={assignee}
+                                    color="info"
+                                    className='chip'
+                                    variant='filled'
+                                    deleteIcon={
+                                        <Tooltip title="remove assignee">
+                                            <RemoveCircleOutlineIcon />
+                                        </Tooltip>
+                                    }
+                                    onDelete={() => handleAssigneeDelete(assignee)}
+                                    sx={{ m: 1 }}
+                                />
+                            ))
+                                :
+                                null}
+
+
+                        </ListItem>
+                    </List>
+                    :
+                    null}
 
                 {projectComponents ?
                     <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
@@ -441,21 +574,6 @@ const ManageProject = () => {
 
 
 
-
-
-
-
-                {/* <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        id="saveProjectChanges"
-                        variant='contained'
-                        type='submit'
-                        sx={{ mt: 7, flexBasis: '25%' }}
-                    >
-                        Save changes
-                    </Button>
-                </Box> */}
-
                 <ModalComponent
                     open={openModal}
                     setOpenModal={setOpenModal}
@@ -474,6 +592,26 @@ const ManageProject = () => {
                 >
                 </ModalComponent>
 
+                <ReallocateUserPrompt
+                    open={openReallocatePromptUser}
+                    setOpen={setOpenReallocatePromptUser}
+                    user={removeProjectAssignee}
+                    project={selectProject}
+                    projectAvailableAssignee={projectAvailableAssignee}
+                    defectListUser={defectListUser}
+                >
+                    </ReallocateUserPrompt>
+
+                <ReallocateComponentPrompt
+                    open={openReallocatePromptComponent}
+                    setOpen={setOpenReallocatePromptComponent}
+                    component={removeProjectComponent}
+                    project={selectProject}
+                    projectAvailableComponent={projectAvailableComponent}
+                    defectListComponent={defectListComponent}
+                >
+                    
+                </ReallocateComponentPrompt>    
 
             </form>
         </Box>

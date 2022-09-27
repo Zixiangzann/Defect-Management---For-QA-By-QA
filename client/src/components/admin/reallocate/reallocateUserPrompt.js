@@ -7,19 +7,31 @@ import { useState, useEffect } from "react";
 import { defectListOfUserToBeRemoved } from "../../../store/actions/projects";
 import { useNavigate } from 'react-router-dom'
 
+//comp
+import ReallocateUser from "./reallocateUser";
+import { getAllAssignee } from "../../../store/actions/defects";
+
 
 //MUI
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 
+
 const ReallocateUserPrompt = ({
     open,
     setOpen,
     user,
+    project,
+    projectAvailableAssignee,
     defectListUser
 }) => {
 
@@ -33,17 +45,16 @@ const ReallocateUserPrompt = ({
         border: '2px solid #000',
         boxShadow: 24,
         p: 4,
-      };
+    };
 
 
     const dispatch = useDispatch();
 
+    
 
-    const openInNewTab = url => {
-        window.open(url, '_blank', 'noopener,noreferrer');
-    };
-
-
+    useEffect(()=>{
+        
+    },[])
 
 
     return (
@@ -57,46 +68,54 @@ const ReallocateUserPrompt = ({
             <Box sx={style}>
                 {defectListUser && defectListUser.length ?
                     <Box p={2}>
-                        <Typography display={'inline'}>There are total {defectListUser.length} {defectListUser > 1 ? "defect" : "defects"} assigned to </Typography >
-                        <Typography sx={{display:'inline',color:'blue',fontWeight:'600'}}>{user}</Typography>
-                        <Typography sx={{mt:1,mb:1,color:'red'}}>To remove the user from this project, you will need to remove the user from the defect assignee</Typography>
+
+                        <Typography display={'inline'}>There are total {defectListUser.length} {defectListUser.length > 1 ? "defects" : "defect"} assigned to </Typography >
+                        <Typography sx={{ display: 'inline', color: 'blue', fontWeight: '600' }}>{user}</Typography>
+                        <Typography sx={{ mt: 1, mb: 1, color: 'red' }}>To remove user from this project, you will need to remove user from the defect assignee</Typography>
+
 
                         <TableContainer
-                        sx={{maxHeight:'500px'}}>
+                            sx={{ maxHeight: '500px' }}>
                             <Table
-                            stickyHeader
+                                stickyHeader
                             >
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Defect ID</TableCell>
                                         <TableCell>Summary</TableCell>
-                                        {/* <TableCell>Current assignee</TableCell> */}
-                                        <TableCell>Link</TableCell>
+                                        <TableCell>Assignee</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
 
                                     {defectListUser.map((defect, index) => (
-                                        <TableRow
-                                            key={`${defect.defectid}_${index}`}
-                                        >
-                                            <TableCell>{defect.defectid}</TableCell>
-                                            <TableCell>{defect.title}</TableCell>
-                                            {/* <TableCell
-                                            sx={{wordBreak:'break-word'}}
-                                            >{(defect.assignee).join(' ')}</TableCell> */}
-                                            <TableCell>
-                                                <Button
-                                                    onClick={() => { openInNewTab(`/defect/view/${defect.defectid}`) }}
+                                            
+                                            <ReallocateUser
+                                                key={defect.defectid}
+                                                user={user}
+                                                project={project}
+                                                defectDetails={defect}
+                                                projectAvailableAssignee={projectAvailableAssignee}
                                                 >
-                                                    Go to defect
-                                                </Button></TableCell>
-                                        </TableRow>
+
+                                            </ReallocateUser>
+
+                                       
                                     ))}
+                                    
 
                                 </TableBody>
                             </Table>
                         </TableContainer>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: 4, mt: 4 }}>
+                            <Button
+                                variant="contained"
+                                onClick={() => setOpen(false)}>
+                                Close
+                            </Button>
+
+                        </Box>
                     </Box>
                     :
                     null
@@ -104,7 +123,7 @@ const ReallocateUserPrompt = ({
 
 
             </Box >
-        </Modal>
+        </Modal >
 
 
     )

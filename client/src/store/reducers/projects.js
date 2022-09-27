@@ -54,6 +54,12 @@ export const projectsSlice = createSlice({
         .addCase(defectListOfUserToBeRemoved.fulfilled,(state,action)=>{
             state.defectListUserToBeRemoved = action.payload
         })
+        .addCase(defectListOfComponentToBeRemoved.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(defectListOfUserToBeRemoved.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
     }
 })
 
