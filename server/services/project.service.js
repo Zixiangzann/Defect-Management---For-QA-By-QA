@@ -217,28 +217,44 @@ export const addComponentsToProject = async (req) => {
 
     try {
 
+        const title = req.body.title
+
         //require addComponent permission.
         if (!req.user.permission[0].addComponent) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to add new component');
 
-        req.body.components.map((e) => {
-            if (e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
-        })
-
-        const title = req.body.title
-        //remove any duplicate in components before adding project
-        //front end will also validate this. but just in case somehow it get to backend with duplicate.
-        const components = [... new Set(req.body.components)]
-
-
         const project = await Project.findOne({ title: title }).exec()
         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
-        //check the component to be added does not already exist in project
-        components.map((component) => {
-            if (project.components.includes(component)) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'The component/s you are trying to add is already exist in this project');
-        })
 
-        project.components.push(...components);
-        project.save();
+
+        //adding components array
+        if (Array.isArray(req.body.components)) {
+
+            //remove any duplicate in components before adding project
+            //front end will also validate this. but just in case somehow it get to backend with duplicate.
+            const components = [... new Set(req.body.components)]
+
+            components.map((e) => {
+                if (e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
+            })
+
+            //check the component to be added does not already exist in project
+            components.map((component) => {
+                if (project.components.includes(component)) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'The component/s you are trying to add is already exist in this project');
+            })
+
+            //add to project collection
+            project.components.push(...components);
+            project.save();
+        } else {
+            //adding single component
+            const components = req.body.components
+            if (components > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
+            if (project.components.includes(components)) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'The component/s you are trying to add is already exist in this project');
+
+            //add to project collection
+            project.components.push(components);
+            project.save();
+        }
 
         return project;
     } catch (error) {

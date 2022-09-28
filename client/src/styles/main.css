@@ -250,11 +250,15 @@
         flex-basis: 100%;
     }
 
+    #editProjectDescriptionForm{
+        flex-basis: 100%;
+    }
+
     #project-select{
         flex-basis: 100%;
     }
 
-    #userManagementInnerTab{
+    #managementInnerTab{
         display: flex;
         flex-direction: column;
         width: 100%;
@@ -262,7 +266,7 @@
  
     }
 
-    .userManagementInnerTabItem{
+    .managementInnerTabItem{
         width:100% !important;
         }
 

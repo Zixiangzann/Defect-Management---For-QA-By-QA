@@ -1,14 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'
 import { errorGlobal, successGlobal } from '../reducers/notifications';
-import { getAuthHeader} from '../../utils/tools'
+import { getAuthHeader } from '../../utils/tools'
 
 //get all users available for assigning to project
 export const getAllUsersForAssign = createAsyncThunk(
     'projects/getAllUsersForAssign',
-    async() => {
+    async () => {
         try {
-            const request = await axios.post('/api/project/getallusersforassign',{},getAuthHeader())
+            const request = await axios.post('/api/project/getallusersforassign', {}, getAuthHeader())
             return { allUsersForAssign: request.data }
         } catch (error) {
             throw error;
@@ -18,22 +18,22 @@ export const getAllUsersForAssign = createAsyncThunk(
 
 export const addProject = createAsyncThunk(
     'projects/addProject',
-    async({
+    async ({
         title,
         description,
         assignee,
         components,
-    },{rejectWithValue}) => {
+    }, { rejectWithValue }) => {
         try {
-            const request = await axios.post('/api/project/add',{
+            const request = await axios.post('/api/project/add', {
                 title,
                 description,
                 assignee,
                 components,
-            },getAuthHeader())
+            }, getAuthHeader())
 
             return request.data
-            
+
         } catch (error) {
             if (!error.response) {
                 throw error
@@ -45,17 +45,63 @@ export const addProject = createAsyncThunk(
     }
 )
 
+export const addComponents = createAsyncThunk(
+    'projects/addComponents',
+    async ({
+        title,
+        components
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/components/add', {
+                title,
+                components
+            }, getAuthHeader())
+
+            return request.data
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+
+            return rejectWithValue(error.response)
+
+        }
+    }
+)
+
+export const removeComponents = createAsyncThunk(
+    'projects/removeComponents',
+    async ({
+        title,
+        componentToBeRemove
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/components/remove', {
+                title,
+                componentToBeRemove
+            }, getAuthHeader())
+
+            return request.data
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+            return rejectWithValue(error.response)
+        }
+    }
+)
+
 export const defectListOfUserToBeRemoved = createAsyncThunk(
     'projects/defectListOfUserToBeRemoved',
-    async({
+    async ({
         projectTitle,
         userEmail
-    },{rejectWithValue}) => {
+    }, { rejectWithValue }) => {
         try {
-            const request = await axios.post('/api/project/assignee/defectlist',{
+            const request = await axios.post('/api/project/assignee/defectlist', {
                 projectTitle,
                 userEmail
-            },getAuthHeader())
+            }, getAuthHeader())
 
             return request.data
         } catch (error) {
@@ -71,15 +117,15 @@ export const defectListOfUserToBeRemoved = createAsyncThunk(
 
 export const defectListOfComponentToBeRemoved = createAsyncThunk(
     'projects/defectListOfComponentToBeRemoved',
-    async({
+    async ({
         title,
         componentToBeRemove
-    },{rejectWithValue}) => {
+    }, { rejectWithValue }) => {
         try {
-            const request = await axios.post('/api/project/components/defectlist',{
+            const request = await axios.post('/api/project/components/defectlist', {
                 title,
                 componentToBeRemove
-            },getAuthHeader())
+            }, getAuthHeader())
 
             return request.data
         } catch (error) {

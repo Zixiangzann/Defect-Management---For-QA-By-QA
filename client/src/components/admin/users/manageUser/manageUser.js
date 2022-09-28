@@ -793,11 +793,11 @@ const ManageUser = () => {
                 <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }} >
 
                     <List
-                        id="userManagementInnerTab"
+                        id="managementInnerTab"
                         sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}
                     >
                         {userDetails.email ?
-                            <ListItem className='userManagementInnerTabItem'
+                            <ListItem className='managementInnerTabItem'
                                 sx={{ width: 'max-content' }}>
                                 <ListItemButton
                                     sx={{
@@ -815,7 +815,7 @@ const ManageUser = () => {
                             : null}
 
                         {userDetails.email && users.data.permission[0].resetUserPassword ?
-                            <ListItem className='userManagementInnerTabItem'
+                            <ListItem className='managementInnerTabItem'
                                 sx={{ width: 'max-content' }}>
                                 <ListItemButton
                                     sx={{
@@ -835,7 +835,7 @@ const ManageUser = () => {
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
                             <ListItem
-                                className='userManagementInnerTabItem'
+                                className='managementInnerTabItem'
                                 sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
@@ -855,7 +855,7 @@ const ManageUser = () => {
 
                         {userDetails.email && (users.data.role === 'owner' || users.data.role === 'admin') ?
                             <ListItem
-                                className='userManagementInnerTabItem'
+                                className='managementInnerTabItem'
                                 sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton
@@ -875,7 +875,7 @@ const ManageUser = () => {
 
                         {userDetails.email && users.data.permission[0].assignProject ?
                             <ListItem
-                                className='userManagementInnerTabItem'
+                                className='managementInnerTabItem'
                                 sx={{ width: 'max-content' }}
                             >
                                 <ListItemButton

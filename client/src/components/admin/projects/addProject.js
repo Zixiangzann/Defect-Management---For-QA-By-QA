@@ -105,10 +105,10 @@ const AddProject = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-     
+
         //only want to store the email
         const assigneeEmail = []
-        assignee.map((a)=>{
+        assignee.map((a) => {
             assigneeEmail.push(a.email)
         })
 
@@ -118,31 +118,31 @@ const AddProject = () => {
             assignee: assigneeEmail,
             components: components
         }))
-        .unwrap()
-        .then(()=>{
-            setProjectName('')
-            setProjectDescription('')
-            setAssignee([])
-            setComponents([])
-            setComponentErrorMessage('')
-            setComponentAddError('')
-        })
+            .unwrap()
+            .then(() => {
+                setProjectName('')
+                setProjectDescription('')
+                setAssignee([])
+                setComponents([])
+                setComponentErrorMessage('')
+                setComponentAddError('')
+            })
     }
 
 
     return (
         <Box className="addProjectContainer" sx={{ display: 'flex' }}>
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
-                
+
                 <Typography variant='h6' mb={3} flexBasis='100%' color='#07078e'>Project Details: </Typography>
                 {/* <Typography variant='h6' sx={{ m: 1 }}>Project Title: </Typography> */}
 
                 <FormControl
                     id='addprojectNameForm'
-                    sx={{ m: 1 ,mb:2 ,flexBasis:'25%'}}
-                    >
+                    sx={{ m: 1, mb: 2, flexBasis: '25%' }}
+                >
                     <InputLabel htmlFor='projectName'
-                    sx={{color:'#9a239a'}}
+                        sx={{ color: '#9a239a' }}
                     >Project Name</InputLabel>
                     <OutlinedInput
                         required
@@ -153,11 +153,11 @@ const AddProject = () => {
                         label="Project Title"
                         onChange={handleProjectName}
                         onBlur={handleTrimOnBlur}
-                        inputProps={{maxLength:20}}
+                        inputProps={{ maxLength: 20 }}
                     />
-                     <FormHelperText sx={{textAlign:'end'}}>Max Length: 20</FormHelperText>
+                    <FormHelperText sx={{ textAlign: 'end' }}>Max Length: 20</FormHelperText>
                 </FormControl>
-                
+
 
                 <TextField
                     id="projectDescription"
@@ -172,17 +172,57 @@ const AddProject = () => {
                 <Box flexBasis={'100%'} borderBottom={'1px solid grey'} m={6}></Box>
                 <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Assign Project: </Typography>
 
+                <List className='card' sx={{ m: 2, flexBasis: '100%', borderColor: '#1976d2' }}>
+                    <Typography ml={2} fontWeight={'600'} color={'#1976d2'}>Added Assignee</Typography>
+
+
+                    <ListItem
+                        sx={{ flexWrap: 'wrap' }}>
+                        <ListItemAvatar
+                            className="BoxAvatarLayout"
+                        >
+                            <Avatar>
+                                <PersonIcon />
+                            </Avatar>
+
+                        </ListItemAvatar>
+                        <Box sx={{ width: '90%' }}>
+                            {assignee.map((user, index) => (
+                                <Chip
+                                    avatar={<Avatar alt={user.username} src={user.photoURL} />}
+                                    key={`${user.username + index}`}
+                                    item={user.username}
+                                    label={user.username}
+                                    className='chip'
+                                    color="primary"
+                                    variant='filled'
+                                    sx={{ m: 1 }}
+                                />
+                            ))}
+                        </Box>
+
+                    </ListItem>
+                </List>
+
                 <FormControl
                     id="availableForAssign"
-                    sx={{ m: '2rem' }}
-                    fullWidth
+                    sx={{flexBasis:'40%', m: '2rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#0288d1' } }}
+                    
                 >
-                    <InputLabel className='availableForAssignLabel' sx={{color:'#9a239a'}}>Assign to Project: </InputLabel>
+                    <InputLabel className='availableForAssignLabel' sx={{ color: '#0288d1' }}>{assignee && assignee.length <= 0 ? "Select User" : "Selected User"} </InputLabel>
                     <Select
                         multiple
                         name='assignee'
-                        label='Assign to Project'
+                        label={assignee && assignee.length <= 0 ? "Select User" : "Selected User"}
                         value={assignee}
+
+                        sx={{
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: '#05a5fc'
+                            }, "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: '#0288d1'
+                            }
+                        }}
                         onChange={
                             (e) => {
                                 handleAssignee(e)
@@ -192,12 +232,12 @@ const AddProject = () => {
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                 {selected.map((value) => (
                                     <Chip
-                                        avatar={<Avatar alt={value.username} src={value.photoURL} />}
-                                        key={value.username}
+                                        // avatar={<Avatar alt={value.username} src={value.photoURL} />}
+                                        key={value.email}
                                         label={value.username}
                                         color="primary"
-                                        variant='outlined'
-                                        sx={{ ml: 2 }} />
+                                        variant='contained'
+                                        sx={{ ml: 0 }} />
                                 ))}
                             </Box>
                         )}
@@ -241,39 +281,38 @@ const AddProject = () => {
                 <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Project Components</Typography>
 
 
-{/* need to add remove components from array */}
-                <List className='card' sx={{ m: 2, flexBasis: '100%' }}>
+                <List className='card' sx={{ m: 2, flexBasis: '100%', borderColor: '#9f2f9f' }}>
                     <Typography ml={2} fontWeight={'600'} color={'#9f2f9f'}>Added Components</Typography>
 
 
                     <ListItem
-                                sx={{ flexWrap: 'wrap' }}>
-                                <ListItemAvatar
-                                 className="BoxAvatarLayout"
-                                >
+                        sx={{ flexWrap: 'wrap' }}>
+                        <ListItemAvatar
+                            className="BoxAvatarLayout"
+                        >
                             <Avatar>
                                 <GridViewIcon />
                             </Avatar>
 
                         </ListItemAvatar>
-                        <Box sx={{width:'90%'}}>
-                        {components.map((component, index) => (
-                            <Chip
-                                key={`${component + index}`}
-                                item={component}
-                                label={component}
-                                color="secondary"
-                                className='chip'
-                                variant='filled'
-                                deleteIcon={
-                                    <Tooltip title="remove">
-                                        <RemoveCircleOutlineIcon />
-                                    </Tooltip>
-                                }
-                                onDelete={()=>handleRemoveComponent(component)}
-                                sx={{ m: 1 }}
-                            />
-                        ))}
+                        <Box sx={{ width: '90%' }}>
+                            {components.map((component, index) => (
+                                <Chip
+                                    key={`${component + index}`}
+                                    item={component}
+                                    label={component}
+                                    color="secondary"
+                                    className='chip'
+                                    variant='filled'
+                                    deleteIcon={
+                                        <Tooltip title="remove">
+                                            <RemoveCircleOutlineIcon />
+                                        </Tooltip>
+                                    }
+                                    onDelete={() => handleRemoveComponent(component)}
+                                    sx={{ m: 1 }}
+                                />
+                            ))}
                         </Box>
 
 
@@ -283,10 +322,11 @@ const AddProject = () => {
                 <FormControl
                     id='addProjectComponentsForm'
                     sx={{ m: 2, flexBasis: '40%' }}
+                    color="secondary"
 
                 >
                     <InputLabel htmlFor='projectComponents'
-                    sx={{color:'#9a239a'}}
+                        sx={{ color: '#9a239a', '&. MuiInputBase-input': { borderColor: '#9a239a' } }}
                     >Add Components</InputLabel>
                     <OutlinedInput
                         name="projectComponents"
@@ -297,20 +337,28 @@ const AddProject = () => {
                         onChange={handleProjectComponentField}
                         onBlur={handleTrimOnBlur}
                         error={componentAddError}
-                        inputProps={{maxLength:20}}
+                        inputProps={{ maxLength: 20 }}
+                        color="secondary"
+                        sx={{
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: '#df35fc'
+                            }, "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: '#9c27b0'
+                            }
+                        }}
                         endAdornment={
                             <Button
                                 id="addComponentsBtn"
                                 variant="outlined"
                                 color="secondary"
-                                startIcon={<AddIcon sx={{color:'blueviolet'}}/>}
+                                startIcon={<AddIcon sx={{ color: 'blueviolet' }} />}
                                 onClick={handleAddComponent}
                             >
                                 Add
                             </Button>
                         }
                     />
-                    <FormHelperText sx={{textAlign:'end'}}>Max Length: 20</FormHelperText>
+                    <FormHelperText sx={{ textAlign: 'end' }}>Max Length: 20</FormHelperText>
                     <FormHelperText id="componentErrorMessage" error>{componentErrorMessage}</FormHelperText>
                 </FormControl>
 

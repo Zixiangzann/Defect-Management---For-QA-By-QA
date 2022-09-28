@@ -5,11 +5,11 @@ import { htmlDecode } from '../../../utils/tools';
 import Moment from 'react-moment';
 
 //comp
-import { getProjectByTitle,getAllAssignee, getAllComponents } from '../../../store/actions/defects';
-import { getAllUsersEmail,getAllProjects } from '../../../store/actions/admin';
+import { getProjectByTitle, getAllAssignee, getAllComponents } from '../../../store/actions/defects';
+import { getAllUsersEmail, getAllProjects } from '../../../store/actions/admin';
 import ModalComponent from '../../../utils/modal/modal';
 import ReallocateUserPrompt from '../reallocate/reallocateUserPrompt';
-import { defectListOfUserToBeRemoved,defectListOfComponentToBeRemoved } from '../../../store/actions/projects';
+import { defectListOfUserToBeRemoved, defectListOfComponentToBeRemoved, removeComponents, addComponents } from '../../../store/actions/projects';
 import { resetState } from '../../../store/reducers/projects';
 import { removeFromProject } from '../../../store/actions/admin';
 import ReallocateComponentPrompt from '../reallocate/reallocateComponentPrompt';
@@ -40,11 +40,18 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
+import AddIcon from '@mui/icons-material/Add';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
 
 
 
 
 const ManageProject = () => {
+
+    //State
+    //Nav tab
+    const [tab, setTab] = useState(0);
 
     //redux
     const dispatch = useDispatch()
@@ -91,7 +98,12 @@ const ManageProject = () => {
     // //list of components available to be reassign
     const [projectAvailableComponent, setProjectAvailableComponent] = useState([])
 
-    
+    //add component
+    const [componentField, setComponentField] = useState('')
+    const [componentAddError, setComponentAddError] = useState(false)
+    const [componentErrorMessage, setComponentErrorMessage] = useState('')
+
+
 
 
     const defaultEditState = {
@@ -104,6 +116,43 @@ const ManageProject = () => {
 
     const handleModalInput = (event) => {
         setModalInput(event.target.value);
+    }
+
+    //handle add component
+
+    const handleProjectComponentField = (event) => {
+        setComponentField(event.target.value)
+    }
+
+    const handleAddComponent = () => {
+
+        //check if the component to be added is not already in availableComponents
+
+        if (componentField.trim() === "") {
+            setComponentErrorMessage("Component name cannot be empty")
+            setComponentAddError(true)
+        } else if (projectAvailableComponent.includes(componentField)) {
+            setComponentErrorMessage("Component cannot have same name")
+            setComponentAddError(true)
+        } else {
+            //add the component
+            dispatch(addComponents({
+                title: selectProject,
+                components: componentField
+            }))
+                .unwrap()
+                .then(() => {
+                    dispatch(getProjectByTitle({ projectTitle: selectProject }))
+                })
+            setComponentField('')
+            setComponentErrorMessage('')
+            setComponentAddError(false)
+        }
+    }
+
+    const handleTrimOnBlur = (event) => {
+        setComponentField(componentField.trim())
+
     }
 
     //Edit handle
@@ -124,15 +173,19 @@ const ManageProject = () => {
                 }))
                     .unwrap()
                     .then(() => {
-                        dispatch(getProjectByTitle({projectTitle}))
+                        dispatch(getProjectByTitle({ projectTitle }))
                         //get the assignee again
                         dispatch(getAllAssignee(selectProject))
                     })
                 break;
             case "removeComponentFromProject":
-                // const component = removeProjectComponent
-                // const projectTitle = selectProject
-                // dispatch(remove)
+                const componentToBeRemove = removeProjectComponent
+                const title = selectProject
+                dispatch(removeComponents({ title, componentToBeRemove }))
+                    .unwrap()
+                    .then(() => {
+                        dispatch(getProjectByTitle({ projectTitle: title }))
+                    })
                 break;
             default:
                 break;
@@ -194,24 +247,24 @@ const ManageProject = () => {
                 projectTitle: selectProject,
                 userEmail: removeProjectAssignee
             }))
-            .unwrap()
-            .catch(()=>{
-                setRemoveProjectAssigneeClicked(false)
-            })
+                .unwrap()
+                .catch(() => {
+                    setRemoveProjectAssigneeClicked(false)
+                })
         }
 
-        if(selectProject && removeProjectComponent && removeProjectComponentClicked){
+        if (selectProject && removeProjectComponent && removeProjectComponentClicked) {
             dispatch(defectListOfComponentToBeRemoved({
                 title: selectProject,
                 componentToBeRemove: removeProjectComponent
             }))
-            .unwrap()
-            .catch(()=>{
-                setRemoveProjectComponentClicked(false)
-            })
+                .unwrap()
+                .catch(() => {
+                    setRemoveProjectComponentClicked(false)
+                })
         }
 
-    }, [removeProjectAssigneeClicked,removeProjectComponentClicked])
+    }, [removeProjectAssigneeClicked, removeProjectComponentClicked])
 
     useEffect(() => {
 
@@ -224,31 +277,31 @@ const ManageProject = () => {
                 setOpenReallocatePromptUser(false)
                 setModalDescription(
                     <Box>
-                    <Typography display={'inline'}>You are about to remove user: </Typography> 
-                    <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{removeProjectAssignee}" </Typography> 
-                    <Typography display={'inline'}>from this project: </Typography>
-                    <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{selectProject}"</Typography>
+                        <Typography display={'inline'}>You are about to remove user: </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{removeProjectAssignee}" </Typography>
+                        <Typography display={'inline'}>from this project: </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{selectProject}"</Typography>
                     </Box>)
             }
         }
 
         if (removeProjectComponentClicked) {
-            if(defectListComponent.length > 0){
+            if (defectListComponent.length > 0) {
                 setOpenReallocatePromptComponent(true)
             } else {
                 setOpenModal(true)
                 setOpenReallocatePromptComponent(false)
                 setModalDescription(
-                <Box>
-                <Typography display={'inline'}>You are about to remove component: </Typography> 
-                <Typography display={'inline'} color={"#9c27b0"} fontWeight={'600'}>"{removeProjectComponent}" </Typography> 
-                <Typography display={'inline'}>from this project: </Typography>
-                <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{selectProject}"</Typography>
-                </Box>)
+                    <Box>
+                        <Typography display={'inline'}>You are about to remove component: </Typography>
+                        <Typography display={'inline'} color={"#9c27b0"} fontWeight={'600'}>"{removeProjectComponent}" </Typography>
+                        <Typography display={'inline'}>from this project: </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{selectProject}"</Typography>
+                    </Box>)
             }
         }
 
-    }, [defectListUser,defectListComponent])
+    }, [defectListUser, defectListComponent])
 
 
     //use effect for assignee and component reassigning
@@ -257,10 +310,10 @@ const ManageProject = () => {
         if (openReallocatePromptUser === false) {
             setRemoveProjectAssigneeClicked(false)
         }
-        if (openReallocatePromptComponent === false){
+        if (openReallocatePromptComponent === false) {
             setRemoveProjectComponentClicked(false)
         }
-    }, [openReallocatePromptUser,openReallocatePromptComponent])
+    }, [openReallocatePromptUser, openReallocatePromptComponent])
 
     //on modal state change
     useEffect(() => {
@@ -271,20 +324,20 @@ const ManageProject = () => {
 
     useEffect(() => {
 
-        if(selectProject){
-        dispatch(getAllAssignee(selectProject))
-        dispatch(getAllComponents(selectProject))
+        if (selectProject) {
+            dispatch(getAllAssignee(selectProject))
+            dispatch(getAllComponents(selectProject))
         }
     }, [selectProject])
 
-    useEffect(()=>{
-        if(defects.data.assignee){
-        setProjectAvailableAssignee([...defects.data.assignee])
+    useEffect(() => {
+        if (defects.data.assignee) {
+            setProjectAvailableAssignee([...defects.data.assignee])
         }
-        if(defects.data.components){
+        if (defects.data.components) {
             setProjectAvailableComponent([...defects.data.components])
         }
-    },[defects])
+    }, [defects])
 
 
 
@@ -313,10 +366,12 @@ const ManageProject = () => {
     //initial
     //set selectedProjectDetails to state
     useEffect(() => {
-        setProjectTitle(projects.selectedProjectDetails.title)
-        setProjectDescription(htmlDecode(projects.selectedProjectDetails.description))
-        setProjectComponents(projects.selectedProjectDetails.components)
-        setProjectAssignee(projects.selectedProjectDetails.assignee)
+        if (projects.selectedProjectDetails) {
+            setProjectTitle(projects.selectedProjectDetails.title)
+            setProjectDescription(htmlDecode(projects.selectedProjectDetails.description))
+            setProjectComponents(projects.selectedProjectDetails.components)
+            setProjectAssignee(projects.selectedProjectDetails.assignee)
+        }
     }, [projects.selectedProjectDetails])
 
     useEffect(() => {
@@ -360,13 +415,77 @@ const ManageProject = () => {
                 </FormControl>
 
                 <Box flexBasis={'100%'}></Box>
-                
-                {selectProject ?
-                <Typography className="adminHeader" variant='h5' sx={{flexBasis:'100%',margin:'2rem'}}>Project Details:</Typography>
+
+
+                {/* Tabs */}
+                {selectProject  ?
+                <Box sx={{ flexBasis: '100%', mt: 5, ml: 1 }} >
+
+                    <List
+                        id="managementInnerTab"
+                        sx={{ display: 'inline-flex', flexDirection: 'row', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}
+                    >
+
+                        <ListItem className='managementInnerTabItem'
+                            sx={{ width: 'max-content' }}>
+                            <ListItemButton
+                                sx={{
+                                    color: (tab === 0 ? '#a534eb' : 'black'),
+                                    borderBottom: (tab === 0 ? '2px solid purple' : '')
+                                }}
+                                onClick={() => setTab(0)}
+                            >
+                                <ListItemText
+                                    primary="Project Details"
+
+                                />
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem className='managementInnerTabItem'
+                            sx={{ width: 'max-content' }}>
+                            <ListItemButton
+                                sx={{
+                                    color: (tab === 1 ? '#a534eb' : 'black'),
+                                    borderBottom: (tab === 1 ? '2px solid purple' : '')
+                                }}
+                                onClick={() => setTab(1)}
+                            >
+                                <ListItemText
+                                    primary="Project Assignee"
+
+                                />
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem className='managementInnerTabItem'
+                            sx={{ width: 'max-content' }}>
+                            <ListItemButton
+                                sx={{
+                                    color: (tab === 2 ? '#a534eb' : 'black'),
+                                    borderBottom: (tab === 2 ? '2px solid purple' : '')
+                                }}
+                                onClick={() => setTab(2)}
+                            >
+                                <ListItemText
+                                    primary="Project Components"
+
+                                />
+                            </ListItemButton>
+                        </ListItem>
+
+
+                    </List>
+                    <Divider></Divider>
+                </Box>
                 :
                 null
-                }
-                {projectTitle ?
+                            }
+
+                {/* project details */}
+                {tab == 0 && projectTitle  ?
+                <Box sx={{flexBasis:'100%',display:'flex',flexWrap:'wrap'}}>
+                    <Typography className="adminHeader" variant='h5' sx={{ flexBasis: '100%', margin: '2rem' }}>Project Details:</Typography>
                     <FormControl
                         id='editProjectTitleForm'
                         sx={{ m: 3, width: '45%' }}>
@@ -423,14 +542,10 @@ const ManageProject = () => {
                         />
                         <FormHelperText sx={{ textAlign: 'end' }}>Max Length: 20</FormHelperText>
                     </FormControl>
-                    :
-                    null
-                }
-
-                {projectTitle ?
+                
                     <FormControl
                         id='editProjectDescriptionForm'
-                        sx={{ m: 3, width: '100%' }}>
+                        sx={{ m: 3, width: '80%' }}>
                         <InputLabel htmlFor='projectDescription'
                             sx={{ color: '#9a239a' }}
                         >Project Description</InputLabel>
@@ -484,90 +599,151 @@ const ManageProject = () => {
                             }
                         />
                     </FormControl>
+                    </Box>
                     :
                     null
                 }
-                {projectAssignee ?
-                    <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
 
-                        <Typography ml={2} fontWeight={'600'} color={'#0288d1'}>{projectAssignee.length <= 1 ? "User assigned to this project " : "Users assigned to this project: "}</Typography>
+{/* project assginee */}
+                {tab === 1 ?
+                    <Box>
+                        <Typography className="adminHeader" variant='h5' sx={{ flexBasis: '100%', margin: '2rem' }}>Project Assignee:</Typography>
+                        <List className='card' sx={{ m: 3, flexBasis: '100%', borderColor: '#0288d1'  }}>
 
-
-                        <ListItem
-                            sx={{ flexWrap: 'wrap' }}>
-                            <ListItemAvatar
-                                className="BoxAvatarLayout"
-                            >
-                                <Avatar>
-                                    <PersonIcon />
-                                </Avatar>
-
-                            </ListItemAvatar>
-
-                            {projectAssignee ? projectAssignee.map((assignee, index) => (
-                                <Chip
-                                    key={`${assignee + index}`}
-                                    item={assignee}
-                                    label={assignee}
-                                    color="info"
-                                    className='chip'
-                                    variant='filled'
-                                    deleteIcon={
-                                        <Tooltip title="remove assignee">
-                                            <RemoveCircleOutlineIcon />
-                                        </Tooltip>
-                                    }
-                                    onDelete={() => handleAssigneeDelete(assignee)}
-                                    sx={{ m: 1 }}
-                                />
-                            ))
-                                :
-                                null}
+                            <Typography ml={2} fontWeight={'600'} color={'#0288d1'}>{projectAssignee.length <= 1 ? "User assigned to this project " : "Users assigned to this project: "}</Typography>
 
 
-                        </ListItem>
-                    </List>
+                            <ListItem
+                                sx={{ flexWrap: 'wrap' }}>
+                                <ListItemAvatar
+                                    className="BoxAvatarLayout"
+                                >
+                                    <Avatar>
+                                        <PersonIcon />
+                                    </Avatar>
+
+                                </ListItemAvatar>
+
+                                {projectAssignee ? projectAssignee.map((assignee, index) => (
+                                    <Chip
+                                        key={`${assignee + index}`}
+                                        item={assignee}
+                                        label={assignee}
+                                        color="info"
+                                        className='chip'
+                                        variant='filled'
+                                        deleteIcon={
+                                            <Tooltip title="remove assignee">
+                                                <RemoveCircleOutlineIcon />
+                                            </Tooltip>
+                                        }
+                                        onDelete={() => handleAssigneeDelete(assignee)}
+                                        sx={{ m: 1 }}
+                                    />
+                                ))
+                                    :
+                                    null}
+
+                                    
+
+
+                            </ListItem>
+                        </List>
+                    </Box>
                     :
                     null}
 
-                {projectComponents ?
-                    <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
-                        <Typography ml={2} fontWeight={'600'} color={'#9f2f9f'}>{projectComponents.length <= 1 ? "Project Component: " : "Project Components: "} </Typography>
+{/* project components */}
+                {tab === 2 ?
+                    <Box flexBasis={'100%'}>
+                        <Typography className="adminHeader" variant='h5' sx={{ flexBasis: '100%', margin: '2rem' }}>Project Components:</Typography>
 
-                        <ListItem
-                            sx={{ flexWrap: 'wrap' }}>
-                            <ListItemAvatar
-                                className="BoxAvatarLayout"
+                        <List className='card' sx={{ m: 3, flexBasis: '100%', borderColor: '#9f2f9f' }}>
+                            <Typography ml={2} fontWeight={'600'} color={'#9f2f9f'}>{projectComponents && projectComponents.length <= 1 ? "Project Component: " : "Project Components: "} </Typography>
+
+                            <ListItem
+                                sx={{ flexWrap: 'wrap' }}>
+                                <ListItemAvatar
+                                    className="BoxAvatarLayout"
+                                >
+                                    <Avatar>
+                                        <PersonIcon />
+                                    </Avatar>
+
+                                </ListItemAvatar>
+
+                                {projectComponents ? projectComponents.map((component, index) => (
+                                    <Chip
+                                        key={`${component + index}`}
+                                        item={component}
+                                        label={component}
+                                        color="secondary"
+                                        className='chip'
+                                        variant='filled'
+                                        deleteIcon={
+                                            <Tooltip title="remove component">
+                                                <RemoveCircleOutlineIcon />
+                                            </Tooltip>
+                                        }
+                                        onDelete={() => handleComponentsDelete(component)}
+                                        sx={{ m: 1 }}
+                                    />
+                                ))
+                                    :
+                                    null}
+
+
+                            </ListItem>
+                        </List>
+
+                        <Box className="addComponentContainer" sx={{ display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', mt: 3, ml: 1 }}>
+
+                            <FormControl
+                                id='addProjectComponentsForm'
+                                sx={{ m: 2, flexBasis: '40%' }}
+                                color="secondary"
+
                             >
-                                <Avatar>
-                                    <PersonIcon />
-                                </Avatar>
-
-                            </ListItemAvatar>
-
-                            {projectComponents ? projectComponents.map((component, index) => (
-                                <Chip
-                                    key={`${component + index}`}
-                                    item={component}
-                                    label={component}
+                                <InputLabel htmlFor='projectComponents'
+                                    sx={{ color: '#9a239a' , '&. MuiInputBase-input':{borderColor:'#9a239a'}}}
+                                >Add New Components</InputLabel>
+                                <OutlinedInput
+                                    name="projectComponents"
+                                    id="projectComponents"
+                                    text="text"
+                                    value={componentField}
+                                    label="Project Components"
+                                    onChange={handleProjectComponentField}
+                                    onBlur={handleTrimOnBlur}
+                                    error={componentAddError}
+                                    inputProps={{maxLength: 20}}
                                     color="secondary"
-                                    className='chip'
-                                    variant='filled'
-                                    deleteIcon={
-                                        <Tooltip title="remove component">
-                                            <RemoveCircleOutlineIcon />
-                                        </Tooltip>
+                                    sx={{"&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor:'#df35fc'
+                                      }, "& .MuiOutlinedInput-notchedOutline":{
+                                        borderColor:'#9c27b0'
+                                      }}}
+                                  
+                                    endAdornment={
+                                        <Button
+                                            id="addComponentsBtn"
+                                            variant="outlined"
+                                            color="secondary"
+                                            startIcon={<AddIcon sx={{ color: 'blueviolet' }} />}
+                                            onClick={handleAddComponent}
+                                        >
+                                            Add
+                                        </Button>
                                     }
-                                    onDelete={() => handleComponentsDelete(component)}
-                                    sx={{ m: 1 }}
                                 />
-                            ))
-                                :
-                                null}
+                                <FormHelperText sx={{ textAlign: 'end' }}>Max Length: 20</FormHelperText>
+                                <FormHelperText id="componentErrorMessage" error>{componentErrorMessage}</FormHelperText>
+                            </FormControl>
 
 
-                        </ListItem>
-                    </List>
+                        </Box>
+                    </Box>
+
                     :
                     null
                 }
@@ -600,7 +776,7 @@ const ManageProject = () => {
                     projectAvailableAssignee={projectAvailableAssignee}
                     defectListUser={defectListUser}
                 >
-                    </ReallocateUserPrompt>
+                </ReallocateUserPrompt>
 
                 <ReallocateComponentPrompt
                     open={openReallocatePromptComponent}
@@ -610,8 +786,8 @@ const ManageProject = () => {
                     projectAvailableComponent={projectAvailableComponent}
                     defectListComponent={defectListComponent}
                 >
-                    
-                </ReallocateComponentPrompt>    
+
+                </ReallocateComponentPrompt>
 
             </form>
         </Box>

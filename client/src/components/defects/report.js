@@ -308,7 +308,7 @@ const Report = () => {
                                     <MenuItem
                                         key="components-chart"
                                         value="components"
-                                    >components
+                                    >Components
                                     </MenuItem>
 
                                 </Select>
@@ -354,7 +354,7 @@ const Report = () => {
                                     <MenuItem
                                         key="components-table"
                                         value="components"
-                                    >components
+                                    >Components
                                     </MenuItem>
 
                                 </Select>

@@ -2,6 +2,9 @@ import { createSlice } from '@reduxjs/toolkit'
 import { showToast } from '../../utils/tools';
 import { getAllProjects } from '../actions/admin';
 import { getProjectByTitle } from '../actions/defects';
+import { addComponents } from '../actions/projects';
+import { removeComponents } from '../actions/projects';
+
 
 import { 
     addProject,
@@ -47,6 +50,19 @@ export const projectsSlice = createSlice({
         })
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project
+        })
+        .addCase(addComponents.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Component Successfully added")
+        })
+        .addCase(addComponents.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(removeComponents.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Component Successfully removed")
+            console.log(action.payload)
+        })
+        .addCase(removeComponents.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
         })
         .addCase(defectListOfComponentToBeRemoved.fulfilled,(state,action)=>{
             state.defectListComponentToBeRemoved = action.payload
