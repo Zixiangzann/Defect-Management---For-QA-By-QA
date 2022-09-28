@@ -366,12 +366,17 @@ const ManageProject = () => {
     //initial
     //set selectedProjectDetails to state
     useEffect(() => {
-        if (projects.selectedProjectDetails) {
-            setProjectTitle(projects.selectedProjectDetails.title)
-            setProjectDescription(htmlDecode(projects.selectedProjectDetails.description))
-            setProjectComponents(projects.selectedProjectDetails.components)
-            setProjectAssignee(projects.selectedProjectDetails.assignee)
+        if (projects.selectedProjectDetails[0]) {
+            setProjectTitle(projects.selectedProjectDetails[0].title)
+            setProjectDescription(htmlDecode(projects.selectedProjectDetails[0].description))
+            setProjectComponents(projects.selectedProjectDetails[0].components)
+            
         }
+
+        if(projects.selectedProjectDetails[1]){
+            setProjectAssignee(projects.selectedProjectDetails[1])
+        }
+        
     }, [projects.selectedProjectDetails])
 
     useEffect(() => {
@@ -606,7 +611,7 @@ const ManageProject = () => {
 
 {/* project assginee */}
                 {tab === 1 ?
-                    <Box>
+                    <Box flexBasis={'100%'}>
                         <Typography className="adminHeader" variant='h5' sx={{ flexBasis: '100%', margin: '2rem' }}>Project Assignee:</Typography>
                         <List className='card' sx={{ m: 3, flexBasis: '100%', borderColor: '#0288d1'  }}>
 
@@ -624,21 +629,23 @@ const ManageProject = () => {
 
                                 </ListItemAvatar>
 
-                                {projectAssignee ? projectAssignee.map((assignee, index) => (
+                                {projectAssignee ? projectAssignee.map((user, index) => (
                                     <Chip
-                                        key={`${assignee + index}`}
-                                        item={assignee}
-                                        label={assignee}
-                                        color="info"
+                                        key={`${user.username + index}`}
+                                        avatar={<Avatar alt={user.username} src={user.photoURL} />}
+                                        item={user.username}
+                                        label={user.username}
                                         className='chip'
+                                        color="primary"
                                         variant='filled'
+                                        sx={{ m: 1 }}
                                         deleteIcon={
                                             <Tooltip title="remove assignee">
                                                 <RemoveCircleOutlineIcon />
                                             </Tooltip>
                                         }
-                                        onDelete={() => handleAssigneeDelete(assignee)}
-                                        sx={{ m: 1 }}
+                                        onDelete={() => handleAssigneeDelete(user.email)}
+                                        
                                     />
                                 ))
                                     :
@@ -667,7 +674,7 @@ const ManageProject = () => {
                                     className="BoxAvatarLayout"
                                 >
                                     <Avatar>
-                                        <PersonIcon />
+                                        <GridViewIcon />
                                     </Avatar>
 
                                 </ListItemAvatar>

@@ -117,19 +117,19 @@ const ManageUserProject = ({
 
                 </Select>
 
-                {selectProject !== "" ?
+                {selectProject !== "" && admin.selectedProjectDetails[0] ?
                     <Box flexBasis={'100%'}>
 
                         <Box className="projectDetailsContainer" display={'flex'} flexWrap={'wrap'}>
                             <Typography sx={{ flexBasis: '100%', mt: 3, mb: 2, ml: 2, fontSize: '1.2rem', fontWeight: '300' }}>Project Details</Typography>
                             <Typography className="projectManagementDetailsSubject" display={'inline'} sx={{ flexBasis: '200px', color: '#1a1ad2', fontWeight: '600', ml: 2 }}>Project Title: </Typography>
-                            <Typography className="projectManagementDetailsValue" sx={{ display: 'inline' }}>{admin.selectedProjectDetails.title}</Typography>
+                            <Typography className="projectManagementDetailsValue" sx={{ display: 'inline' }}>{admin.selectedProjectDetails[0].title}</Typography>
                             <Box flexBasis={'100%'}></Box>
                             <Typography className="projectManagementDetailsSubject" display={'inline'} sx={{ flexBasis: '200px', color: '#1a1ad2', fontWeight: '600', ml: 2 }}>Project Description: </Typography>
-                            <Typography className="projectManagementDetailsValue" sx={{ display: 'inline' }}>{<div style={{ display: 'inline' }} dangerouslySetInnerHTML={{ __html: htmlDecode(admin.selectedProjectDetails.description) }}></div>}</Typography>
+                            <Typography className="projectManagementDetailsValue" sx={{ display: 'inline' }}>{<div style={{ display: 'inline' }} dangerouslySetInnerHTML={{ __html: htmlDecode(admin.selectedProjectDetails[0].description) }}></div>}</Typography>
                             <Box flexBasis={'100%'}></Box>
                             <Typography className="projectManagementDetailsSubject" display={'inline'} sx={{ flexBasis: '200px', color: '#1a1ad2', fontWeight: '600', ml: 2 }}>Project Created Date: </Typography>
-                            <Typography className="projectManagementDetailsValue" sx={{ display: 'inline' }}><Moment format="DD/MMM/YYYY HH:MMA">{admin.selectedProjectDetails.date}</Moment></Typography>
+                            <Typography className="projectManagementDetailsValue" sx={{ display: 'inline' }}><Moment format="DD/MMM/YYYY HH:MMA">{admin.selectedProjectDetails[0].date}</Moment></Typography>
                         </Box>
 
                         <List className='card' sx={{ m: 3, flexBasis: '100%' }}>
@@ -148,7 +148,7 @@ const ManageUserProject = ({
 
                                 </ListItemAvatar>
                                 <Box sx={{ width: '90%' }}>
-                                    {admin.selectedProjectDetails.components ? admin.selectedProjectDetails.components.map((component, index) => (
+                                    {admin.selectedProjectDetails[0].components ? admin.selectedProjectDetails[0].components.map((component, index) => (
                                         <Chip
                                             key={`${component + index}`}
                                             item={component}
@@ -181,13 +181,14 @@ const ManageUserProject = ({
                                     </Avatar>
                                 </ListItemAvatar>
                                 <Box sx={{ width: '90%' }}>
-                                    {admin.selectedProjectDetails.assignee ? admin.selectedProjectDetails.assignee.map((assignee, index) => (
+                                    {admin.selectedProjectDetails[1] ? admin.selectedProjectDetails[1].map((user, index) => (
                                         <Chip
-                                            key={`${assignee + index}`}
-                                            item={assignee}
-                                            label={assignee}
-                                            color="info"
+                                            key={`${user.username + index}`}
+                                            avatar={<Avatar alt={user.username} src={user.photoURL} />}
+                                            item={user.username}
+                                            label={user.username}
                                             className='chip'
+                                            color="primary"
                                             variant='filled'
                                             sx={{ m: 1 }}
                                         />

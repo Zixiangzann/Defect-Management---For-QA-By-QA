@@ -54,9 +54,17 @@ export const createProject = async (req) => {
 
 export const getProjectByTitle = async (title) => {
     try {
-        const project = Project.findOne({ title })
+        const project = await Project.findOne({ title })
         if (project === null) throw ApiError(httpStatus.NOT_FOUND, 'Project details not found')
-        return project;
+        //use project assignee to get user details
+        
+        const user = await User.find({email:project.assignee},{"username":1 , "email": 1, "photoURL": 1})
+       
+        const result = new Array();
+        result.push(project)
+        result.push(user)
+
+        return result;
     } catch (error) {
         throw error;
     }
