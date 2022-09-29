@@ -79,7 +79,7 @@ const ManageUserProject = ({
                                         </Tooltip>
                                     }
                                     onDelete={() => {
-                                        
+
                                         handleProjectDelete(title)
                                     }}
                                     sx={{ m: 1 }}
@@ -203,13 +203,20 @@ const ManageUserProject = ({
 
 
 
+
                         <Box className="assignProjectBtnContainer" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button
-                                variant='contained'
-                                sx={{ mt: 5 }}
-                                onClick={() => handleProjectAssign()}
-                            >Assign user to this project</Button>
+                            <Tooltip title={admin.selectedProjectDetails[0].assignee.includes(searchUser) ? "User is already assigned" : ""}>
+                                <span>
+                                <Button
+                                    variant='contained'
+                                    sx={{ mt: 5 }}
+                                    disabled={admin.selectedProjectDetails[0].assignee.includes(searchUser)}
+                                    onClick={() => handleProjectAssign()}
+                                >Assign user to this project</Button>
+                                </span>
+                            </Tooltip>
                         </Box>
+
 
 
                     </Box>

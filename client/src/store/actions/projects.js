@@ -45,6 +45,74 @@ export const addProject = createAsyncThunk(
     }
 )
 
+export const updateProjectTitleAndDescription = createAsyncThunk(
+    'project/updateProjectTitleAndDescription',
+    async ({
+        oldTitle,
+        newTitle,
+        newDescription
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/update', {
+                oldTitle,
+                newTitle,
+                newDescription
+            }, getAuthHeader())
+
+            return request
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+            return rejectWithValue(error.response)
+        }
+    }
+)
+
+export const assignProject = createAsyncThunk(
+    'project/assignProject',
+    async ({
+        userEmail,
+        projectTitle
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/assignee/assign', {
+                userEmail,
+                projectTitle
+            }, getAuthHeader())
+
+            return request
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+            return rejectWithValue(error.response)
+        }
+    }
+)
+
+
+export const removeFromProject = createAsyncThunk(
+    'project/removeFromProject',
+    async ({
+        userEmail,
+        projectTitle
+    }, { rejectWithValue }) => {
+        try {
+            const request = await axios.patch('/api/project/assignee/removefromproject', {
+                userEmail,
+                projectTitle
+            }, getAuthHeader())
+            return request
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+            return rejectWithValue(error.response)
+        }
+    }
+)
+
 export const addComponents = createAsyncThunk(
     'projects/addComponents',
     async ({

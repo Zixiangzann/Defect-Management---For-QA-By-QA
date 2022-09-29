@@ -350,7 +350,7 @@ const PaginateComponent = ({
                                                     setAnchorEl(e.currentTarget)
                                                 }}
                                             >
-                                                <MenuIcon color='secondary' /></TableCell>
+                                                <MenuIcon color='secondary' sx={{'&:hover':{color:'#ce32e7'}}} /></TableCell>
                                             :
                                             null
                                         }

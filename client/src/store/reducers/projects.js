@@ -2,8 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 import { showToast } from '../../utils/tools';
 import { getAllProjects } from '../actions/admin';
 import { getProjectByTitle } from '../actions/defects';
-import { addComponents } from '../actions/projects';
-import { removeComponents } from '../actions/projects';
+import { addComponents, removeComponents, assignProject, removeFromProject,updateProjectTitleAndDescription } from '../actions/projects';
+
 
 
 import { 
@@ -40,7 +40,7 @@ export const projectsSlice = createSlice({
             state.assignee.availableForAssign = action.payload.allUsersForAssign
         })
         .addCase(addProject.fulfilled,(state,action) => {
-            showToast('SUCCESS',"Project Successfully Created")
+            showToast('SUCCESS',"Project created successfully")
         })
         .addCase(addProject.rejected,(state,action) => {
             showToast('ERROR',action.payload.data.message)
@@ -51,15 +51,32 @@ export const projectsSlice = createSlice({
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project
         })
+        .addCase(updateProjectTitleAndDescription.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Project details updated successfully")
+        })
+        .addCase(updateProjectTitleAndDescription.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(assignProject.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Assignee added successfully")
+        })
+        .addCase(assignProject.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
+        .addCase(removeFromProject.fulfilled,(state,action)=>{
+            showToast('SUCCESS',"Assignee removed successfully")
+        })
+        .addCase(removeFromProject.rejected,(state,action)=>{
+            showToast('ERROR',action.payload.data.message)
+        })
         .addCase(addComponents.fulfilled,(state,action)=>{
-            showToast('SUCCESS',"Component Successfully added")
+            showToast('SUCCESS',"Component added successfully")
         })
         .addCase(addComponents.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(removeComponents.fulfilled,(state,action)=>{
-            showToast('SUCCESS',"Component Successfully removed")
-            console.log(action.payload)
+            showToast('SUCCESS',"Component removed successfully")
         })
         .addCase(removeComponents.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)

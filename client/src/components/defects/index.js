@@ -63,7 +63,11 @@ const Defect = () => {
                             className='createNewDefectBtn'
                             variant="contained"
                             onClick={() => navigate('/defect/create')}
-                            sx={{ backgroundColor: 'darkslateblue', color: 'cornsilk', marginBottom: '5px', flexBasis: '20%' }}
+                            sx={{backgroundColor: '#574C9A'
+                            , color: 'cornsilk'
+                            , marginBottom: '5px'
+                            , flexBasis: '20%'
+                            , '&:hover':{backgroundColor:'#5E4DC2',color:'white'} }}
                             disabled={!users.data.permission[0].addDefect}
                         >
                             Create New Defect

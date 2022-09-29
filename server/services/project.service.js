@@ -104,6 +104,41 @@ export const getAllUsersForAssign = async (req) => {
     }
 }
 
+export const updateProjectByTitle = async (req) => {
+    try {
+
+        if (!req.user.permission[0].addProject) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update project details');
+
+        const oldTitle = req.body.oldTitle
+        const newTitle = req.body.newTitle;
+        const newDescription = req.body.newDescription;
+        
+        const project = await Project.findOne({ title: oldTitle })
+        if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
+
+        if(newTitle){
+
+            const newProjectDetail = Project.findOneAndUpdate({ title: oldTitle }, {
+                "$set": {
+                    title: newTitle
+                }}, { new: true }).exec();
+            return (newProjectDetail);
+
+        }else if(newDescription){
+
+            const newProjectDetail = Project.findOneAndUpdate({ title: oldTitle }, {
+                "$set": {
+                    description: newDescription
+                }}, { new: true }).exec();
+            return (newProjectDetail);
+
+        }
+
+    } catch (error) {
+        throw error
+    }
+}
+
 export const assignProject = async (req) => {
 
     // const adminEmail = req.user.email
@@ -335,24 +370,7 @@ export const defectListOfToBeRemovedComponents = async (req) => {
 //     }
 // }
 
-// export const updateProjectByTitle = async (title, body) => {
-//     try {
-//         const project = await Project.findOne({ title: title }).exec()
-//         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
 
-//         const newProjectDetail = Project.findOneAndUpdate({ title: title }, {
-//             "$set": {
-//                 title: body.title,
-//                 description: body.description
-//             }, "$push": {
-//                 assignee: body.assignee
-//             }
-//         }, { new: true }).exec();
-//         return (newProjectDetail);
-//     } catch (error) {
-//         throw error
-//     }
-// }
 
 
 //not using yet

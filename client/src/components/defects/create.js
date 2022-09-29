@@ -174,7 +174,7 @@ const CreateDefect = () => {
                     }
 
                     ))
-                    navigate('/')
+                    navigate('/defect')
                 })
         }
     })

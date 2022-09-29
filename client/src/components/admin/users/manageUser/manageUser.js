@@ -522,6 +522,12 @@ const ManageUser = () => {
         setOpenModal(true)
         setModalDescription(`You are about to Reset user's Password\n 
         Account: "${userDetails.email}" password will be reset`)
+        setModalDescription( 
+            <Box>
+                <Typography display={'inline'}>You are about to reset user's Password. Account: </Typography>
+                <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.email}" </Typography>
+                <Typography display={'inline'}>Password will be resetted </Typography>
+            </Box>)
         setModalInput('')
     }
 
@@ -608,30 +614,67 @@ const ManageUser = () => {
                 setEditingField(confirmChanges);
                 break;
             case "confirmFirstname":
-                setModalDescription(`You are about to change user's First name\n\n From: "${userDetails.firstname}" \n To: "${firstname}"`)
+                setModalDescription( 
+                <Box>
+                    <Typography display={'inline'}>You are about to change user's First name </Typography>
+                    <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.firstname}" </Typography>
+                    <Typography display={'inline'}>to </Typography>
+                    <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{firstname}"</Typography>
+                </Box>)
                 setEditingField(confirmChanges);
                 break;
             case "confirmLastname":
-                setModalDescription(`You are about to change user's Last name\n\n From: "${userDetails.lastname}" \n To: "${lastname}"`)
+                setModalDescription( 
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's Last name </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.lastname}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{lastname}"</Typography>
+                    </Box>)
+                
                 setEditingField(confirmChanges);
                 break;
             case "confirmUsername":
-                setModalDescription(`You are about to change user's Username\n\n From: "${userDetails.username}" \n To: "${username}"`)
+                setModalDescription( 
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's Username </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.username}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{username}"</Typography>
+                    </Box>)
                 setEditingField(confirmChanges);
                 break;
             case "confirmEmail":
-                setModalDescription(`You are about to change user's Email\n\n From: "${userDetails.email}" \n To: "${email}"`)
+                setModalDescription( 
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's Email </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.email}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{email}"</Typography>
+                    </Box>)
                 setEditingField(confirmChanges);
                 break;
             case "confirmJobtitle":
-                setModalDescription(`You are about to change user's Job title\n\n From: "${userDetails.jobtitle}" \n To: "${jobtitle}"`)
+                setModalDescription( 
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's Job title </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.jobtitle}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{jobtitle}"</Typography>
+                    </Box>)
                 setEditingField(confirmChanges);
                 break;
             case "confirmRole":
-                setModalDescription(`You are about to change user's Role \n\n From: "${userDetails.role.charAt(0).toUpperCase() + userDetails.role.slice(1)}" 
-                To: "${role.charAt(0).toUpperCase() + role.slice(1)}"
-                ${role === 'user' && (userDetails.role === 'owner' || userDetails.role === 'admin') ? "Note: Account will lose all Admin permission" : ""}
-                `)
+                setModalDescription( 
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's Role </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.role.charAt(0).toUpperCase() + userDetails.role.slice(1)}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{role.charAt(0).toUpperCase() + role.slice(1)}"</Typography>
+                        {role === 'user' && (userDetails.role === 'owner' || userDetails.role === 'admin') ? 
+                        <Typography color={'red'}>"Note: Account will lose all Admin permission"</Typography>
+                        : ""}
+                    </Box>)
                 setEditingField(confirmChanges);
                 break;
             case "confirmPermission":
@@ -639,9 +682,13 @@ const ManageUser = () => {
                 setEditingField("confirmUpdatePermission");
                 break;
             case "confirmPhone":
-                setModalDescription(`You are about to change user's phone number \n\n From: "${userDetails.phone}" 
-                To: "+${phone}"
-                `)
+                setModalDescription( 
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's Phone number </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.phone}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{phone}"</Typography>
+                    </Box>)
                 setEditingField(confirmChanges);
                 break;
             default:

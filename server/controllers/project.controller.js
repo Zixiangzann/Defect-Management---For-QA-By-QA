@@ -44,8 +44,8 @@ const projectController = {
 
     async updateProjectByTitle(req, res, next) {
         try {
-            const projectTitle = req.query.title;
-            const project = await projectService.updateProjectByTitle(projectTitle, req.body)
+            // const projectTitle = req.query.title;
+            const project = await projectService.updateProjectByTitle(req)
             res.json(project);
         } catch (error) {
             next(error)

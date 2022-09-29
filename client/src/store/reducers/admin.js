@@ -170,18 +170,7 @@ export const adminSlice = createSlice({
         .addCase(updateUserPermission.rejected,(state,action)=>{
             showToast('ERROR',action.payload.data.message)
         })
-        .addCase(assignProject.fulfilled,(state,action)=>{
-            showToast('SUCCESS',"Successfully Updated")
-        })
-        .addCase(assignProject.rejected,(state,action)=>{
-            showToast('ERROR',action.payload.data.message)
-        })
-        .addCase(removeFromProject.fulfilled,(state,action)=>{
-            showToast('SUCCESS',"Successfully Updated")
-        })
-        .addCase(removeFromProject.rejected,(state,action)=>{
-            showToast('ERROR',action.payload.data.message)
-        })
+   
 
     }
 })
