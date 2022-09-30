@@ -114,23 +114,42 @@ export const updateProjectByTitle = async (req) => {
         const newDescription = req.body.newDescription;
         
         const project = await Project.findOne({ title: oldTitle })
+        //only using it for email
+        const oldDescription = {oldDescription: project.description};
+
         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
 
         if(newTitle){
 
-            const newProjectDetail = Project.findOneAndUpdate({ title: oldTitle }, {
+            //update in Project Collection
+            const newProjectDetail = await Project.findOneAndUpdate({ title: oldTitle }, {
                 "$set": {
                     title: newTitle
                 }}, { new: true }).exec();
-            return (newProjectDetail);
+
+            //update in User Collection
+            const updatedUserProject = await User.updateMany(
+                {project:oldTitle},
+                {$set:{"project.$":newTitle}})
+
+            //update in Defect Collection
+            const updatedDefectProject = await Defect.updateMany({project:oldTitle}
+                ,{$set:{"project":newTitle}})    
+
+            return (newProjectDetail);            
 
         }else if(newDescription){
 
-            const newProjectDetail = Project.findOneAndUpdate({ title: oldTitle }, {
+            const newProjectDetail = await Project.findOneAndUpdate({ title: oldTitle }, {
                 "$set": {
                     description: newDescription
                 }}, { new: true }).exec();
-            return (newProjectDetail);
+
+            const result = {
+                ...newProjectDetail._doc,
+                ...oldDescription
+            }    
+            return (result);
 
         }
 
@@ -180,6 +199,7 @@ export const assignProject = async (req) => {
     result.push(
         {
             "email": await updatedUser.email,
+            "username": user.username,
             "project": await updatedUser.project
         }
     )
@@ -222,6 +242,7 @@ export const removeAssigneeFromProject = async (req) => {
     result.push(await updatedProject)
     result.push({
         "email": await updatedUser.email,
+        "username": user.username,
         "project": await updatedUser.project
     })
 

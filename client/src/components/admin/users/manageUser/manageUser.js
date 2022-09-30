@@ -11,6 +11,7 @@ import ManageUserResetPW from './manageUserResetPW';
 import ReallocateUserPrompt from '../../reallocate/reallocateUserPrompt';
 import { defectListOfUserToBeRemoved } from '../../../../store/actions/projects';
 import { getAllAssignee } from '../../../../store/actions/defects';
+import { Loader } from '../../../../utils/tools';
 
 //lib
 import { useDispatch, useSelector } from 'react-redux';
@@ -54,7 +55,8 @@ import List from '@mui/material/List';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import { getProjectByTitle } from '../../../../store/actions/defects';
-
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 
@@ -63,6 +65,9 @@ const ManageUser = () => {
     //State
     //Nav tab
     const [tab, setTab] = useState(0);
+
+
+
 
     //Search User state
     const [searchUser, setSearchUser] = useState('')
@@ -75,7 +80,12 @@ const ManageUser = () => {
     const userPermission = useSelector(state => state.admin.userPermission[0])
     const userProject = useSelector(state => state.admin.userProject)
     const defectListUser = useSelector(state => state.projects.defectListUserToBeRemoved)
-    
+
+    //loading show loader
+    //admin slice
+    const adminLoading = useSelector(state => state.admin.loading)
+    //project slice
+    const projectLoading = useSelector(state => state.projects.loading)
 
     //User Field state
     const [profilePictureSample, setProfilePictureSample] = useState('');
@@ -520,13 +530,11 @@ const ManageUser = () => {
     const handleResetPassword = (event) => {
         setEditingField('resetPassword')
         setOpenModal(true)
-        setModalDescription(`You are about to Reset user's Password\n 
-        Account: "${userDetails.email}" password will be reset`)
-        setModalDescription( 
+        setModalDescription(
             <Box>
-                <Typography display={'inline'}>You are about to reset user's Password. Account: </Typography>
+                <Typography display={'inline'}>You are about to reset user's Password. </Typography>
                 <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.email}" </Typography>
-                <Typography display={'inline'}>Password will be resetted </Typography>
+                <Typography display={'inline'}>password will be resetted. </Typography>
             </Box>)
         setModalInput('')
     }
@@ -614,28 +622,28 @@ const ManageUser = () => {
                 setEditingField(confirmChanges);
                 break;
             case "confirmFirstname":
-                setModalDescription( 
-                <Box>
-                    <Typography display={'inline'}>You are about to change user's First name </Typography>
-                    <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.firstname}" </Typography>
-                    <Typography display={'inline'}>to </Typography>
-                    <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{firstname}"</Typography>
-                </Box>)
+                setModalDescription(
+                    <Box>
+                        <Typography display={'inline'}>You are about to change user's First name </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.firstname}" </Typography>
+                        <Typography display={'inline'}>to </Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{firstname}"</Typography>
+                    </Box>)
                 setEditingField(confirmChanges);
                 break;
             case "confirmLastname":
-                setModalDescription( 
+                setModalDescription(
                     <Box>
                         <Typography display={'inline'}>You are about to change user's Last name </Typography>
                         <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.lastname}" </Typography>
                         <Typography display={'inline'}>to </Typography>
                         <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{lastname}"</Typography>
                     </Box>)
-                
+
                 setEditingField(confirmChanges);
                 break;
             case "confirmUsername":
-                setModalDescription( 
+                setModalDescription(
                     <Box>
                         <Typography display={'inline'}>You are about to change user's Username </Typography>
                         <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.username}" </Typography>
@@ -645,7 +653,7 @@ const ManageUser = () => {
                 setEditingField(confirmChanges);
                 break;
             case "confirmEmail":
-                setModalDescription( 
+                setModalDescription(
                     <Box>
                         <Typography display={'inline'}>You are about to change user's Email </Typography>
                         <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.email}" </Typography>
@@ -655,7 +663,7 @@ const ManageUser = () => {
                 setEditingField(confirmChanges);
                 break;
             case "confirmJobtitle":
-                setModalDescription( 
+                setModalDescription(
                     <Box>
                         <Typography display={'inline'}>You are about to change user's Job title </Typography>
                         <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.jobtitle}" </Typography>
@@ -665,15 +673,15 @@ const ManageUser = () => {
                 setEditingField(confirmChanges);
                 break;
             case "confirmRole":
-                setModalDescription( 
+                setModalDescription(
                     <Box>
                         <Typography display={'inline'}>You are about to change user's Role </Typography>
                         <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.role.charAt(0).toUpperCase() + userDetails.role.slice(1)}" </Typography>
                         <Typography display={'inline'}>to </Typography>
                         <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{role.charAt(0).toUpperCase() + role.slice(1)}"</Typography>
-                        {role === 'user' && (userDetails.role === 'owner' || userDetails.role === 'admin') ? 
-                        <Typography color={'red'}>"Note: Account will lose all Admin permission"</Typography>
-                        : ""}
+                        {role === 'user' && (userDetails.role === 'owner' || userDetails.role === 'admin') ?
+                            <Typography color={'red'}>"Note: Account will lose all Admin permission"</Typography>
+                            : ""}
                     </Box>)
                 setEditingField(confirmChanges);
                 break;
@@ -682,12 +690,12 @@ const ManageUser = () => {
                 setEditingField("confirmUpdatePermission");
                 break;
             case "confirmPhone":
-                setModalDescription( 
+                setModalDescription(
                     <Box>
                         <Typography display={'inline'}>You are about to change user's Phone number </Typography>
                         <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{userDetails.phone}" </Typography>
                         <Typography display={'inline'}>to </Typography>
-                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"{phone}"</Typography>
+                        <Typography display={'inline'} color={'darkblue'} fontWeight={'600'}>"+{phone}"</Typography>
                     </Box>)
                 setEditingField(confirmChanges);
                 break;
@@ -744,13 +752,18 @@ const ManageUser = () => {
             } else {
                 setOpenModal(true)
                 setOpenReallocatePrompt(false)
-                setModalDescription(`You are about to remove user from project: "${removeUserProject}"`)
+                setModalDescription(
+                    <Box>
+                        <Typography display={'inline'}>You are about to remove user from project:  </Typography>
+                        <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{removeUserProject}"</Typography>
+
+                    </Box>)
             }
         }
 
     }, [defectListUser])
 
-  
+
     //on user reallocate prompt close
     useEffect(() => {
         if (openReallocatePrompt === false) {
@@ -768,7 +781,11 @@ const ManageUser = () => {
         setAssignUserProject(selectProject)
         setEditingField('assignToProject')
         setOpenModal(true)
-        setModalDescription(`You are about to assign user to "${selectProject}" project`)
+        setModalDescription(
+            <Box>
+                <Typography display={'inline'}>You are about to assign user to project:  </Typography>
+                <Typography display={'inline'} color={"#0288d1"} fontWeight={'600'}>"{selectProject}"</Typography>
+            </Box>)
         setModalInput('')
     }
 
@@ -780,18 +797,18 @@ const ManageUser = () => {
 
     useEffect(() => {
 
-        if(removeUserProject){
-        dispatch(getAllAssignee(removeUserProject))
+        if (removeUserProject) {
+            dispatch(getAllAssignee(removeUserProject))
         }
     }, [removeUserProjectClicked])
 
-    useEffect(()=>{
-        if(defects.data.assignee){
-        setProjectAvailableAssignee([...defects.data.assignee])
+    useEffect(() => {
+        if (defects.data.assignee) {
+            setProjectAvailableAssignee([...defects.data.assignee])
         }
-    },[defects])
+    }, [defects])
 
-  
+
     useEffect(() => {
 
         if (userDetails) setPermissionChanged(permissionChangedCheck)
@@ -809,7 +826,22 @@ const ManageUser = () => {
 
 
     return (
+
+
         <Box mt={5} sx={{ overflow: 'auto', maxHeight: '650px' }} >
+
+            {adminLoading ?
+                <Loader
+                    loading={adminLoading} />
+                :
+                null
+            }
+            {projectLoading ?
+                <Loader
+                    loading={projectLoading} />
+                :
+                null
+            }
 
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
 
@@ -1074,7 +1106,14 @@ const ManageUser = () => {
                     open={copyPasswordModalOpen}
                     setOpenModal={setCopyPasswordModalOpen}
                     title="Password has been reset successfully"
-                    description={`Email: ${searchUser} \n Password: ${newPassword}`}
+                    description={
+                        <Box>
+                            <Typography display={'inline-block'} width={'100px'} color={'#0000cd'} fontWeight={'600'}>Email:</Typography>
+                            <Typography display={'inline-block'}>{searchUser}</Typography>
+                            <br></br>
+                            <Typography display={'inline-block'} width={'100px'} color={'#0000cd'} fontWeight={'600'}>Password:</Typography>
+                            <Typography display={'inline-block'}>{newPassword}</Typography>
+                        </Box>}
                     warn="Please copy and pass to the user, you will only see this password once"
                     handleModalConfirm={handleCopyPassword}
                     button1="Copy to Clipboard"
@@ -1083,7 +1122,7 @@ const ManageUser = () => {
                 >
                 </ModalComponent>
 
-              
+
 
             </form>
         </Box>

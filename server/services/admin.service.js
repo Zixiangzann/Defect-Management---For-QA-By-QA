@@ -408,21 +408,13 @@ export const updateUserEmail = async (req) => {
     }
 
     //update in user collection
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedEmail = req.body.userNewEmail
 
     //to check if user new email is already taken.
     if (await User.emailTaken(userUpdatedEmail)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Email taken')
-
-    //check if admin email and password is correct
-    // const adminCredentials = await userService.findUserByEmail(adminEmail);
-    // if (!(await adminCredentials.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
-
+    
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');

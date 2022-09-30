@@ -15,6 +15,7 @@ import {
 
 //slice for admin project management
 let DEFAULT_PROJECTS_STATE = {
+    loading:false,
     assignee:{
         availableForAssign: [],
         currentAssignee: []
@@ -39,10 +40,15 @@ export const projectsSlice = createSlice({
         .addCase(getAllUsersForAssign.fulfilled, (state,action) => {
             state.assignee.availableForAssign = action.payload.allUsersForAssign
         })
+        .addCase(addProject.pending,(state,action) => {
+           state.loading = true;
+        })
         .addCase(addProject.fulfilled,(state,action) => {
+            state.loading = false;
             showToast('SUCCESS',"Project created successfully")
         })
         .addCase(addProject.rejected,(state,action) => {
+            state.loading = false;
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(getAllProjects.fulfilled,(state,action)=>{
@@ -51,34 +57,59 @@ export const projectsSlice = createSlice({
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project
         })
+        .addCase(updateProjectTitleAndDescription.pending,(state,action)=>{
+            state.loading = true;
+        })
         .addCase(updateProjectTitleAndDescription.fulfilled,(state,action)=>{
+            state.loading = false;
             showToast('SUCCESS',"Project details updated successfully")
         })
         .addCase(updateProjectTitleAndDescription.rejected,(state,action)=>{
+            state.loading = false;
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(assignProject.pending,(state,action)=>{
+            state.loading = true;
+        })
         .addCase(assignProject.fulfilled,(state,action)=>{
+            state.loading = false;
             showToast('SUCCESS',"Assignee added successfully")
         })
         .addCase(assignProject.rejected,(state,action)=>{
+            state.loading = false;
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(removeFromProject.pending,(state,action)=>{
+            state.loading = true;
+        })
         .addCase(removeFromProject.fulfilled,(state,action)=>{
+            state.loading = false;
             showToast('SUCCESS',"Assignee removed successfully")
         })
         .addCase(removeFromProject.rejected,(state,action)=>{
+            state.loading = false;
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(addComponents.pending,(state,action)=>{
+            state.loading = true;
+        })
         .addCase(addComponents.fulfilled,(state,action)=>{
+            state.loading = false;
             showToast('SUCCESS',"Component added successfully")
         })
         .addCase(addComponents.rejected,(state,action)=>{
+            state.loading = false;
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(removeComponents.pending,(state,action)=>{
+            state.loading = true;
+        })
         .addCase(removeComponents.fulfilled,(state,action)=>{
+            state.loading = false;
             showToast('SUCCESS',"Component removed successfully")
         })
         .addCase(removeComponents.rejected,(state,action)=>{
+            state.loading = false;
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(defectListOfComponentToBeRemoved.fulfilled,(state,action)=>{

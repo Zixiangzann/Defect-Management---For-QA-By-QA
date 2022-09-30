@@ -109,65 +109,114 @@ export const adminSlice = createSlice({
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project
         })
+        .addCase(updateProfilePicture.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateProfilePicture.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
-            console.log("change profile pic fulfiled")
         })
         .addCase(updateProfilePicture.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(updateFirstname.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
+        .addCase(updateFirstname.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateFirstname.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(updateLastname.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
+        .addCase(updateLastname.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateLastname.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(updateUsername.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
+        .addCase(updateUsername.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateUsername.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(updatePhone.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updatePhone.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updatePhone.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(updateEmail.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateEmail.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateEmail.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(updateJobtitle.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateJobtitle.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateJobtitle.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(updateRole.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateRole.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateRole.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(resetUserPassword.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(resetUserPassword.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(resetUserPassword.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
+        .addCase(updateUserPermission.pending,(state,action)=>{
+            state.loading = true
+        })
         .addCase(updateUserPermission.fulfilled,(state,action)=>{
+            state.loading = false
             showToast('SUCCESS',"Successfully Updated")
         })
         .addCase(updateUserPermission.rejected,(state,action)=>{
+            state.loading = false
             showToast('ERROR',action.payload.data.message)
         })
    

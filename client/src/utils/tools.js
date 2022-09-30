@@ -17,6 +17,8 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button'
 import FormHelperText from '@mui/material/FormHelperText'
 import Typography from '@mui/material/Typography'
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 export const ProfilePicEditor = ({
@@ -129,11 +131,17 @@ export const errorHelperSelect = (formik, values) => (
 
 export const Loader = ({
     message
+    ,loading
 }) => {
     return (
-        <Box className="root_loader" sx={{ display: 'inline-flex', m: 1 }}>
-            <CirularProgress />
-            <Typography ml={5} mt={2}>{message}</Typography>
+        <Box mt={5} sx={{ overflow: 'auto', maxHeight: '650px' }} >
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}
+            // onClick={handleClose}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </Box>
     )
 }
@@ -499,17 +507,17 @@ export const SeverityColorCode = ({
 
 }
 
-export const checkArrayEqual = (array1,array2) => {
+export const checkArrayEqual = (array1, array2) => {
     if (array1.length === array2.length) {
         return array1.every((element, index) => {
-          if (element === array2[index]) {
-            return true;
-          }
-    
-          return false;
+            if (element === array2[index]) {
+                return true;
+            }
+
+            return false;
         });
-      }
-    
-      return false;
     }
+
+    return false;
+}
 

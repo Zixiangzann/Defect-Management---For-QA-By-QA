@@ -19,23 +19,22 @@ const userController = {
             next(error)
         }
     },
-    async updateUserEmail(req, res, next) {
-        try {
-            const user = await userService.updateUserEmail(req);
-            const token = await authService.genAuthToken(user);
-            //////
-            await emailService.registerEmail(user.email,user);
+    // async updateUserEmail(req, res, next) {
+    //     try {
+    //         const user = await userService.updateUserEmail(req);
+    //         const token = await authService.genAuthToken(user);
+    //         // await emailService.registerEmail(user.email,user);
 
-            res.cookie('x-access-token', token)
-                .send({
-                    user: res.locals.permission.filter(user._doc),
-                    token
-                })
-        } catch (error) {
-            next(error)
-        }
+    //         res.cookie('x-access-token', token)
+    //             .send({
+    //                 user: res.locals.permission.filter(user._doc),
+    //                 token
+    //             })
+    //     } catch (error) {
+    //         next(error)
+    //     }
 
-    }, 
+    // }, 
     async verifyAccount(req,res,next){
         try{
             const token = userService.validateToken(req.query.validation);

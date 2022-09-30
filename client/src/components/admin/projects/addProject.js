@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { addProject, getAllUsersForAssign } from "../../../store/actions/projects";
 
+//comp
+import { Loader } from "../../../utils/tools";
+
 //mui
 import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
@@ -35,6 +38,8 @@ const AddProject = () => {
 
     const dispatch = useDispatch()
     const availableForAssign = useSelector(state => state.projects.assignee.availableForAssign)
+//loading show loader
+    const projectLoading = useSelector(state => state.projects.loading)
 
     const [projectName, setProjectName] = useState('')
     const [projectDescription, setProjectDescription] = useState('')
@@ -132,9 +137,17 @@ const AddProject = () => {
 
     return (
         <Box className="addProjectContainer" sx={{ display: 'flex' }}>
+            
+            {projectLoading ?
+                <Loader
+                    loading={projectLoading} />
+                :
+                null
+            }
+
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
 
-                <Typography variant='h6' mb={3} flexBasis='100%' color='#07078e'>Project Details: </Typography>
+                <Typography variant='h6' mb={3} flexBasis='100%' color='#07078e'>Enter project details </Typography>
                 {/* <Typography variant='h6' sx={{ m: 1 }}>Project Title: </Typography> */}
 
                 <FormControl
@@ -142,7 +155,7 @@ const AddProject = () => {
                     sx={{ m: 1, mb: 2, flexBasis: '25%' }}
                 >
                     <InputLabel htmlFor='projectName'
-                        sx={{ color: '#9a239a' }}
+                        sx={{ color: 'black' }}
                     >Project Name</InputLabel>
                     <OutlinedInput
                         required
@@ -161,7 +174,7 @@ const AddProject = () => {
 
                 <TextField
                     id="projectDescription"
-                    label={<Typography color='#9a239a'>Project Description</Typography>}
+                    label={<Typography color='black'>Project Description</Typography>}
                     multiline
                     minRows={4}
                     sx={{ flexBasis: '100%', m: 1 }}
@@ -170,7 +183,7 @@ const AddProject = () => {
                 />
 
                 <Box flexBasis={'100%'} borderBottom={'1px solid grey'} m={6}></Box>
-                <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Assign Project: </Typography>
+                <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Assign user to project</Typography>
 
                 <List className='card' sx={{ m: 2, flexBasis: '100%', borderColor: '#1976d2' }}>
                     <Typography ml={2} fontWeight={'600'} color={'#1976d2'}>Added Assignee</Typography>
@@ -278,7 +291,7 @@ const AddProject = () => {
 
                 <Box flexBasis={'100%'} borderBottom={'1px solid grey'} m={6}></Box>
 
-                <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Project Components</Typography>
+                <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Add components to project</Typography>
 
 
                 <List className='card' sx={{ m: 2, flexBasis: '100%', borderColor: '#9f2f9f' }}>

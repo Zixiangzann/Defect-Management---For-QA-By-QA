@@ -13,6 +13,7 @@ import { defectListOfUserToBeRemoved, defectListOfComponentToBeRemoved, removeCo
 import { resetState } from '../../../store/reducers/projects';
 // import { removeFromProject } from '../../../store/actions/admin';
 import ReallocateComponentPrompt from '../reallocate/reallocateComponentPrompt';
+import { Loader } from '../../../utils/tools';
 
 //MUI
 import { Divider, Typography } from '@mui/material'
@@ -55,6 +56,8 @@ const ManageProject = () => {
     const dispatch = useDispatch()
     const projects = useSelector(state => state.projects)
     const availableForAssign = useSelector(state => state.projects.assignee.availableForAssign)
+//loading show loader
+    const projectLoading = useSelector(state => state.projects.loading)
 
     //Defects that are assigned to the about to be removed user/component
     const defectListUser = useSelector(state => state.projects.defectListUserToBeRemoved)
@@ -258,15 +261,15 @@ const ManageProject = () => {
                     oldTitle: selectProject,
                     newTitle: projectTitle
                 }))
-                .unwrap()
+                    .unwrap()
                     .then(() => {
                         dispatch(getProjectByTitle({ projectTitle: projectTitle }))
                         dispatch(getAllProjects())
-                        .unwrap()
-                        .then((()=>{
-                            setSelectProject(projectTitle)
-                            setEditEnabled(defaultEditState)
-                        }))
+                            .unwrap()
+                            .then((() => {
+                                setSelectProject(projectTitle)
+                                setEditEnabled(defaultEditState)
+                            }))
                     })
                 break;
             case "confirmProjectDescription":
@@ -274,7 +277,7 @@ const ManageProject = () => {
                     oldTitle: selectProject,
                     newDescription: projectDescription
                 }))
-                .unwrap()
+                    .unwrap()
                     .then(() => {
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
                         setEditEnabled(defaultEditState)
@@ -543,6 +546,13 @@ const ManageProject = () => {
 
     return (
         <Box className="manageProjectContainer" mt={5} sx={{ overflow: 'auto', maxHeight: '650px' }} >
+
+            {projectLoading ?
+                <Loader
+                    loading={projectLoading} />
+                :
+                null
+            }
 
             <form style={{ width: '100%', padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
                 {!selectProject ?

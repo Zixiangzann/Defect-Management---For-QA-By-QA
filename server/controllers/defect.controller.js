@@ -1,12 +1,18 @@
 import httpStatus from 'http-status';
 import { updateAttachment, countIssueType } from '../services/defect.service.js';
 import { defectService } from '../services/index.js';
+import { emailService } from '../services/index.js';
 
 const defectController ={
 
     async createDefect(req,res,next){
         try {
             const defect = await defectService.createDefect(req.body,req.user);
+
+            //send email
+            //You have created a defect , click to view defect
+            //xxxxxxx have created a defect and assigned to you, click to view defect
+
             res.json(defect)
         } catch (error) {
             next(error)
@@ -34,6 +40,11 @@ const defectController ={
         try {
             const defectId = req.params.defectId;
             const defect = await defectService.updateDefectById(defectId,req.user,req.body);
+
+            //send email
+            //You have edited a defect, click to view defect
+            //xxxxxxx have edited a defect that you are assigned to/watching. 
+
             res.json(defect);
         } catch (error) {
             next(error);
@@ -43,6 +54,12 @@ const defectController ={
         try {
             const defectId = req.params.defectId;
             await defectService.deleteDefectById(defectId,req.user);
+
+            //send email
+            //You have deleted a defect
+            //xxxxxxx have deleted a defect that you are assigned to/watching. 
+
+
             res.status(httpStatus.OK).json({[defectId]:'deleted'});
         } catch (error) {
             next(error);

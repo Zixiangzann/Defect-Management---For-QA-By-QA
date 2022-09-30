@@ -46,7 +46,8 @@ const Router = () => {
     return (
         <BrowserRouter>
             {loading ?
-                <Loader />
+                <Loader 
+                loading={loading}/>
                 :
                 <>
                     <Header />

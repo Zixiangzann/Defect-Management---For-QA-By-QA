@@ -4,52 +4,70 @@ import 'dotenv/config'
 
 
 let transporter = nodemailer.createTransport({
-    service:"Gmail",
+    service: "Gmail",
     secure: true,
-    auth:{
-        user:process.env.EMAIL,
-        pass:process.env.EMAIL_PASSWORD
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 })
 
-export const registerEmail = async(userEmail,user) => {
-    try{
+export const mail = async (mailInfo) => {
+    try {
         // const emailToken = user.generateRegisterToken();
         let mailGenerator = new Mailgen({
-            theme:"default",
-            product:{
-                name:"Defect Management(ForQAByQA)",
-                link:`${process.env.EMAIL_MAIN_URL}`
+            theme: "default",
+            product: {
+                name: "Defect Management(ForQAByQA)",
+                link: `${process.env.EMAIL_MAIN_URL}`
             }
         });
 
-        const email = {
-          body:{
-              name: `${user.firstname} ${user.lastname}`,
-              intro: 'Welcome to Defect Management(ForQAByQA)! \n A admin have created a account for you.',
-              action:{
-                instructions: 'Please get your account credentials from your admin and login to change your password to proceed',
-                button:{
-                    color:'#1a73e8',
-                    text: 'Account validation',
-                    link: `${process.env.SITE_DOMAIN}auth`
+        let email = {
+            body: {
+                name: mailInfo.name,
+                intro: mailInfo.intro,
+                outro: mailInfo.outro,
+                greeting: 'Hi'
+            }
+        }
+
+        const button = {
+            action: {
+                instructions: mailInfo.instructions,
+                button: {
+                    color: '#1a73e8',
+                    text: mailInfo.buttonText,
+                    link: `${process.env.SITE_DOMAIN}${mailInfo.link}`
                 }
-                },
-                outro: 'Please contact your admin if you have any questions.'
-          }
+            }
+        }
+
+        if (mailInfo.showButton) {
+            email = {
+                ...email,
+                ...button,
+            }
+        }
+
+        if(mailInfo.showGreeting === false){
+            email.body.greeting = false
         }
 
         let emailBody = mailGenerator.generate(email)
         let message = {
             from: process.env.EMAIL,
-            to: userEmail,
-            subject: "Welcome to Defect Tracker",
-            html:emailBody
+            to: mailInfo.toEmail,
+            subject: mailInfo.subject,
+            html: emailBody
         }
 
         await transporter.sendMail(message)
         return true;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 }
