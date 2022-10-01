@@ -1,7 +1,7 @@
 //lib
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { addProject, getAllUsersForAssign } from "../../../store/actions/projects";
+import { addProject, checkProjectTitleExist, getAllUsersForAssign } from "../../../store/actions/projects";
 
 //comp
 import { Loader } from "../../../utils/tools";
@@ -38,8 +38,9 @@ const AddProject = () => {
 
     const dispatch = useDispatch()
     const availableForAssign = useSelector(state => state.projects.assignee.availableForAssign)
-//loading show loader
+    //loading show loader
     const projectLoading = useSelector(state => state.projects.loading)
+    const projectError = useSelector(state => state.projects.error)
 
     const [projectName, setProjectName] = useState('')
     const [projectDescription, setProjectDescription] = useState('')
@@ -124,7 +125,7 @@ const AddProject = () => {
             components: components
         }))
             .unwrap()
-            .then(() => {
+            .finally(() => {
                 setProjectName('')
                 setProjectDescription('')
                 setAssignee([])
@@ -137,7 +138,7 @@ const AddProject = () => {
 
     return (
         <Box className="addProjectContainer" sx={{ display: 'flex' }}>
-            
+
             {projectLoading ?
                 <Loader
                     loading={projectLoading} />
@@ -165,22 +166,37 @@ const AddProject = () => {
                         value={projectName}
                         label="Project Title"
                         onChange={handleProjectName}
-                        onBlur={handleTrimOnBlur}
+                        onBlur={() => {
+                            handleTrimOnBlur()
+                            dispatch(checkProjectTitleExist({ title: projectName }))
+                        }}
                         inputProps={{ maxLength: 20 }}
                     />
                     <FormHelperText sx={{ textAlign: 'end' }}>Max Length: 20</FormHelperText>
+                    <FormHelperText error>{projectError.projectTitleTaken ? projectError.projectTitleTaken : null}</FormHelperText>
                 </FormControl>
 
+                <FormControl
+                    id='projectDescriptionForm'
+                    sx={{ m: 1, flexBasis: '100%' }}
+                >
+                    <InputLabel htmlFor='projectDescription'
+                        sx={{ color: 'black' }}
+                    >Project Description</InputLabel>
+                    <OutlinedInput
+                        required
+                        name="projectDescription"
+                        id="projectDescription"
+                        text="text"
+                        value={projectDescription}
+                        label="Project Description"
+                        onChange={handleProjectDescription}
+                        multiline
+                        minRows={4}
 
-                <TextField
-                    id="projectDescription"
-                    label={<Typography color='black'>Project Description</Typography>}
-                    multiline
-                    minRows={4}
-                    sx={{ flexBasis: '100%', m: 1 }}
-                    value={projectDescription}
-                    onChange={handleProjectDescription}
-                />
+                    />
+                </FormControl>
+
 
                 <Box flexBasis={'100%'} borderBottom={'1px solid grey'} m={6}></Box>
                 <Typography variant='h6' mb={2} flexBasis='100%' color='#07078e'>Assign user to project</Typography>
@@ -219,8 +235,8 @@ const AddProject = () => {
 
                 <FormControl
                     id="availableForAssign"
-                    sx={{flexBasis:'40%', m: '2rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#0288d1' } }}
-                    
+                    sx={{ flexBasis: '40%', m: '1rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#0288d1' } }}
+
                 >
                     <InputLabel className='availableForAssignLabel' sx={{ color: '#0288d1' }}>{assignee && assignee.length <= 0 ? "Select User" : "Selected User"} </InputLabel>
                     <Select

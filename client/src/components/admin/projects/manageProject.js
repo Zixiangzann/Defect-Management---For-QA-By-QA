@@ -266,7 +266,7 @@ const ManageProject = () => {
                         dispatch(getProjectByTitle({ projectTitle: projectTitle }))
                         dispatch(getAllProjects())
                             .unwrap()
-                            .then((() => {
+                            .finally((() => {
                                 setSelectProject(projectTitle)
                                 setEditEnabled(defaultEditState)
                             }))
@@ -278,7 +278,7 @@ const ManageProject = () => {
                     newDescription: projectDescription
                 }))
                     .unwrap()
-                    .then(() => {
+                    .finally(() => {
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
                         setEditEnabled(defaultEditState)
                     })
@@ -290,7 +290,7 @@ const ManageProject = () => {
                     projectTitle: selectProject
                 }))
                     .unwrap()
-                    .then(() => {
+                    .finally(() => {
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
                         setAssignee('')
                     })
@@ -301,7 +301,7 @@ const ManageProject = () => {
                     projectTitle: selectProject
                 }))
                     .unwrap()
-                    .then(() => {
+                    .finally(() => {
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
                     })
                 break;
@@ -312,7 +312,7 @@ const ManageProject = () => {
                     components: componentField
                 }))
                     .unwrap()
-                    .then(() => {
+                    .finally(() => {
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
                     })
                 setComponentField('')
@@ -322,7 +322,7 @@ const ManageProject = () => {
             case "removeComponentFromProject":
                 dispatch(removeComponents({ title: selectProject, componentToBeRemove: removeProjectComponent }))
                     .unwrap()
-                    .then(() => {
+                    .finally(() => {
                         dispatch(getProjectByTitle({ projectTitle: selectProject }))
                     })
                 break;

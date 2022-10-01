@@ -14,6 +14,7 @@ import History from "../models/history.js";
 
 import { getAuth } from 'firebase-admin/auth'
 import admin from "../firebase.js"
+import { mailUserAdded } from "../mailTemplate/templates.js";
 
 export const addUser = async (req) => {
     try {
@@ -118,6 +119,14 @@ export const addUser = async (req) => {
 
 
         await user.save();
+
+        //send email
+        try {
+            mailUserAdded(req, user)
+        } catch {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'User added, but system failed to send email notification');
+        }
+
         return user;
 
     } catch (error) {
@@ -209,10 +218,10 @@ export const updateProfilePicture = async (req) => {
 
     const updateUser = await User.findOneAndUpdate({ email: userEmail }, { photoURL: userUpdatedPhotoURL }, { new: true });
     //update user in comment collection
-    const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.photoURL": userUpdatedPhotoURL},{ new: true });
+    const updateUserInComment = await Comment.updateMany({ "user.email": userEmail }, { "user.$.photoURL": userUpdatedPhotoURL }, { new: true });
     result.push(updateUser)
     //update user in history collection
-    const updateUserInHistory = await History.updateMany({"user.email": userEmail},{"user.$.photoURL": userUpdatedPhotoURL},{ new: true });
+    const updateUserInHistory = await History.updateMany({ "user.email": userEmail }, { "user.$.photoURL": userUpdatedPhotoURL }, { new: true });
 
     //firebase
     const uid = user.firebaseuid
@@ -322,8 +331,8 @@ export const updateUserUserName = async (req) => {
     //update in user collection
     const updateUser = await User.findOneAndUpdate({ email: userEmail }, { username: userUpdatedUsername }, { new: true });
     //update in comment collection
-    const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.username": userUpdatedUsername},{ new: true });
-    const updateUserInHistory = await History.updateMany({"user.email": userEmail},{"user.$.username": userUpdatedUsername},{ new: true });
+    const updateUserInComment = await Comment.updateMany({ "user.email": userEmail }, { "user.$.username": userUpdatedUsername }, { new: true });
+    const updateUserInHistory = await History.updateMany({ "user.email": userEmail }, { "user.$.username": userUpdatedUsername }, { new: true });
     result.push(updateUser)
 
     //firebase
@@ -414,7 +423,7 @@ export const updateUserEmail = async (req) => {
 
     //to check if user new email is already taken.
     if (await User.emailTaken(userUpdatedEmail)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Email taken')
-    
+
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
@@ -423,9 +432,9 @@ export const updateUserEmail = async (req) => {
     const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
     const updatedUserProject = await Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
     const updatedUserDefect = await Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
-    const updateUserInComment = await Comment.updateMany({"user.email": userEmail},{"user.$.email": userUpdatedEmail},{ new: true });
-    const updateUserInHistory =  await History.updateMany({"user.email": userEmail},{"user.$.email": userUpdatedEmail},{ new: true });
-    
+    const updateUserInComment = await Comment.updateMany({ "user.email": userEmail }, { "user.$.email": userUpdatedEmail }, { new: true });
+    const updateUserInHistory = await History.updateMany({ "user.email": userEmail }, { "user.$.email": userUpdatedEmail }, { new: true });
+
 
     // join the json and return as response
     const result = new Array();

@@ -16,6 +16,21 @@ export const getAllUsersForAssign = createAsyncThunk(
     }
 )
 
+export const checkProjectTitleExist = createAsyncThunk(
+    'projects/checkProjectTitleExist',
+    async({title}) => {
+        try {
+            const request = await axios.post('/api/project/checkprojectexist',{
+                title
+            },getAuthHeader())
+            return {message: request.data.message}
+            
+        } catch (error) {
+            throw error
+        }
+    })
+
+
 export const addProject = createAsyncThunk(
     'projects/addProject',
     async ({

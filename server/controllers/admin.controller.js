@@ -40,23 +40,6 @@ const adminController = {
     async addUser(req, res, next) {
         try {
             const createdAccount = await adminService.addUser(req);
-
-            //send a email that account is created
-            const mailInfo = {
-                name: `${createdAccount.firstname} ${createdAccount.lastname}`,
-                intro: "Welcome to Defect Management(ForQAByQA)! \n A admin have created a account for you.",
-                instructions: "Please get your account credentials from your admin and login to change your password to proceed",
-                showButton: true,
-                buttonText: "Account validation",
-                link: "auth",
-                outro: "Please contact your admin if you have any questions.",
-                subject: "Welcome to Defect Management(ForQAByQA)",
-                toEmail: createdAccount.email
-            }
-
-            await emailService.mail(mailInfo);
-            // await emailService.registerEmail(req.body.userDetails.email, createdAccount);
-
             res.status(httpStatus.CREATED).json(createdAccount)
         } catch (error) {
             next(error)

@@ -26,6 +26,14 @@ export const projectSchema = mongoose.Schema({
         default: Date.now
     }
 })
+
+projectSchema.statics.projectTitleTaken = async function (title){
+    const project = await this.findOne({"title":title.toLowerCase().trim()}).collation(
+        { locale: 'en', strength: 2 }
+      );
+    return !!project
+}
+
 mongoose.plugin(mongooseAggregatePaginate);
 const Project = mongoose.model('Project', projectSchema)
 

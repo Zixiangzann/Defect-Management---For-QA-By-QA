@@ -221,6 +221,10 @@
         flex-basis: 100%;
     }
 
+    #availableForAssign{
+        flex-basis: 100%;
+    }
+
   }
 
 

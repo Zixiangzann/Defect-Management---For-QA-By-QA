@@ -15,6 +15,9 @@ router.patch('/update',auth('updateAny','projects'),projectController.updateProj
 
 router.post('/getallusersforassign',auth('readAny','projects'),projectController.getAllUsersForAssign)
 
+//check if project title is taken
+router.post('/checkprojectexist',auth('readAny','projects'),projectController.checkProjectTitleExist)
+
 //project assignee
 router.patch('/assignee/assign',auth('updateAny','projects'),projectController.assignProject)
 router.patch('/assignee/removefromproject',auth('updateAny','projects'),projectController.removeAssigneeFromProject)

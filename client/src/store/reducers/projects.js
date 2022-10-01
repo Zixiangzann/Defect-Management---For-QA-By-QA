@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { showToast } from '../../utils/tools';
 import { getAllProjects } from '../actions/admin';
 import { getProjectByTitle } from '../actions/defects';
-import { addComponents, removeComponents, assignProject, removeFromProject,updateProjectTitleAndDescription } from '../actions/projects';
+import { addComponents, removeComponents, assignProject, removeFromProject,updateProjectTitleAndDescription, checkProjectTitleExist } from '../actions/projects';
 
 
 
@@ -16,6 +16,9 @@ import {
 //slice for admin project management
 let DEFAULT_PROJECTS_STATE = {
     loading:false,
+    error:{
+        projectTitleTaken: null
+    },
     assignee:{
         availableForAssign: [],
         currentAssignee: []
@@ -39,6 +42,13 @@ export const projectsSlice = createSlice({
         builder
         .addCase(getAllUsersForAssign.fulfilled, (state,action) => {
             state.assignee.availableForAssign = action.payload.allUsersForAssign
+        })
+        .addCase(checkProjectTitleExist.fulfilled,(state,action) => {
+            if(action.payload.message){
+                state.error.projectTitleTaken = action.payload.message
+            }else{
+                state.error.projectTitleTaken = null
+            }
         })
         .addCase(addProject.pending,(state,action) => {
            state.loading = true;

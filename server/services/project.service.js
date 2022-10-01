@@ -4,20 +4,39 @@ import { ApiError } from '../middleware/apiError.js'
 import Defect from '../models/defect.js'
 import User from "../models/user.js"
 import { userService } from "./index.js";
+import {
+    mailProjectAssigneeAdded,
+    mailProjectAssigneeRemoved,
+    mailProjectComponentAdded,
+    mailProjectComponentRemoved,
+    mailProjectCreated,
+    mailProjectTitleUpdated
+} from '../mailTemplate/templates.js'
 
 export const createProject = async (req) => {
+
+    const title = req.body.title
+    const description = req.body.description
 
     //require addProject permission.
     if (!req.user.permission[0].addProject) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to create project');
 
-    if (req.body.title.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for project name is: 20');
+    if (title.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for project name is: 20');
 
     req.body.components.map((e) => {
         if (e.length > 20) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Max length for component name is: 20');
     })
 
-    const title = req.body.title
-    const description = req.body.description
+    //title and description cannot be empty
+    if (title.trim().length <= 0) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Project Title is required');
+    if (description.trim().length <= 0) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Project Description is required');
+
+    //Check if title is already taken
+    if (await Project.projectTitleTaken(title)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, This Project name have been taken, Please use another Project name');
+    }
+
+
     //remove any duplicate in assignee/components before adding project
     //front end will also validate this. but just in case somehow it get to backend with duplicate.
     const assignee = [... new Set(req.body.assignee)]
@@ -45,8 +64,25 @@ export const createProject = async (req) => {
             "action": "assigned user to project"
         })
 
+        //send email
+        try {
+            mailProjectCreated(req, result)
+        } catch {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Project created but failed to send email notification');
+        }
 
         return result;
+    } catch (error) {
+        throw error
+    }
+}
+
+export const checkProjectTitleExist = async (body) => {
+    try {
+        if (await Project.projectTitleTaken(body.title)) {
+            return { message: 'Sorry, This Project name has been taken, Please use another Project name' }
+        }
+
     } catch (error) {
         throw error
     }
@@ -57,9 +93,9 @@ export const getProjectByTitle = async (title) => {
         const project = await Project.findOne({ title })
         if (project === null) throw ApiError(httpStatus.NOT_FOUND, 'Project details not found')
         //use project assignee to get user details
-        
-        const user = await User.find({email:project.assignee},{"username":1 , "email": 1, "photoURL": 1})
-       
+
+        const user = await User.find({ email: project.assignee }, { "username": 1, "email": 1, "photoURL": 1 })
+
         const result = new Array();
         result.push(project)
         result.push(user)
@@ -112,43 +148,60 @@ export const updateProjectByTitle = async (req) => {
         const oldTitle = req.body.oldTitle
         const newTitle = req.body.newTitle;
         const newDescription = req.body.newDescription;
-        
+
         const project = await Project.findOne({ title: oldTitle })
         //only using it for email
-        const oldDescription = {oldDescription: project.description};
+        const oldDescription = { oldDescription: project.description };
 
         if (project === null) throw new ApiError(httpStatus.NOT_FOUND, 'Project not found')
 
-        if(newTitle){
+        if (newTitle) {
 
             //update in Project Collection
             const newProjectDetail = await Project.findOneAndUpdate({ title: oldTitle }, {
                 "$set": {
                     title: newTitle
-                }}, { new: true }).exec();
+                }
+            }, { new: true }).exec();
 
             //update in User Collection
             const updatedUserProject = await User.updateMany(
-                {project:oldTitle},
-                {$set:{"project.$":newTitle}})
+                { project: oldTitle },
+                { $set: { "project.$": newTitle } })
 
             //update in Defect Collection
-            const updatedDefectProject = await Defect.updateMany({project:oldTitle}
-                ,{$set:{"project":newTitle}})    
+            const updatedDefectProject = await Defect.updateMany({ project: oldTitle }
+                , { $set: { "project": newTitle } })
 
-            return (newProjectDetail);            
+            //send email
+            try {
+                mailProjectTitleUpdated(req, newProjectDetail)
+            } catch {
+                throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Project title updated but failed to send email notification');
+            }
 
-        }else if(newDescription){
+            return (newProjectDetail);
+
+        } else if (newDescription) {
 
             const newProjectDetail = await Project.findOneAndUpdate({ title: oldTitle }, {
                 "$set": {
                     description: newDescription
-                }}, { new: true }).exec();
+                }
+            }, { new: true }).exec();
 
             const result = {
                 ...newProjectDetail._doc,
                 ...oldDescription
-            }    
+            }
+
+            //send email
+            try {
+                mailProjectTitleUpdated(req, result)
+            } catch {
+                throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Project description updated but failed to send email notification');
+            }
+
             return (result);
 
         }
@@ -160,8 +213,6 @@ export const updateProjectByTitle = async (req) => {
 
 export const assignProject = async (req) => {
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const projectTitle = req.body.projectTitle
 
@@ -169,12 +220,6 @@ export const assignProject = async (req) => {
     if (!req.user.permission[0].assignProject) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -203,6 +248,13 @@ export const assignProject = async (req) => {
             "project": await updatedUser.project
         }
     )
+
+    //send email
+    try {
+        mailProjectAssigneeAdded(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Assignee added but failed to send email notification');
+    }
 
     return result;
 
@@ -245,6 +297,13 @@ export const removeAssigneeFromProject = async (req) => {
         "username": user.username,
         "project": await updatedUser.project
     })
+
+    //send email
+    try {
+        mailProjectAssigneeRemoved(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Assignee removed but failed to send email notification ');
+    }
 
     return result;
 
@@ -320,6 +379,13 @@ export const addComponentsToProject = async (req) => {
             project.save();
         }
 
+        //send email
+        try {
+            mailProjectComponentAdded(req, project)
+        } catch {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Component added but failed to send email notification');
+        }
+
         return project;
     } catch (error) {
         throw error;
@@ -345,6 +411,13 @@ export const removeComponentsFromProject = async (req) => {
         if (defect.length > 0) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Unable to remove component as there are defect/s assigned to this component');
 
         const updatedProject = await Project.findOneAndUpdate({ title: title }, { $pull: { components: componentToBeRemove } }, { new: true })
+
+        //send email
+        try {
+            mailProjectComponentRemoved(req, project)
+        } catch {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Component removed but failed to send email notification');
+        }
 
         return updatedProject;
     } catch (error) {

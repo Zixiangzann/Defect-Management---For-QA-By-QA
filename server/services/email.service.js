@@ -47,8 +47,8 @@ export const mail = async (mailInfo) => {
         }
 
         if (mailInfo.showButton) {
-            email = {
-                ...email,
+            email.body = {
+                ...email.body,
                 ...button,
             }
         }

@@ -285,7 +285,7 @@ export const calcuDateDiff = (isodate) => {
 
 }
 
-//TODO: plan in the further to be able to customize 
+//TODO: plan in the future to be able to customize 
 export const StatusColorCode = ({
     status,
     textWidth

@@ -87,7 +87,6 @@ const CreateDefect = () => {
 
     const handleEditorState = (state) => {
         formik.setFieldValue('description', state, true)
-        console.log(formik.values.description)
     }
 
     const handleEditorBlur = (blur) => {
@@ -174,6 +173,8 @@ const CreateDefect = () => {
                     }
 
                     ))
+                })
+                .finally(()=>{
                     navigate('/defect')
                 })
         }
@@ -183,6 +184,12 @@ const CreateDefect = () => {
         <>
             <Typography variant='h4' sx={{ marginTop: '2rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Create Issue</Typography>
 
+            {defects.loading ?
+                <Loader
+                    loading={defects.loading} />
+                :
+                null
+            }
 
             <form className='defect_form' style={{ marginTop: '2rem' }} onSubmit={formik.handleSubmit}>
 
