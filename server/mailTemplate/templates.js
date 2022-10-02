@@ -302,7 +302,7 @@ export const mailProjectAssigneeAdded = async (req, project) => {
                     `,
             showButton: false,
             showGreeting: false,
-            subject: "(ForQAByQA) You have assigned yourself a project",
+            subject: "(ForQAByQA) You have assigned yourself to a project",
             toEmail: req.body.userEmail
         }
     } else {
@@ -562,4 +562,180 @@ export const mailUserAdded = async (req, createdAccount) => {
 
     await emailService.mail(mailInfo);
 
+}
+
+//send a mail to inform user account updated
+export const mailUserPicUpdated = async (req,updatedUser) => {
+    
+    const mailInfo = {
+        name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
+        intro: "An admin has updated your account's Profile picture.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's Profile picture have been updated",
+        toEmail: updatedUser[0].email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+//send a mail to inform user account updated
+export const mailUserFirstNameUpdated = async (req, updatedUser) => {     
+     const mailInfo = {
+        name: `${updatedUser.firstname} ${updatedUser.lastname}`,
+        intro: "An admin has updated your account's First name.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's First name have been updated",
+        toEmail: updatedUser.email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+//send a mail to inform user account updated
+export const mailUserLastNameUpdated = async (req, updatedUser) => {
+     
+     const mailInfo = {
+        name: `${updatedUser.firstname} ${updatedUser.lastname}`,
+        intro: "An admin has updated your account's Last name.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's Last name have been updated",
+        toEmail: updatedUser.email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+//send a mail to inform user account updated
+export const mailUserUserNameUpdated = async (req, updatedUser) => {
+     
+     const mailInfo = {
+        name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
+        intro: "An admin has updated your account's Username.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's Username have been updated",
+        toEmail: updatedUser[0].email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+ //send a mail to inform user account updated
+export const mailUserPhoneUpdated = async (req, updatedUser) => {
+    
+     const mailInfo = {
+        name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
+        intro: "An admin has updated your account's Phone number.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's Phone number have been updated",
+        toEmail: updatedUser[0].email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+//send a mail to inform user account updated
+export const mailUserEmailUpdated = async (req, updatedUser) => {
+    
+    const mailInfo = {
+        name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
+        intro: "An admin has updated your account's Email.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's Email have been updated",
+        toEmail: req.body.userNewEmail
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+//send a mail to inform user account updated
+export const mailUserJobTitleUpdated = async (req, updatedUser) => {
+    
+    const mailInfo = {
+        name: `${updatedUser.firstname} ${updatedUser.lastname}`,
+        intro: "An admin has updated your account's Job title.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's Job title have been updated",
+        toEmail: updatedUser.email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+//send a mail to inform user account password resetted
+export const mailUserPasswordResetted = async (req, updatedUser) => {
+
+    let mailInfo;
+
+    //send to self
+    mailInfo = {
+        intro: `<div>
+            <p>Passwords for 
+            <strong><span style="color:#00008b;font-size:1.3rem;"> ${updatedUser[0].email} </span></strong></p>
+            have been successfully reset
+            </p>
+            <p>The user will receive an email notification that their password has been resetted<p>
+            <p><br></p>
+            <p>It is necessary to provide the user with the new account credentials so that he or she can login<p>
+            </div>
+    `,
+        showButton: false,
+        showGreeting: false,
+        subject: "",
+        toEmail: req.user.email
+    }
+
+    await emailService.mail(mailInfo);
+
+
+    //send to user
+    mailInfo = {
+        name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
+        intro: `<p>Your account password has been reset by an admin</p>`,
+        instructions: `<p>To proceed, please get your account credentials from your admin and log in to change your password.</p>`,
+        showButton: true,
+        buttonText: "Account validation",
+        link: "auth",
+        outro: "Please contact your admin if you have any questions.",
+        subject: "Welcome to Defect Management(ForQAByQA)",
+        toEmail: updatedUser[0].email
+    }
+
+    await emailService.mail(mailInfo);
+     
+}
+
+ //send a mail to inform user account role updated
+export const mailUserRoleUpdated = async (req, updatedUser) => {
+   
+    const mailInfo = {
+        name: `${updatedUser.firstname} ${updatedUser.lastname}`,
+        intro: "An admin have updated your account's Role.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's role have been updated",
+        toEmail: updatedUser.email
+    }
+
+    await emailService.mail(mailInfo);
+}
+
+export const mailUserPermissionUpdated = async (req, updatedUser) => {
+     //send a mail to inform user account role updated
+     const mailInfo = {
+        name: `${updatedUser.firstname} ${updatedUser.lastname}`,
+        intro: "An admin have updated your account's Permission.",
+        showButton: false,
+        outro: "Please contact your admin if you have any questions.",
+        subject: "(ForQAByQA) Your account's permission have been updated",
+        toEmail: updatedUser.email
+    }
+
+    await emailService.mail(mailInfo);
 }
