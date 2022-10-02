@@ -91,19 +91,6 @@ const adminController = {
     async updateUserPhotoURL(req, res, next) {
         try {
             const updatedUser = await adminService.updateProfilePicture(req)
-
-            //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
-                intro: "A admin have updated your account's profile picture.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's profile picture have been updated",
-                toEmail: updatedUser[0].email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -113,19 +100,6 @@ const adminController = {
     async updateUserFirstName(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserFirstName(req)
-
-            //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser.firstname} ${updatedUser.lastname}`,
-                intro: "A admin have updated your account's first name.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's first name have been updated",
-                toEmail: updatedUser.email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -135,19 +109,6 @@ const adminController = {
     async updateUserLastName(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserLastName(req)
-
-            //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser.firstname} ${updatedUser.lastname}`,
-                intro: "A admin have updated your account's last name.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's last name have been updated",
-                toEmail: updatedUser.email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -156,20 +117,7 @@ const adminController = {
 
     async updateUserUserName(req, res, next) {
         try {
-            const updatedUser = await adminService.updateUserUserName(req)
-
-            //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
-                intro: "A admin have updated your account's username.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's username have been updated",
-                toEmail: updatedUser[0].email
-            }
-
-            await emailService.mail(mailInfo);
-
+            const updatedUser = await adminService.updateUserUserName(req)           
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -179,19 +127,6 @@ const adminController = {
     async updateUserPhone(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserPhone(req)
-
-             //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
-                intro: "A admin have updated your account's phone number.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's phone number have been updated",
-                toEmail: updatedUser[0].email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -201,19 +136,6 @@ const adminController = {
     async updateUserEmail(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserEmail(req)
-
-            //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
-                intro: "A admin have updated your account's email.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's email have been updated",
-                toEmail: req.body.userNewEmail
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -223,19 +145,6 @@ const adminController = {
     async updateUserJobTitle(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserJobTitle(req)
-
-            //send a mail to inform user account updated
-            const mailInfo = {
-                name: `${updatedUser.firstname} ${updatedUser.lastname}`,
-                intro: "A admin have updated your account's Job Title.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's Job Title have been updated",
-                toEmail: updatedUser.email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -245,22 +154,6 @@ const adminController = {
     async resetUserPassword(req, res, next) {
         try {
             const updatedUser = await adminService.resetUserPassword(req)
-            
-            //send a mail to inform user account password resetted
-            const mailInfo = {
-                name: `${updatedUser[0].firstname} ${updatedUser[0].lastname}`,
-                intro: "A admin have resetted your account password",
-                instructions: "Please get your account credentials from your admin and login to change your password to proceed",
-                showButton: true,
-                buttonText: "Account validation",
-                link: "auth",
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's password have been resetted",
-                toEmail: updatedUser[0].email 
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -270,19 +163,6 @@ const adminController = {
     async updateUserRole(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserRole(req)
-            
-            //send a mail to inform user account role updated
-            const mailInfo = {
-                name: `${updatedUser.firstname} ${updatedUser.lastname}`,
-                intro: "A admin have updated your account's role.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's role have been updated",
-                toEmail: updatedUser.email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)
@@ -292,19 +172,6 @@ const adminController = {
     async updateUserPermission(req, res, next) {
         try {
             const updatedUser = await adminService.updateUserPermission(req)
-            
-            //send a mail to inform user account role updated
-            const mailInfo = {
-                name: `${updatedUser.firstname} ${updatedUser.lastname}`,
-                intro: "A admin have updated your account's permission.",
-                showButton: false,
-                outro: "Please contact your admin if you have any questions.",
-                subject: "(ForQAByQA) Your account's permission have been updated",
-                toEmail: updatedUser.email
-            }
-
-            await emailService.mail(mailInfo);
-
             res.status(httpStatus.OK).json(updatedUser)
         } catch (error) {
             next(error)

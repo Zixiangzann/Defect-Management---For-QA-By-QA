@@ -196,6 +196,21 @@ export const getDefectById = createAsyncThunk(
     }
 )
 
+export const defectWatch = createAsyncThunk(
+    'defects/defectWatch',
+    async ({defectId}, { rejectWithValue }) =>{
+        try {
+            const request = await axios.post(`/api/defect/watch/${defectId}`,{}, getAuthHeader());
+            return request.data;
+        } catch (error) {
+            if (!error.response) {
+                throw error
+            }
+            return rejectWithValue(error.response)
+        }
+    })
+
+
 export const getAllDefectPaginate = createAsyncThunk(
     'defects/getAllDefectPaginate',
     async ({

@@ -443,7 +443,7 @@ const EditDefect = () => {
             dispatch(updateDefect({ values, defectId }))
                 .unwrap()
                 .then((response) => {
-                    navigate('/')
+                    navigate('/defect')
                 })
         }
     })

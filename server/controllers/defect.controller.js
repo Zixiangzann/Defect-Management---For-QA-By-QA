@@ -219,6 +219,16 @@ const defectController = {
         }
     },
 
+    async defectWatch(req, res, next) {
+        try {
+            const defectid = req.params.defectId;
+            const watch = await defectService.defectWatch(defectid,req.user.email)
+            res.status(httpStatus.OK).json({watch});
+        } catch (error) {
+            next(error);
+        }
+    },
+
     //For more
     async getMoreDefects(req, res, next) {
         try {
@@ -239,7 +249,7 @@ const defectController = {
     //Get details for creating defects
     async getAllAssignee(req, res, next) {
         try {
-            const assignee = await defectService.getAllAssignee(req.body.title);
+            const assignee = await defectService.getAllAssignee(req, req.body.title);
             res.json(assignee);
         } catch (error) {
             next(error);

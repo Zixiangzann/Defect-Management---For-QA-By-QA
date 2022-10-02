@@ -328,6 +328,7 @@ export const defectListOfToBeRemovedUser = async (req) => {
 
         //to check if there is any defect assigned to this user
         const defect = await Defect.find({ project: projectTitle, assignee: userEmail })
+        
         return defect
 
     } catch (error) {

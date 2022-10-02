@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { showToast } from '../../utils/tools'
 
 import {
   createDefect,
+  defectWatch,
   deleteDefect,
   filterDefect,
   getAllAssignee,
@@ -26,6 +28,7 @@ let DEFAULT_DEFECT_STATE = {
     severity: null,
     status: null,
     assignee: null,
+    watching: null,
     attachment: []
   },
   filter: {
@@ -97,13 +100,20 @@ export const defectsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getAllProjects.fulfilled, (state, action) => {
-        state.data.project = action.payload.project
+        state.data.project = [...action.payload.project.sort((a, b) => a.title.localeCompare(b.title))]
       })
       .addCase(getAllAssignee.fulfilled, (state, action) => {
         state.data.assignee = action.payload.assignee
       })
       .addCase(getAllComponents.fulfilled, (state, action) => {
         state.data.components = action.payload.components
+      })
+      .addCase(defectWatch.fulfilled, (state, action) => {
+        console.log(action.payload.watch)
+        showToast('SUCCESS',action.payload.watch)
+      })
+      .addCase(defectWatch.rejected, (state,action) => {
+        showToast('ERROR',action.payload.data.message)
       })
       .addCase(createDefect.pending, (state) => { state.loading = true })
       .addCase(createDefect.fulfilled, (state, action) => {

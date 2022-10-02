@@ -42,6 +42,8 @@ export const projectsSlice = createSlice({
         builder
         .addCase(getAllUsersForAssign.fulfilled, (state,action) => {
             state.assignee.availableForAssign = action.payload.allUsersForAssign
+            // const test = action.payload.allUsersForAssign.sort((a, b) => a.email.localeCompare(b.email));
+
         })
         .addCase(checkProjectTitleExist.fulfilled,(state,action) => {
             if(action.payload.message){
@@ -62,7 +64,7 @@ export const projectsSlice = createSlice({
             showToast('ERROR',action.payload.data.message)
         })
         .addCase(getAllProjects.fulfilled,(state,action)=>{
-            state.projectList = [...action.payload.project]
+            state.projectList = [...action.payload.project.sort((a, b) => a.title.localeCompare(b.title))]
         })
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project

@@ -315,6 +315,7 @@ const ManageUser = () => {
                 dispatch(updateProfilePicture({
                     // adminPassword,
                     userEmail,
+                    userId:userDetails.userId,
                     uploadProfilePicture: uploadProfilePicture
                 }))
                     .unwrap()

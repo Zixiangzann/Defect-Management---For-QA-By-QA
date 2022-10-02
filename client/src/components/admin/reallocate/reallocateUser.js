@@ -29,6 +29,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 const ReallocateUser = ({
     defectDetails,
     projectAvailableAssignee,
+    fromAssignee,
     user,
     project
 }) => {
@@ -51,6 +52,11 @@ const ReallocateUser = ({
     const [assignee, setAssignee] = useState([]);
     const [assigneeChanged, setAssigneeChanged] = useState(false)
 
+    //for getting username for history
+    const [before, setBefore] = useState([])
+    const [after, setAfter] = useState([])
+    const [assigneeUpdated, setAssigneeUpdated] = useState(false)
+
     const handleChange = (event) => {
         const {
             target: { value },
@@ -63,42 +69,73 @@ const ReallocateUser = ({
     };
 
     useEffect(() => {
+
+        //before changes
+
+        if (defectDetails) {
+            let initial = []
+            projectAvailableAssignee.map((user) => {
+                if (defectDetails.assignee.indexOf(user.email) > -1) {
+                    initial.push(user.username)
+                }
+            })
+            setBefore([...initial])
+        }
+
         if (defectDetails) {
             setAssignee(defectDetails.assignee)
         }
+
     }, [defectDetails])
+
 
     useEffect(() => {
         //update assignee, only update if have differences and assignee must have at least 1
         if (assigneeChanged) {
 
-          
-            if (!checkArrayEqual(assignee,defectDetails.assignee)) {
+
+            if (!checkArrayEqual(assignee, defectDetails.assignee)) {
                 if (assignee.length >= 1) {
                     //updating assignee
                     dispatch(updateDefect({ assignee: assignee, defectId: defectDetails.defectid }))
-                    .unwrap()
-                    .then(()=>{
-                        dispatch(defectListOfUserToBeRemoved({projectTitle:project,userEmail:user}))
-                    })
+                        .unwrap()
+                        .then(() => {
+                            let current = []
+                            if (assignee && assigneeChanged) {
+                                projectAvailableAssignee.map((user) => {
+                                    if (assignee.indexOf(user.email) > -1) {
+                                        current.push(user.username)
+                                    }
+                                })
+                                setAfter([...current])
+                                setAssigneeUpdated(true)
+                            }
+                        })
 
-                    dispatch(addHistory({
-                        defectId: defectDetails.defectid,
-                        from: defectDetails.assignee,
-                        to: assignee,
-                        field: "assignee",
-                        editdate: new Date()
-                    }))
-
-                    
                 }
             }
+            setAssigneeChanged(false)
         }
 
-        setAssigneeChanged(false)
+
 
 
     }, [assigneeChanged])
+
+    useEffect(() => {
+        if (assigneeUpdated) {
+            dispatch(addHistory({
+                defectId: defectDetails.defectid,
+                from: before,
+                to: after,
+                field: "assignee",
+                editdate: new Date()
+            }))
+            dispatch(defectListOfUserToBeRemoved({ projectTitle: project, userEmail: user }))
+            
+            setAssigneeUpdated(false)
+        }
+    }, [assigneeUpdated])
 
 
     return (

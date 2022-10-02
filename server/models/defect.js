@@ -52,6 +52,9 @@ export const defectSchema = mongoose.Schema({
     assignee:{
         type:[String]
     },
+    watching:{
+        type:[String]
+    },
     attachment:{
         type:[{}]
     },

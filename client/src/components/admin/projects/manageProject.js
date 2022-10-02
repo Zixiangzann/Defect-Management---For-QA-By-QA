@@ -495,8 +495,6 @@ const ManageProject = () => {
 
     const handleSelectProject = (event) => {
         setSelectProject(event.target.value)
-        console.log(selectProject)
-
     }
 
     //get project details when selected project

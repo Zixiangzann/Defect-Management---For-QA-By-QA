@@ -14,6 +14,9 @@ router.delete('/delete/:defectId',auth('deleteAny','defects'),defectController.d
 //add file attachment
 router.patch('/update/attachment/:defectId',auth('createAny','defects'),defectController.updateAttachment)
 
+//watchlist
+router.post('/watch/:defectId',auth('updateAny','defects'),defectController.defectWatch);
+
 //get all
 router.post('/more',auth('readAny','defects'),defectController.getMoreDefects);
 router.post('/paginate',auth('readAny','defects'),defectController.defectListPaginate)

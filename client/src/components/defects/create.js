@@ -174,7 +174,7 @@ const CreateDefect = () => {
 
                     ))
                 })
-                .finally(()=>{
+                .finally(() => {
                     navigate('/defect')
                 })
         }
@@ -201,7 +201,13 @@ const CreateDefect = () => {
                         fullWidth
                         sx={{ marginTop: '1rem', flexBasis: '50%' }}>
 
-                        <InputLabel sx={{ color: 'mediumblue' }}>Select Project</InputLabel>
+
+                        {formik.values.project ?
+                            <InputLabel sx={{ color: 'mediumblue' }}>Selected Project</InputLabel>
+                            :
+                            <InputLabel sx={{ color: 'mediumblue' }}>Select Project</InputLabel>
+                        }
+
                         <Select
                             name='project'
                             label='Select Project'
@@ -362,7 +368,16 @@ const CreateDefect = () => {
                                     <FormControl
                                         id="createDefectAssignee"
                                         sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-                                        <InputLabel className='defectDetailsSelectLabel'>Assignee</InputLabel>
+
+                                        {formik.values.project ?
+                                            <InputLabel className='defectDetailsSelectLabel'>Assignee</InputLabel>
+                                            :
+                                            <InputLabel color='grey'>Assignee</InputLabel>
+                                        }
+
+                                        
+
+
                                         <Select
                                             multiple
                                             name='assignee'
@@ -391,6 +406,7 @@ const CreateDefect = () => {
                                                     ))}
                                                 </Box>
                                             )}
+                                            disabled={formik.values.project ? false : true}
                                         >
                                             {defects.data.assignee ? defects.data.assignee.map((item) => (
 
@@ -427,6 +443,13 @@ const CreateDefect = () => {
                                             ) : null}
 
                                         </Select>
+                                        {!formik.values.project ?
+                                            <FormHelperText color='brown'>
+                                                Please select a project first
+                                            </FormHelperText>
+                                            :
+                                            null
+                                        }
                                         {assignee.length === 0 && assigneeSelectTouched === true ?
                                             <FormHelperText error={true}>
                                                 Please select a assignee
@@ -444,13 +467,21 @@ const CreateDefect = () => {
                             id="createDefectComponents"
                             sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                            <InputLabel className='defectDetailsSelectLabel'>Components</InputLabel>
+
+
+                            {formik.values.project ?
+                                <InputLabel className='defectDetailsSelectLabel'>Components</InputLabel>
+                                :
+                                <InputLabel color='grey'>Components</InputLabel>
+                            }
 
                             <Select
                                 name='components'
                                 label='components'
+                                disabled={formik.values.project ? false : true}
                                 value={defects.data.components}
                                 {...formik.getFieldProps('components')}
+
                             >
 
                                 {defects.data.components ? defects.data.components.map((item) => (
@@ -461,6 +492,14 @@ const CreateDefect = () => {
                                 )) : null
                                 }
                             </Select>
+
+                            {!formik.values.project ?
+                                <FormHelperText color='brown'>
+                                    Please select a project first
+                                </FormHelperText>
+                                :
+                                null
+                            }
 
                             {errorHelperSelect(formik, 'components')}
                         </FormControl>

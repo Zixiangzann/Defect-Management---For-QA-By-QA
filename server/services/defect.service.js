@@ -256,7 +256,12 @@ export const paginateDefectList = async (req) => {
 
 //Get details for creating defects
 //Get assignee of the project.
-export const getAllAssignee = async (title) => {
+export const getAllAssignee = async (req, title) => {
+
+    const sortby = req.body.sortby || "email";
+    const order = req.body.order || -1
+    const search = req.body.search || '(.*?)';
+
     try {
         const project = await Project.find({ title: title })
         const assignee = project[0].assignee
@@ -270,6 +275,28 @@ export const getAllAssignee = async (title) => {
         throw error
     }
 }
+
+//add/remove from watchlist
+export const defectWatch = async (defectid,user) => {
+    
+
+    const defect = await Defect.find({defectid})
+    if(!defect) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Defect Details not found'); 
+
+    //Toggle
+    //If user is already watching, remove from watchlist
+    if(defect[0].watching.includes(user)){
+        const removeFromWatchlist = await Defect.findOneAndUpdate({defectid}, { $pull: { watching: user } }, { new: true })
+        return "Removed from watchlist"
+    }else{
+        //if user is not watching, add to watchlist
+        const addedToWatchlist = await Defect.findOneAndUpdate({defectid}, { $push: { watching: user } }, { new: true })
+        return "Added to watchlist"
+    }
+    
+}
+
+
 //Get details for creating defects
 //To get available projects.
 //Only account with viewAllDefect permission can see all projects defects.

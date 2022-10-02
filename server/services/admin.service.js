@@ -14,7 +14,18 @@ import History from "../models/history.js";
 
 import { getAuth } from 'firebase-admin/auth'
 import admin from "../firebase.js"
-import { mailUserAdded } from "../mailTemplate/templates.js";
+import { 
+    mailUserAdded, 
+    mailUserEmailUpdated, 
+    mailUserFirstNameUpdated, 
+    mailUserJobTitleUpdated, 
+    mailUserLastNameUpdated, 
+    mailUserPasswordResetted, 
+    mailUserPermissionUpdated, 
+    mailUserPhoneUpdated, 
+    mailUserPicUpdated, 
+    mailUserRoleUpdated, 
+    mailUserUserNameUpdated } from "../mailTemplate/templates.js";
 
 export const addUser = async (req) => {
     try {
@@ -193,9 +204,8 @@ export const updateProfilePicture = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     //user details
+    // const userId = req.body.userId
     const userEmail = req.body.userEmail
     const userUpdatedPhotoURL = req.body.userNewPhotoURL
 
@@ -205,12 +215,6 @@ export const updateProfilePicture = async (req) => {
     } catch (error) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'A valid URL is required.');
     }
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -240,6 +244,15 @@ export const updateProfilePicture = async (req) => {
 
     result.push(updateUserInComment)
     result.push(updateUserInHistory)
+
+
+    //send email
+    try {
+        mailUserPicUpdated(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Profile picture updated, but system failed to send email notification');
+    }
+
     return result;
 
 }
@@ -252,23 +265,24 @@ export const updateUserFirstName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedFirstName = req.body.userNewFirstName
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    const updateUser = User.findOneAndUpdate({ email: userEmail }, { firstname: userUpdatedFirstName }, { new: true });
+    const updateUser = await User.findOneAndUpdate({ email: userEmail }, { firstname: userUpdatedFirstName }, { new: true });
+
+    //send email
+    try {
+        mailUserFirstNameUpdated(req, updateUser)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'First name updated, but system failed to send email notification');
+    }
+
+
     return updateUser;
 
 }
@@ -280,23 +294,24 @@ export const updateUserLastName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedLastName = req.body.userNewLastName
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    const updateUser = User.findOneAndUpdate({ email: userEmail }, { lastname: userUpdatedLastName }, { new: true });
+    const updateUser = await User.findOneAndUpdate({ email: userEmail }, { lastname: userUpdatedLastName }, { new: true });
+
+    //send email
+    try {
+        mailUserLastNameUpdated(req, updateUser)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Last name updated, but system failed to send email notification');
+    }
+
+
     return updateUser;
 
 }
@@ -310,19 +325,11 @@ export const updateUserUserName = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedUsername = req.body.userNewUsername
 
     if (await User.usernameTaken(userUpdatedUsername)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Username taken');
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -353,6 +360,13 @@ export const updateUserUserName = async (req) => {
     result.push(updateUserInComment)
     result.push(updateUserInHistory)
 
+    //send email
+    try {
+        mailUserUserNameUpdated(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Username updated, but system failed to send email notification');
+    }
+
     return result;
 
 }
@@ -366,20 +380,12 @@ export const updateUserPhone = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     //user details
     const userEmail = req.body.userEmail
     const userUpdatedPhone = req.body.userNewPhone
 
     //to check if user new phone is already taken.
     if (await User.phoneTaken(userUpdatedPhone)) throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry, Phone number has been registered with another account.');
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail })
@@ -403,6 +409,13 @@ export const updateUserPhone = async (req) => {
         console.log('Error updating user:', error);
         throw new ApiError(httpStatus.BAD_REQUEST, error);
     });
+
+    //send email
+    try {
+        mailUserPhoneUpdated(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Phone number updated, but system failed to send email notification');
+    }
 
     return result;
 
@@ -459,7 +472,12 @@ export const updateUserEmail = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, error);
     });
 
-
+    //send email
+    try {
+        mailUserEmailUpdated(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Email updated, but system failed to send email notification');
+    }
 
     return result;
 
@@ -472,23 +490,21 @@ export const updateUserJobTitle = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const userUpdatedJobTitle = req.body.userNewJobTitle
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    const updatedUser = User.findOneAndUpdate({ email: userEmail }, { jobtitle: userUpdatedJobTitle }, { new: true });
+    const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { jobtitle: userUpdatedJobTitle }, { new: true });
+    
+    try {
+        mailUserJobTitleUpdated(req, updatedUser)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Job title updated, but system failed to send email notification');
+    }
+    
     return updatedUser;
 
 }
@@ -502,17 +518,8 @@ export const resetUserPassword = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const userNewPassword = req.body.userNewPassword
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -560,6 +567,12 @@ export const resetUserPassword = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, error);
     });
 
+    try {
+        mailUserPasswordResetted(req, result)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Password has been reset, but system failed to send email notification');
+    }
+
     return result;
 
 }
@@ -571,16 +584,8 @@ export const updateUserRole = async (req) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
     }
 
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     const userNewRole = req.body.userNewRole
-
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
 
     //check if user email is found
     const user = await User.findOne({ email: userEmail });
@@ -588,7 +593,14 @@ export const updateUserRole = async (req) => {
 
 
     if (userNewRole === 'admin' || userNewRole === 'owner') {
-        const updatedUser = User.findOneAndUpdate({ email: userEmail }, { role: userNewRole }, { new: true });
+        const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { role: userNewRole }, { new: true });
+        
+        try {
+            mailUserRoleUpdated(req, updatedUser)
+        } catch {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Role updated, but system failed to send email notification');
+        }
+
         return updatedUser;
     }//changing role to user will remove all admin permission 
     else if (userNewRole === 'user') {
@@ -615,12 +627,19 @@ export const updateUserRole = async (req) => {
             deleteComponent: false,
         }]
 
-        const updatedUser = User.findOneAndUpdate({ email: userEmail }, {
+        const updatedUser = await User.findOneAndUpdate({ email: userEmail }, {
             "$set": {
                 role: userNewRole,
                 permission: removedAllAdminPermission
             }
         }, { new: true });
+
+        try {
+            mailUserRoleUpdated(req, updatedUser)
+        } catch {
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Role updated, but system failed to send email notification');
+        }
+
         return updatedUser;
     }
 
@@ -637,16 +656,8 @@ export const updateUserRole = async (req) => {
 
 export const updateUserPermission = async (req) => {
 
-
-    // const adminEmail = req.user.email
-    // const adminPassword = req.body.adminPassword
     const userEmail = req.body.userEmail
     let userNewPermission
-
-    // only owner and admin allowed to change permission
-    // if (req.user.role !== 'owner' && req.user.role !== 'admin') {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'No permission to perform action');
-    // }
 
     //Only owner account can give all type of permission 
     if (req.user.role === 'owner') {
@@ -662,12 +673,6 @@ export const updateUserPermission = async (req) => {
         }]
     }
 
-    //check if admin email and password is correct
-    // const admin = await userService.findUserByEmail(adminEmail);
-    // if (!(await admin.comparePassword(adminPassword))) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong admin password. No changes were made.');
-    // }
-
     const updatedUser = await User.findOneAndUpdate(
         { email: userEmail },
         {
@@ -677,6 +682,12 @@ export const updateUserPermission = async (req) => {
         },
         { new: true }
     )
+
+    try {
+        mailUserPermissionUpdated(req, updatedUser)
+    } catch {
+        throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Permission updated, but system failed to send email notification');
+    }
 
     return updatedUser;
 

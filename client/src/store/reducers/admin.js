@@ -59,7 +59,7 @@ export const adminSlice = createSlice({
                 emails.push(e.email)
             })
 
-            state.userEmails = [...emails]
+            state.userEmails = [...emails.sort()]
 
         })
         .addCase(checkEmailExist.fulfilled,(state,action)=>{
@@ -84,7 +84,7 @@ export const adminSlice = createSlice({
             }
         })
         .addCase(getUserByEmail.fulfilled,(state,action)=>{
-            // state.userDetails = action.payload.data
+            state.userDetails.userId = action.payload.data[0]._id
             state.userDetails.photoURL = action.payload.data[0].photoURL            
             state.userDetails.firstname = action.payload.data[0].firstname
             state.userDetails.lastname = action.payload.data[0].lastname
@@ -104,7 +104,7 @@ export const adminSlice = createSlice({
             state.error.userNotFound = "User not found"
         })
         .addCase(getAllProjects.fulfilled,(state,action)=>{
-            state.projectList = [...action.payload.project]
+            state.projectList = [...action.payload.project.sort((a, b) => a.title.localeCompare(b.title))]
         })
         .addCase(getProjectByTitle.fulfilled,(state,action)=>{
             state.selectedProjectDetails = action.payload.project

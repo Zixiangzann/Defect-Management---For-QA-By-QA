@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { htmlDecode } from '../../utils/tools';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom'
 
 //Comp
 import { addComment, getCommentByDefectIdPaginate } from '../../store/actions/comments';
-import { getDefectById } from '../../store/actions/defects';
+import { defectWatch, getDefectById } from '../../store/actions/defects';
 import ModalComponent from '../../utils/modal/modal';
 import Activity from './activity';
-import { StatusColorCode,SeverityColorCode } from '../../utils/tools';
+import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
 
 //function
 import { calcuDateDiff } from '../../../src/utils/tools'
@@ -58,9 +59,12 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarIcon from '@mui/icons-material/Star';
 
 const ViewDefect = () => {
+
+    const navigate = useNavigate();
 
 
     const boxDescription = {
@@ -109,9 +113,9 @@ const ViewDefect = () => {
     const [showComment, setShowComment] = useState(false);
 
 
-
     const currentDefect = useSelector(state => state.defects.current.defect)
     const currentAssignee = useSelector(state => state.defects.current.assignee)
+    const users = useSelector(state => state.users)
 
     const comments = useSelector(state => state.comments)
     const dispatch = useDispatch();
@@ -129,6 +133,16 @@ const ViewDefect = () => {
 
     const handleCommentTextArea = (event) => {
         setCommentTextArea(event.target.value);
+    }
+
+    //watchlist
+    const handleWatchlist = () => {
+
+        dispatch(defectWatch({ defectId }))
+        .unwrap()
+        .then(()=>{
+            dispatch(getDefectById(defectId))
+        })
     }
 
     const handleDownload = async (downloadURL) => {
@@ -270,6 +284,10 @@ const ViewDefect = () => {
     useEffect(() => {
         dispatch(getCommentByDefectIdPaginate({ defectId: defectId }))
         dispatch(getDefectById(defectId))
+            .unwrap()
+            .catch(() => {
+                navigate('/defect')
+            })
         setLoading(false)
     }, [defectId, dispatch])
 
@@ -290,11 +308,31 @@ const ViewDefect = () => {
             </Backdrop>
 
 
-            {currentDefect  ?
+            {currentDefect ?
                 <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
 
                     <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography>
                     <Typography className='defect-id-value' sx={{ ml: '1rem', fontSize: '1.2rem', color: 'darkblue' }}>{currentDefect.defectid}</Typography>
+
+                    <Box className="watchDefectContainer">
+
+                        {currentDefect.watching.includes(users.data.email) ?
+                            <Tooltip title='Remove from watchlist'>
+                                <StarIcon
+                                    onClick={handleWatchlist}
+                                    sx={{ ml: 2, fontSize: '2rem', color: 'gold', bottom: '3px', position: 'relative' }}
+                                />
+                            </Tooltip>
+                            :
+                            <Tooltip title='Add to watchlist'>
+                                <StarBorderIcon
+                                    onClick={handleWatchlist}
+                                    sx={{ ml: 2, fontSize: '2rem', bottom: '3px', position: 'relative' }}
+                                />
+                            </Tooltip>
+
+                        }
+                    </Box>
 
                     <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
 
@@ -316,11 +354,11 @@ const ViewDefect = () => {
 
 
                     <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '2rem' }}>{currentDefect.title}</Typography>
-                    
+
                     <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'}>
-                    <Typography mr={'1rem'}>{SeverityColorCode({severity: currentDefect.severity,textWidth:'9rem'})}</Typography>
-                    <Typography >{StatusColorCode({status: currentDefect.status, textWidth:'9rem'})}</Typography>
-                   
+                        <Typography mr={'1rem'}>{SeverityColorCode({ severity: currentDefect.severity, textWidth: '9rem' })}</Typography>
+                        <Typography >{StatusColorCode({ status: currentDefect.status, textWidth: '9rem' })}</Typography>
+
                     </Box>
 
 
@@ -361,7 +399,7 @@ const ViewDefect = () => {
                                 <Typography className='defectDetailsValue'>{currentDefect.server}</Typography>
                             </Box>
                             <Box flexBasis={'20%'}></Box>
-{/* 
+                            {/* 
                             <Box flexBasis={'15%'} id="defectDetailsTitleViewRight">
                                 <Typography className='defectDetailsKey'>Status:</Typography>
                                 <Typography className='defectDetailsKey'>Severity:</Typography>
@@ -438,24 +476,24 @@ const ViewDefect = () => {
 
                     {showAssignee ?
                         <List className='card' sx={{ ml: 3, mb: 3, flexBasis: '100%' }}>
-                             <ListItem
+                            <ListItem
                                 sx={{ flexWrap: 'wrap' }}>
                                 <ListItemAvatar
-                                 className="BoxAvatarLayout"
+                                    className="BoxAvatarLayout"
                                 >
                                     <Avatar>
                                         <PersonIcon />
                                     </Avatar>
                                 </ListItemAvatar>
                                 {/* <Typography>Assignee:</Typography> */}
-                                 <Box sx={{width:'90%'}}>
+                                <Box sx={{ width: '90%' }}>
                                     {currentAssignee.map((item, index) => (
                                         <Chip
                                             key={`${item.username + index}`}
                                             item={item.username}
                                             label={item.username}
                                             color="info"
-                                           
+
                                             className='chip'
                                             avatar={<Avatar alt={item.username} src={item.photoURL} />}
                                             variant='outlined'
@@ -660,9 +698,9 @@ const ViewDefect = () => {
                                                                     <Typography sx={{ m: '1rem' }}>{calcuDateDiff(item.date)}</Typography>
                                                                     <Typography sx={{ flexBasis: '100%', m: '2rem' }}>{item.comment}</Typography>
 
-                                                                    <Box sx={{display:'flex',justifyContent:'flex-end',flexBasis:'100%'}}>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexBasis: '100%' }}>
                                                                         <Button>Reply</Button>
-                                                                        </Box>
+                                                                    </Box>
                                                                 </Paper>
 
                                                             </TableCell>

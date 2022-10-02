@@ -148,12 +148,13 @@ export const updateProfilePicture = createAsyncThunk(
     'admin/updateProfilePicture',
     async ({
         ////adminPassword,
+        userId,
         userEmail,
         uploadProfilePicture,
     }, { rejectWithValue }) => {
         try {
             //Upload profile picture to firebase storage, get url and put the url to db. 
-            //use user email as the name of the profile picture
+            //use userId(objectid) as the name of the profile picture
             let photoURL = ""
             console.log(uploadProfilePicture)
 
@@ -166,7 +167,7 @@ export const updateProfilePicture = createAsyncThunk(
                     if (uploadProfilePicture) {
                         onAuthStateChanged(auth, async (user) => {
                             if (user) {
-                                const storageRef = ref(storage, `Profile-Picture/${userEmail}`)
+                                const storageRef = ref(storage, `Profile-Picture/${userId}`)
                                 const uploadTask = uploadBytesResumable(storageRef, uploadProfilePicture)
                                 uploadTask.then((snapshot) => {
                                     getDownloadURL(snapshot.ref).then((downloadURL) => {
@@ -189,6 +190,7 @@ export const updateProfilePicture = createAsyncThunk(
                 const request = await axios.patch('/api/admin/updateuser/photourl', {
                     //adminPassword,
                     userEmail,
+                    userId,
                     userNewPhotoURL: photoURL
                 }, getAuthHeader());
 
