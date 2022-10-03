@@ -64,6 +64,8 @@ const WYSIWYG = (props) => {
                     setEditorData({
                         editorState: EditorState.createWithContent(contentState)
                     })
+
+                    props.setEditorState(template)
                 }}>
                     Generate Template
                 </Button>

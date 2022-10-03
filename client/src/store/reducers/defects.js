@@ -36,14 +36,15 @@ let DEFAULT_DEFECT_STATE = {
     field:{
     project: null,
     components: null,
+    server:null,
     severity: null,
     status: null,
     search: '',
     },
     showColumn:{
       menu:true,
-      defectId:true,
-      summary:true,
+      defectid:true,
+      title:true,
       project:true,
       components:true,
       severity:true,
@@ -51,12 +52,12 @@ let DEFAULT_DEFECT_STATE = {
       server:false,
       reporter:false,
       createdDate:false,
-      updatedDate: false,
+      lastUpdatedDate: false,
     }
   },
   sort: {
     order: -1,
-    sortby: 'defectid'
+    sortby: 'createdDate'
   },
   current: {
     defect: null,
@@ -72,7 +73,8 @@ export const defectsSlice = createSlice({
       state.data = DEFAULT_DEFECT_STATE
     },
     resetFilterState: (state, action) => {
-      state.filter = DEFAULT_DEFECT_STATE.filter
+      state.filter.filtered = DEFAULT_DEFECT_STATE.filter.filtered
+      state.filter.field = DEFAULT_DEFECT_STATE.filter.field
       state.data.components = ""
     },
     setFilterState: (state, action) => {
@@ -80,8 +82,8 @@ export const defectsSlice = createSlice({
 
     },
     setSearch: (state, action) => {
-      state.filter.search = action.payload
-      if (state.filter.field.search !== '' || state.filter.field.project !== null || state.filter.field.components !== null || state.filter.field.severity !== null || state.filter.field.status !== null) {
+      state.filter.field.search = action.payload
+      if (state.filter.field.search !== '' || state.filter.field.project !== null || state.filter.field.server !== null  || state.filter.field.components !== null || state.filter.field.severity !== null || state.filter.field.status !== null) {
         state.filter.filtered = true;
       } else {
         state.filter.filtered = false;

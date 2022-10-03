@@ -59,6 +59,7 @@ const CreateDefect = () => {
     const [enableSelectProject, setEnableSelectProject] = useState(false)
     const [assignee, setAssignee] = useState([])
     const [assigneeSelectTouched, setAssigneeSelectTouched] = useState(false);
+    const [submitClicked, setSubmitClicked] = useState(false)
     //add files to be uploaded in a array
     const [filesArray, setFilesArray] = useState([])
 
@@ -311,6 +312,14 @@ const CreateDefect = () => {
                             :
                             null
                         }
+
+                        {!formik.values.description && submitClicked === true ?
+                            <FormHelperText error={true}>
+                                Type more details...
+                            </FormHelperText>
+                            :
+                            null
+                        }
                     </FormControl>
 
                     <Divider sx={{ marginTop: '2rem', marginBottom: '2rem' }} />
@@ -375,7 +384,7 @@ const CreateDefect = () => {
                                             <InputLabel color='grey'>Assignee</InputLabel>
                                         }
 
-                                        
+
 
 
                                         <Select
@@ -450,7 +459,7 @@ const CreateDefect = () => {
                                             :
                                             null
                                         }
-                                        {assignee.length === 0 && assigneeSelectTouched === true ?
+                                        {!formik.values.assignee && submitClicked === true ?
                                             <FormHelperText error={true}>
                                                 Please select a assignee
                                             </FormHelperText>
@@ -580,6 +589,10 @@ const CreateDefect = () => {
                         <Button
                             variant='contained'
                             type="submit"
+                            onClick={() => {
+                                //set submit to clicked true
+                                setSubmitClicked(true)
+                            }}
                             sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
                             Create
                         </Button>

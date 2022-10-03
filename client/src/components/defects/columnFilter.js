@@ -25,8 +25,8 @@ const ColumnFilter = ({
 
     const [state, setState] = useState({
         menu: true,
-        defectId: true,
-        summary:true,
+        defectid: true,
+        title:true,
         project: true,
         components: true,
         severity: true,
@@ -34,7 +34,7 @@ const ColumnFilter = ({
         server: false,
         reporter: false,
         createdDate: false,
-        updatedDate: false,
+        lastUpdatedDate: false,
     });
 
     const handleChange = (event) => {
@@ -74,10 +74,10 @@ const ColumnFilter = ({
 
                     />
                     <FormControlLabel
-                        name="defectId"
+                        name="defectid"
                         control={
                             <Checkbox
-                                checked={state.defectId}
+                                checked={state.defectid}
                             />
                         }
                         label={'Defect ID'}
@@ -85,10 +85,10 @@ const ColumnFilter = ({
                     />
 
                     <FormControlLabel
-                        name="summary"
+                        name="title"
                         control={
                             <Checkbox
-                                checked={state.summary}
+                                checked={state.title}
                             />
                         }
                         label={'Summary'}
@@ -165,10 +165,10 @@ const ColumnFilter = ({
                         label={'Created Date'} />
 
 <FormControlLabel
-                        name="updatedDate"
+                        name="lastUpdatedDate"
                         control={
                             <Checkbox
-                                checked={state.updatedDate}
+                                checked={state.lastUpdatedDate}
                             />}
                         onClick={handleChange}
                         label={'Updated Date'} />

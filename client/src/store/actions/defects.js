@@ -217,7 +217,7 @@ export const getAllDefectPaginate = createAsyncThunk(
         page = 1,
         limit = 10,
         project = "",
-        sortby = 'defectid',
+        sortby = 'lastUpdatedDate',
         order = -1,
         search
     }, { dispatch }) => {
@@ -298,7 +298,7 @@ export const filterDefect = createAsyncThunk(
         status,
         severity,
         server,
-        sortby = 'defectid',
+        sortby = 'lastUpdatedDate',
         order = 1,
         search
     }) => {

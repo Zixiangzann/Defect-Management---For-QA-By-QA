@@ -12,18 +12,20 @@ export const createDefect = async (body, user) => {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to perform action');
         }
 
-        const checkIfExist = await DefectCount.findOne({}).exec()
+        //check if project exist
+        const checkIfProjectExist = await DefectCount.findOne({ projectName: body.project }).exec()
 
-        if (checkIfExist === null) {
+        if (checkIfProjectExist === null) {
             //set it to 1 if it is not exist
             const count = new DefectCount({
+                projectName: body.project,
                 defectCount: 1
             })
             await count.save()
         } else {
             //increase count by 1(defectid)
-            const currentCount = await DefectCount.findOne({}).select('defectCount').exec()
-            await DefectCount.findOneAndUpdate({}, {
+            const currentCount = await DefectCount.findOne({ projectName: body.project }, { "defectCount": 1, "_id": 0 })
+            await DefectCount.findOneAndUpdate({ projectName: body.project }, {
                 "$set": {
                     defectCount: currentCount.defectCount + 1
                 }
@@ -31,28 +33,46 @@ export const createDefect = async (body, user) => {
                 { new: true }).exec();
         }
 
-        //get new count and set it to defectid
-        const newCount = await DefectCount.findOne({}).select('defectCount').exec()
-        console.log(newCount)
-        const defect = new Defect({
-            defectid: parseInt(await newCount.defectCount),
-            reporter: user.username,
-            title: body.title,
-            description: body.description,
-            project: body.project,
-            components: body.components,
-            issuetype: body.issuetype,
-            severity: body.severity,
-            status: body.status,
-            assignee: body.assignee,
-            server: body.server
-        })
-        await defect.save();
+  
+        //defectid = project + the number of count of the defects in that project. 
+        const projectDefectCount = await DefectCount.findOne({ projectName: body.project }, { "defectCount": 1, "_id": 0 })
+        const defectid = `${body.project}-${projectDefectCount.defectCount}`
 
-        // const update = DefectCount.update('')
-        return defect;
+        try {
+            const defect = new Defect({
+                defectid: defectid,
+                reporter: user.username,
+                title: body.title,
+                description: body.description,
+                project: body.project,
+                components: body.components,
+                issuetype: body.issuetype,
+                severity: body.severity,
+                status: body.status,
+                assignee: body.assignee,
+                server: body.server
+            })
+
+            await defect.save();
+            return defect;
+
+        } catch (error) {
+            console.log(error)
+            //if fail to create the defect, need to rollback the count
+            const currentCountProject = await DefectCount.findOne({ projectName: body.project }).select('defectCount').exec()
+            await DefectCount.findOneAndUpdate({ projectName: body.project }, {
+                "$set": {
+                    defectCount: currentCountProject.defectCount - 1
+                }
+            },
+                { new: true }).exec();
+
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'System failed to create defect');
+
+        }
+s
     } catch (error) {
-        throw error
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'System failed to create defect');
     }
 }
 
@@ -99,7 +119,7 @@ export const getDefectById = async (defectId, user) => {
         //using the assigne from defect, find the users 
         const assignee = defect.assignee
         const users = await User.find({ email: assignee }).select(["photoURL", "username", "email"])
-        
+
         result.push({"defect":defect})
         result.push({"assignee":users})
 
@@ -207,7 +227,7 @@ export const getMoreDefects = async (req, user) => {
 //Do a seperate search for id? 
 export const paginateDefectList = async (req) => {
 
-    const sortby = req.body.sortby || "defectid";
+    const sortby = req.body.sortby || "lastUpdatedDate";
     const order = req.body.order || -1
     const limit = req.body.limit || 15;
     const skip = req.body.skip || 0;
@@ -278,7 +298,7 @@ export const getAllAssignee = async (req, title) => {
 
 //add/remove from watchlist
 export const defectWatch = async (defectid,user) => {
-    
+
 
     const defect = await Defect.find({defectid})
     if(!defect) throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'Defect Details not found'); 
@@ -293,7 +313,7 @@ export const defectWatch = async (defectid,user) => {
         const addedToWatchlist = await Defect.findOneAndUpdate({defectid}, { $push: { watching: user } }, { new: true })
         return "Added to watchlist"
     }
-    
+
 }
 
 
@@ -332,7 +352,7 @@ export const getAllComponents = async (title) => {
 export const filterDefectList = async (req, user) => {
     try {
 
-        const sortby = req.body.sortby || "defectid";
+        const sortby = req.body.sortby || "lastUpdatedDate";
         const order = req.body.order || 1;
         const limit = req.body.limit || 15;
         const skip = req.body.skip || 0;

@@ -34,7 +34,9 @@ import PhotoIcon from '@mui/icons-material/Photo';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoFileIcon from '@mui/icons-material/VideoFile';
-import { TableBody, TableFooter, TextField } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import TableFooter from '@mui/material/TableFooter';
+import TableBody from '@mui/material/TableBody';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -61,6 +63,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
+import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
 
 const ViewDefect = () => {
 
@@ -311,7 +314,19 @@ const ViewDefect = () => {
             {currentDefect ?
                 <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
 
-                    <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography>
+                    {/* <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography> */}
+                    
+                    <Button
+                    startIcon={<ArrowCircleLeftRoundedIcon
+                    />}
+                    onClick={()=>navigate(`/defect`)}
+                    sx={{mb:3}}
+                    >
+                        Back
+                    </Button>
+
+                    <Box flexBasis={'100%'}></Box>
+
                     <Typography className='defect-id-value' sx={{ ml: '1rem', fontSize: '1.2rem', color: 'darkblue' }}>{currentDefect.defectid}</Typography>
 
                     <Box className="watchDefectContainer">
@@ -353,7 +368,7 @@ const ViewDefect = () => {
                     </Box>
 
 
-                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '2rem' }}>{currentDefect.title}</Typography>
+                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem' }}>{currentDefect.title}</Typography>
 
                     <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'}>
                         <Typography mr={'1rem'}>{SeverityColorCode({ severity: currentDefect.severity, textWidth: '9rem' })}</Typography>

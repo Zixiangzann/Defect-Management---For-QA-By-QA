@@ -6,7 +6,7 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 export const defectSchema = mongoose.Schema({
     defectid:{
-        type:Number,
+        type:String,
         unique:true
     },
     reporter:{

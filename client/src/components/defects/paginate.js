@@ -9,7 +9,7 @@ import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../store/ac
 import { setOrder, setSearch, setSortBy, resetFilterState } from '../../store/reducers/defects';
 import ModalComponent from '../../utils/modal/modal';
 import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
-
+import { Loader } from '../../utils/tools';
 
 //MUI
 import Table from '@mui/material/Table'
@@ -47,13 +47,17 @@ const PaginateComponent = ({
     const showColumn = useSelector(state => state.defects.filter.showColumn)
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [toRemove, setToRemove] = useState(null);
+    const [searchField, setSearchField] = useState('');
 
     const [page, setPage] = useState(0);
 
+    const [loading, setLoading] = useState(false)
+    const [firstLoad, setFirstLoad] = useState(true)
+
     //Table
     const tableHeader = [
-        'defectId',
-        'summary',
+        'defectid',
+        'title',
         'project',
         'components',
         'severity',
@@ -61,15 +65,17 @@ const PaginateComponent = ({
         'server',
         'reporter',
         'createdDate',
-        'updatedDate'
+        'lastUpdatedDate'
     ]
 
     const changeHeaderText = (header) => {
-        if (header === "defectId") {
+        if (header === "defectid") {
             return "Defect ID"
-        } else if (header === "createdDate") {
+        } else if(header === "title"){
+            return "Summary"
+        }else if (header === "createdDate") {
             return "Created Date"
-        } else if (header === "updatedDate") {
+        } else if (header === "lastUpdatedDate") {
             return "Updated Date"
         } else {
             return header.charAt(0).toUpperCase() + header.slice(1);
@@ -81,7 +87,7 @@ const PaginateComponent = ({
 
     //For table header sorting state
     const [orderActive, setOrderActive] = useState('desc');
-    const [sortActive, setSortActive] = useState('defectid');
+    const [sortActive, setSortActive] = useState('lastUpdatedDate');
 
     //toggle order
     const handleOrder = () => {
@@ -97,7 +103,7 @@ const PaginateComponent = ({
     }
 
     const handleSearch = (event) => {
-        dispatch(setSearch(event.target.value));
+        setSearchField(event.target.value)
     }
 
     //Modal
@@ -220,24 +226,16 @@ const PaginateComponent = ({
     }
 
     useEffect(() => {
-        switch (sortActive) {
-            case "Defect ID":
-                dispatch(setSortBy('defectid'));
-                break;
-            case "Created Date":
-                dispatch(setSortBy('date'));
-                break;
-            default:
-                dispatch(setSortBy(sortActive.toLocaleLowerCase()));
-                break;
-        }
-
+        dispatch(setSortBy(sortActive));
         orderActive === 'asc' ? dispatch(setOrder(1)) : dispatch(setOrder(-1))
-
     }, [sortActive, orderActive])
 
 
     useEffect(() => {
+
+        if(firstLoad){
+            setLoading(true)
+        }
 
         if (filter.filtered === false) {
             dispatch(getAllDefectPaginate({
@@ -245,43 +243,64 @@ const PaginateComponent = ({
                 limit: rowsPerPage,
                 sortby: sort.sortby,
                 order: sort.order,
-                search: filter.search
+                search: filter.field.search
             }))
+            .unwrap()
+            .then(()=>{
+                if(firstLoad){
+                    setLoading(false)
+                    setFirstLoad(false)
+                }
+            })
         } else {
             dispatch(filterDefect({
                 page: page + 1,
                 limit: rowsPerPage,
-                project: filter.project,
-                components: filter.components,
-                server: filter.server,
-                severity: filter.severity,
-                status: filter.status,
+                project: filter.field.project,
+                components: filter.field.components,
+                server: filter.field.server,
+                severity: filter.field.severity,
+                status: filter.field.status,
                 sortby: sort.sortby,
                 order: sort.order,
-                search: filter.search
+                search: filter.field.search
             }))
+            .unwrap()
+            .then(()=>{
+                if(firstLoad){
+                    setLoading(false)
+                    setFirstLoad(false)
+                }
+            })
         }
-    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.search]);
+    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.field.search]);
 
     useEffect(() => {
         //reset filter state on load
-        dispatch(resetFilterState())
+        // dispatch(resetFilterState())
+        setSearchField(filter.field.search)
     }, [])
 
-    useEffect(() => {
-        console.log(showColumn)
-    }, [showColumn])
-
+    useEffect(()=>{
+        dispatch(setSearch(searchField));
+    },[searchField])
 
 
     return (
         <>
+
+
+            <Loader
+            loading={loading}
+            />
+
             {defects && defects.docs ?
                 <Paper sx={{ width: '100%', mb: 2, mt: 2 }}>
                     <TextField
                         id="search-by-title"
                         label="Search by title"
                         type="search"
+                        value={searchField}
                         variant="standard"
                         onChange={(e) => handleSearch(e)}
                         sx={{ float: 'right', mb: 3, mt: 1, mr: 1, overflow: 'hidden' }}
@@ -311,6 +330,7 @@ const PaginateComponent = ({
                                             {showColumn[header] ?
                                                 <TableCell
                                                     key={`table-${header}`}
+                                                    sx={{textAlign:'center'}}
 
                                                 >
                                                     <TableSortLabel
@@ -356,59 +376,70 @@ const PaginateComponent = ({
                                         }
 
 
-                                        {showColumn.defectId ?
-                                            <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}>{item.defectid}</TableCell>
+                                        {showColumn.defectid ?
+                                            <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}>
+                                                <Typography 
+                                                variant='body'
+                                                onClick={()=>navigate(`/defect/view/${item.defectid}`)} 
+                                                sx={{color:'blue',cursor:'pointer'}}>{item.defectid}</Typography>
+                                                </TableCell>
                                             :
                                             null
                                         }
 
-                                        {showColumn.summary ?
-                                            <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
+                                        {showColumn.title ?
+                                            <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', textAlign: 'center',overflowWrap: 'anywhere', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
                                             :
                                             null
                                         }
 
                                         {showColumn.project ?
-                                            <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px' }}>{item.project}</TableCell>
+                                            <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px',textAlign: 'center' }}>{item.project}</TableCell>
                                             :
                                             null
                                         }
 
                                         {showColumn.components ?
-                                            <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px' }}>{item.components}</TableCell>
+                                            <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px',textAlign: 'center' }}>{item.components}</TableCell>
                                             :
                                             null
                                         }
 
                                         {showColumn.severity ?
-                                            <TableCell key={`${item.severity}-${index}`} sx={{ minWidth: '150px' }}>{SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}</TableCell>
+                                            <TableCell key={`${item.severity}-${index}`} sx={{ width: '20px',textAlign: 'center' }}>
+                                                <Box sx={{flexBasis:'100%',display:'flex',justifyContent:'center'}}>
+                                                {SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}
+                                                </Box>
+                                                </TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.status ?
-                                            <TableCell key={`${item.status}-${index}`} sx={{ minWidth: '50px' }}>
+                                            <TableCell key={`${item.status}-${index}`} sx={{ width: '20px',textAlign: 'center' }}>
+                                                <Box sx={{flexBasis:'100%',display:'flex',justifyContent:'center'}}>
                                                 {StatusColorCode({ status: item.status, textWidth: '6rem' })}
+                                                </Box>
                                             </TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.server ?
-                                            <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px' }}>{item.server}</TableCell>
+                                            <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px',textAlign: 'center' }}>{item.server}</TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.reporter ?
-                                            <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                            <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px',textAlign: 'center', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.createdDate ?
-                                            <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
+                                            <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px',textAlign: 'center' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
                                             :
                                             null
                                         }
-                                        {showColumn.updatedDate ?
-                                            <TableCell key={`${item.lastUpdatedDate}-${index}`} sx={{ minWidth: '50px' }}><Moment format="DD/MMM/YYYY">{item.lastUpdatedDate}</Moment></TableCell>
+                                        {showColumn.lastUpdatedDate ?
+                                            <TableCell key={`${item.lastUpdatedDate}-${index}`} sx={{ minWidth: '50px',textAlign: 'center' }}><Moment format="DD/MMM/YYYY">{item.lastUpdatedDate}</Moment></TableCell>
                                             :
                                             null
                                         }

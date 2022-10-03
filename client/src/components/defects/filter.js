@@ -52,7 +52,19 @@ const DefectFilter = ({
             ...state,
             [event.target.name]: value
         });
+    }
 
+    useEffect(()=>{
+        setState({
+            project: defects.filter.field.project,
+            components: defects.filter.field.components,
+            severity:defects.filter.field.severity,
+            status:defects.filter.field.status,
+            server: defects.filter.field.server,
+        })
+    },[])
+
+    useEffect(()=>{
         dispatch(setFilterState({
             project: state.project,
             components: state.components,
@@ -61,9 +73,9 @@ const DefectFilter = ({
             server: state.server,
             order: defects.sort.order,
             sortby: defects.sort.sortby,
-            search: defects.filter.search
+            search: defects.filter.field.search
         }))
-    }
+    },[state])
 
     useEffect(() => {
         dispatch(filterDefect(
@@ -75,7 +87,7 @@ const DefectFilter = ({
                 server: state.server,
                 order: defects.sort.order,
                 sortby: defects.sort.sortby,
-                search: defects.filter.search
+                search: defects.filter.field.search
             }))
     }, [state])
 
