@@ -26,7 +26,7 @@ const ColumnFilter = ({
     const [state, setState] = useState({
         menu: true,
         defectid: true,
-        title:true,
+        title: true,
         project: true,
         components: true,
         severity: true,
@@ -105,6 +105,7 @@ const ColumnFilter = ({
                         onClick={handleChange}
                     />
 
+
                     <FormControlLabel
                         name="components"
                         control={
@@ -144,6 +145,16 @@ const ColumnFilter = ({
                         onClick={handleChange}
                         label={'Server'} />
 
+                    <FormControlLabel
+                        name="assigneeDetails"
+                        control={
+                            <Checkbox
+                                checked={state.assigneeDetails}
+                            />}
+                        label={'Assignee'}
+                        onClick={handleChange}
+                    />
+
 
                     <FormControlLabel
                         name="reporter"
@@ -164,7 +175,7 @@ const ColumnFilter = ({
                         onClick={handleChange}
                         label={'Created Date'} />
 
-<FormControlLabel
+                    <FormControlLabel
                         name="lastUpdatedDate"
                         control={
                             <Checkbox

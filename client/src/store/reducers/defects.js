@@ -39,6 +39,7 @@ let DEFAULT_DEFECT_STATE = {
     server:null,
     severity: null,
     status: null,
+    assignee: null,
     search: '',
     },
     showColumn:{
@@ -46,6 +47,7 @@ let DEFAULT_DEFECT_STATE = {
       defectid:true,
       title:true,
       project:true,
+      assigneeDetails: true,
       components:true,
       severity:true,
       status:true,
@@ -75,11 +77,11 @@ export const defectsSlice = createSlice({
     resetFilterState: (state, action) => {
       state.filter.filtered = DEFAULT_DEFECT_STATE.filter.filtered
       state.filter.field = DEFAULT_DEFECT_STATE.filter.field
-      state.data.components = ""
+      state.data.components = null;
     },
     setFilterState: (state, action) => {
       state.filter.field = action.payload
-
+      state.filter.filtered = true;
     },
     setSearch: (state, action) => {
       state.filter.field.search = action.payload
@@ -131,7 +133,13 @@ export const defectsSlice = createSlice({
       .addCase(filterDefect.fulfilled, (state, action) => {
         state.loading = false
         state.defectLists = action.payload
-        if (state.filter.field.search !== '' || state.filter.field.project !== null || state.filter.field.components !== null || state.filter.field.severity !== null || state.filter.field.status !== null) {
+        if (state.filter.field.search !== '' 
+        || state.filter.field.project !== null 
+        || state.filter.field.components !== null 
+        || state.filter.field.severity !== null 
+        || state.filter.field.status !== null
+        || state.filter.field.assignee !== null
+        ) {
           state.filter.filtered = true;
         } else {
           state.filter.filtered = false;

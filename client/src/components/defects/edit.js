@@ -418,7 +418,6 @@ const EditDefect = () => {
                 beforeEditAssignee.push(item.username)
             })
 
-            //for more accurate, maybe need to order by the id first then compare.
             if (beforeEditAssignee.sort().toString() !== afterEditAssignee.sort().toString()) {
                 dispatch(addHistory({
                     defectId,
@@ -437,7 +436,10 @@ const EditDefect = () => {
                 })
 
                 formik.values.assignee = assigneeEmail
+                formik.values.assigneeDetails = assignee
             }
+
+           
 
 
             dispatch(updateDefect({ values, defectId }))

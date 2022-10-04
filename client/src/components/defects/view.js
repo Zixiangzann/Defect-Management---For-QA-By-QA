@@ -364,11 +364,11 @@ const ViewDefect = () => {
                         }}>&nbsp; {calcuDateDiff(currentDefect.createdDate)}</Typography>
 
                         <Typography className='view-title' sx={{ fontWeight: '300' }}>&nbsp; by</Typography>
-                        <Typography className='view-value' sx={{ fontWeight: '600' }}>&nbsp;{currentDefect.reporter}</Typography>
+                        <Typography className='view-value' sx={{ fontWeight: '600' }}>&nbsp;{currentDefect.reporter.username}</Typography>
                     </Box>
 
 
-                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem' }}>{currentDefect.title}</Typography>
+                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem',overflowWrap:'break-word',width:'100%' }}>{currentDefect.title}</Typography>
 
                     <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'}>
                         <Typography mr={'1rem'}>{SeverityColorCode({ severity: currentDefect.severity, textWidth: '9rem' })}</Typography>

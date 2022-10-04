@@ -64,7 +64,7 @@ export const paginateComment = async (defectid,body, user) => {
         }
 
         let aggQuery = Comment.aggregate(
-            [{$match:{defectid:parseInt(defectid)}},
+            [{$match:{defectid:defectid}},
                 { $sort: { [sortby]: order } }
                 ]
                 , { collation: { locale: "en", caseLevel: true } }

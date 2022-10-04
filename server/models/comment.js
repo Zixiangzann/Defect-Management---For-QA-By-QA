@@ -4,7 +4,7 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 export const commentSchema = mongoose.Schema({
     defectid:{
-        type:Number
+        type:String
     },
     user:[{}],
     comment:{

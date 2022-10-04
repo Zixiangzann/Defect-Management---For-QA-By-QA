@@ -226,6 +226,10 @@ export const updateProfilePicture = async (req) => {
     result.push(updateUser)
     //update user in history collection
     const updateUserInHistory = await History.updateMany({ "user.email": userEmail }, { "user.$.photoURL": userUpdatedPhotoURL }, { new: true });
+     //update assigneeDetails in defect collection
+     const updateAssigneeDetailsInDefect = await Defect.updateMany({"assigneeDetails.email": userEmail},{"assigneeDetails.$.photoURL": userUpdatedPhotoURL},{new: true});
+     //update reporter in defect collection
+     const updatedReporterInDefect = await Defect.updateMany({"reporter.email": userEmail},{"reporter.photoURL": userUpdatedPhotoURL},{new: true});
 
     //firebase
     const uid = user.firebaseuid
@@ -244,6 +248,8 @@ export const updateProfilePicture = async (req) => {
 
     result.push(updateUserInComment)
     result.push(updateUserInHistory)
+    result.push(updateAssigneeDetailsInDefect)
+    result.push(updatedReporterInDefect)
 
 
     //send email
@@ -337,9 +343,15 @@ export const updateUserUserName = async (req) => {
 
     //update in user collection
     const updateUser = await User.findOneAndUpdate({ email: userEmail }, { username: userUpdatedUsername }, { new: true });
-    //update in comment collection
+    //update in user comment collection
     const updateUserInComment = await Comment.updateMany({ "user.email": userEmail }, { "user.$.username": userUpdatedUsername }, { new: true });
+    // update user in history collection
     const updateUserInHistory = await History.updateMany({ "user.email": userEmail }, { "user.$.username": userUpdatedUsername }, { new: true });
+    //update assigneeDetails in defect collection
+    const updateAssigneeDetailsInDefect = await Defect.updateMany({"assigneeDetails.email": userEmail},{"assigneeDetails.$.username": userUpdatedUsername},{new: true});
+    //update reporter in defect collection
+    const updatedReporterInDefect = await Defect.updateMany({"reporter.email": userEmail},{"reporter.username": userUpdatedUsername},{new: true});
+
     result.push(updateUser)
 
     //firebase
@@ -359,6 +371,8 @@ export const updateUserUserName = async (req) => {
 
     result.push(updateUserInComment)
     result.push(updateUserInHistory)
+    result.push(updatedReporterInDefect)
+    result.push(updateAssigneeDetailsInDefect)
 
     //send email
     try {
@@ -441,19 +455,29 @@ export const updateUserEmail = async (req) => {
     const user = await User.findOne({ email: userEmail })
     if (!user) throw new ApiError(httpStatus.BAD_REQUEST, 'User details not found');
 
-    //need to update in User(email),Project(assignee),Defects(Reporter),Comments(email),History(email)
+    //need to update in User(email),Project(assignee),Defects(Reporter,assigneeDetails),Comments(email),History(email)
     const updatedUser = await User.findOneAndUpdate({ email: userEmail }, { email: userUpdatedEmail }, { new: true })
     const updatedUserProject = await Project.updateMany({ "assignee": userEmail }, { $set: { "assignee.$": userUpdatedEmail } })
-    const updatedUserDefect = await Defect.updateMany({ "reporter": userEmail }, { $set: { reporter: userUpdatedEmail } })
     const updateUserInComment = await Comment.updateMany({ "user.email": userEmail }, { "user.$.email": userUpdatedEmail }, { new: true });
     const updateUserInHistory = await History.updateMany({ "user.email": userEmail }, { "user.$.email": userUpdatedEmail }, { new: true });
+    //update assigneeDetails in defect collection
+    const updateAssigneeDetailsInDefect = await Defect.updateMany({"assigneeDetails.email": userEmail},{"assigneeDetails.$.email": userUpdatedEmail},{new: true});
+    //update reporter in defect collection
+    const updatedReporterInDefect = await Defect.updateMany({"reporter.email": userEmail},{"reporter.email": userUpdatedEmail},{new: true});
+    //update assignee in defect collection, email only..
+    const updateAssigneeEmailInDefect = await Defect.updateMany({"assignee": userEmail},{ $set: { "assignee.$": userUpdatedEmail }},{new:true})
+    //update watching in defect collection
+    const updateWatchingEmailDefect = await Defect.updateMany({"watching": userEmail},{ $set: { "watching.$": userUpdatedEmail }},{new:true})
 
 
     // join the json and return as response
     const result = new Array();
     result.push(updatedUser)
     result.push(updatedUserProject)
-    result.push(updatedUserDefect)
+    result.push(updateAssigneeDetailsInDefect)
+    result.push(updatedReporterInDefect)
+    result.push(updateAssigneeEmailInDefect)
+    result.push(updateWatchingEmailDefect)
     result.push(updateUserInComment)
     result.push(updateUserInHistory)
 

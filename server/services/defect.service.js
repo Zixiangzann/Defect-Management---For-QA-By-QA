@@ -37,11 +37,18 @@ export const createDefect = async (body, user) => {
         //defectid = project + the number of count of the defects in that project. 
         const projectDefectCount = await DefectCount.findOne({ projectName: body.project }, { "defectCount": 1, "_id": 0 })
         const defectid = `${body.project}-${projectDefectCount.defectCount}`
+        //reporter details
+        const reporter = {
+            "_id": user._id,
+            "photoURL":user.photoURL,
+            "email": user.email,
+            "username": user.username
+        }
 
         try {
             const defect = new Defect({
                 defectid: defectid,
-                reporter: user.username,
+                reporter: reporter,
                 title: body.title,
                 description: body.description,
                 project: body.project,
@@ -50,6 +57,7 @@ export const createDefect = async (body, user) => {
                 severity: body.severity,
                 status: body.status,
                 assignee: body.assignee,
+                assigneeDetails: body.assigneeDetails,
                 server: body.server
             })
 
@@ -132,6 +140,8 @@ export const getDefectById = async (defectId, user) => {
 
 export const updateDefectById = async (defectId, user, body) => {
     try {
+
+
         const defect = await Defect.findOne({ defectid: defectId }).exec();
         if (defect === null) throw new ApiError(httpStatus.NOT_FOUND, 'Defect details not found');
 
@@ -160,6 +170,7 @@ export const updateDefectById = async (defectId, user, body) => {
                     severity: body.severity,
                     status: body.status,
                     assignee: body.assignee,
+                    assigneeDetails: body.assigneeDetails,
                     server: body.server,
                     lastUpdatedDate: Date.now()
                 }

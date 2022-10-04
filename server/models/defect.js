@@ -10,7 +10,7 @@ export const defectSchema = mongoose.Schema({
         unique:true
     },
     reporter:{
-        type:String
+        type:{}
     },
     title:{
         type:String,
@@ -51,6 +51,9 @@ export const defectSchema = mongoose.Schema({
     },
     assignee:{
         type:[String]
+    },
+    assigneeDetails:{
+        type:[{}]
     },
     watching:{
         type:[String]

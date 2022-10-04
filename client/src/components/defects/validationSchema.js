@@ -9,7 +9,8 @@ export const formValues = {
     issuetype:'',
     severity:'',
     status:'',
-    assignee:''
+    assignee:'',
+    assigneeDetails: '',
 }
 
 export const validation = () => (

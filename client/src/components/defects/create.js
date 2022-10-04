@@ -155,13 +155,16 @@ const CreateDefect = () => {
         validationSchema: validation,
         onSubmit: (values) => {
             //only want to save the assignee email
+
             const assigneeEmail = []
             assignee.map((item) => {
                 assigneeEmail.push(item.email)
             })
-            console.log(assigneeEmail)
+
             formik.values.status = "New"
             formik.values.assignee = assigneeEmail
+            formik.values.assigneeDetails = assignee
+
             dispatch(createDefect(
                 values))
                 .unwrap()

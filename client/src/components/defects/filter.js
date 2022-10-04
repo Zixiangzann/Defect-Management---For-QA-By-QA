@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 //comp
 import { getAllDefectPaginate } from '../../store/actions/defects';
-import { resetDataState, setFilterState, resetFilterState } from '../../store/reducers/defects';
+import { resetDataState, setFilterState, resetFilterState, setSortBy, setOrder } from '../../store/reducers/defects';
 import { getAllAssignee, getAllComponents, getAllProjects, filterDefect } from '../../store/actions/defects';
 import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
 
@@ -20,11 +20,15 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
-import Popper from '@mui/material/Popper';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Tooltip from '@mui/material/Tooltip';
 import Menu from '@mui/material/Menu';
-import { boolean } from 'yup';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Checkbox from '@mui/material/Checkbox';
+import Chip from '@mui/material/Chip';
+import Typography from "@mui/material/Typography";
+import Avatar from '@mui/material/Avatar';
+
 
 
 const DefectFilter = ({
@@ -35,11 +39,23 @@ const DefectFilter = ({
     const open = Boolean(defectFilterAnchor)
 
     const defects = useSelector(state => state.defects);
+    const [assignee, setAssignee] = useState([])
+    const [components, setComponents] = useState('')
     const dispatch = useDispatch();
+
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: '400px',
+            },
+        },
+    };
 
     const [state, setState] = useState({
         project: "",
-        components: "",
         severity: "",
         status: "",
         server: ""
@@ -47,6 +63,12 @@ const DefectFilter = ({
 
 
     const handleChange = (event) => {
+
+        if(event.target.name === "project") {
+            setAssignee([])
+            setComponents('')
+        }
+
         const value = event.target.value;
         setState({
             ...state,
@@ -54,42 +76,68 @@ const DefectFilter = ({
         });
     }
 
-    useEffect(()=>{
+    const handleAssignee = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setAssignee(
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
+    const handleComponents = (event) => {
+        setComponents(event.target.value)
+    }
+
+    useEffect(() => {
         setState({
             project: defects.filter.field.project,
-            components: defects.filter.field.components,
-            severity:defects.filter.field.severity,
-            status:defects.filter.field.status,
+            // components: defects.filter.field.components,
+            severity: defects.filter.field.severity,
+            status: defects.filter.field.status,
             server: defects.filter.field.server,
         })
-    },[])
 
-    useEffect(()=>{
+        if(defects.filter.field.assignee){
+            setAssignee(defects.filter.field.assignee)
+        }
+
+        if(defects.filter.field.components){
+            setComponents(defects.filter.field.components)
+        }
+
+    }, [])
+
+    useEffect(() => {
         dispatch(setFilterState({
             project: state.project,
-            components: state.components,
+            components: components,
             status: state.status,
             severity: state.severity,
             server: state.server,
-            order: defects.sort.order,
-            sortby: defects.sort.sortby,
+            assignee: assignee,
             search: defects.filter.field.search
         }))
-    },[state])
+        dispatch(setSortBy(defects.sort.sortby))            
+        dispatch(setOrder(defects.sort.order))
+    }, [state,components,assignee])
 
     useEffect(() => {
+        if(defects.filter.filtered){
         dispatch(filterDefect(
             {
                 project: state.project,
-                components: state.components,
+                components: components,
                 status: state.status,
                 severity: state.severity,
                 server: state.server,
+                assignee: assignee,
                 order: defects.sort.order,
                 sortby: defects.sort.sortby,
                 search: defects.filter.field.search
             }))
-    }, [state])
+        }
+    }, [state,components,assignee])
 
     useEffect(() => {
         // setState({})
@@ -98,6 +146,14 @@ const DefectFilter = ({
         }
     }, [open]);
 
+
+    useEffect(() => {
+        if(defects.filter.field.project){
+        dispatch(getAllAssignee(defects.filter.field.project))
+        }
+    }, [state.project])
+
+ 
 
 
     return (
@@ -125,6 +181,7 @@ const DefectFilter = ({
                                             //clear search input field
                                             // document.getElementById('search-by-title').value = ''
                                             dispatch(resetFilterState());
+                                            setAssignee([])
                                             dispatch(getAllDefectPaginate({
                                                 order: defects.sort.order,
                                                 sortby: defects.sort.sortby
@@ -179,8 +236,8 @@ const DefectFilter = ({
                                     <Select
                                         name='components'
                                         label='components'
-                                        value={state.components ?? ""}
-                                        onChange={handleChange}
+                                        value={components}
+                                        onChange={handleComponents}
                                     >
 
                                         {defects.data.components ? defects.data.components.map((item) => (
@@ -257,6 +314,61 @@ const DefectFilter = ({
 
                                 </Select>
                             </FormControl>
+
+                            {defects.data.assignee  && defects.filter.field.project ?
+
+                            <FormControl sx={{ margin: '0.5rem', flexBasis: '100%'  }}>
+                                <InputLabel id="assignee-checkbox-label">Assignee</InputLabel>
+                                <Select
+                                    labelId="assignee-checkbox-label"
+                                    id="assigneeSelect"
+                                    multiple
+                                    value={assignee}
+                                    onChange={handleAssignee}
+                                    input={<OutlinedInput label="Assignee" />}
+                                    renderValue={(selected) => (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {selected.map((value) => (
+                                                <Chip
+                                                label={value}
+                                                variant="outlined"
+                                                color="primary"
+                                                sx={{ width: 'max-content', justifyContent: 'flex-start', m: 0.2 }}
+                                            />
+                                            ))}
+                                        </Box>
+                                    )}
+                                    MenuProps={MenuProps}
+                                >
+
+
+                                    {defects.data.assignee ? defects.data.assignee.map((user) => (
+                                        <MenuItem key={user.username} value={user.username}>
+                                            <Checkbox checked={assignee.indexOf(user.username) > -1} />
+                                            <Avatar
+                                                alt={user.username}
+                                                src={user.photoURL}
+                                                sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
+
+                                            <Box>
+                                                <Typography
+                                                    sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
+                                                >{user.email}</Typography>
+                                                <Typography
+                                                    sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
+                                                >@{user.username}</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                    ))
+                                        :
+                                        null
+                                    }
+                                </Select>
+                            </FormControl>
+                            :
+                            null
+                                }
+
                         </Box>
 
                     </Box>

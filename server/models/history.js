@@ -5,7 +5,7 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 export const historySchema = mongoose.Schema({
     defectid:{
-        type:Number
+        type:String
     },
     user:[{}],
     from:{

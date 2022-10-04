@@ -1,6 +1,6 @@
 //lib
 import Moment from 'react-moment'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,6 +35,7 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Avatar, Chip } from '@mui/material';
 
 
 const PaginateComponent = ({
@@ -63,6 +64,7 @@ const PaginateComponent = ({
         'severity',
         'status',
         'server',
+        'assigneeDetails',
         'reporter',
         'createdDate',
         'lastUpdatedDate'
@@ -71,9 +73,12 @@ const PaginateComponent = ({
     const changeHeaderText = (header) => {
         if (header === "defectid") {
             return "Defect ID"
-        } else if(header === "title"){
+        } else if (header === "title") {
             return "Summary"
-        }else if (header === "createdDate") {
+        } else if (header === "assigneeDetails") {
+            return "Assignee"
+        }
+        else if (header === "createdDate") {
             return "Created Date"
         } else if (header === "lastUpdatedDate") {
             return "Updated Date"
@@ -233,7 +238,7 @@ const PaginateComponent = ({
 
     useEffect(() => {
 
-        if(firstLoad){
+        if (firstLoad) {
             setLoading(true)
         }
 
@@ -245,13 +250,13 @@ const PaginateComponent = ({
                 order: sort.order,
                 search: filter.field.search
             }))
-            .unwrap()
-            .then(()=>{
-                if(firstLoad){
-                    setLoading(false)
-                    setFirstLoad(false)
-                }
-            })
+                .unwrap()
+                .then(() => {
+                    if (firstLoad) {
+                        setLoading(false)
+                        setFirstLoad(false)
+                    }
+                })
         } else {
             dispatch(filterDefect({
                 page: page + 1,
@@ -265,13 +270,13 @@ const PaginateComponent = ({
                 order: sort.order,
                 search: filter.field.search
             }))
-            .unwrap()
-            .then(()=>{
-                if(firstLoad){
-                    setLoading(false)
-                    setFirstLoad(false)
-                }
-            })
+                .unwrap()
+                .then(() => {
+                    if (firstLoad) {
+                        setLoading(false)
+                        setFirstLoad(false)
+                    }
+                })
         }
     }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.field.search]);
 
@@ -281,9 +286,11 @@ const PaginateComponent = ({
         setSearchField(filter.field.search)
     }, [])
 
-    useEffect(()=>{
+    useEffect(() => {
+        if(searchField){
         dispatch(setSearch(searchField));
-    },[searchField])
+        }
+    }, [searchField])
 
 
     return (
@@ -291,7 +298,7 @@ const PaginateComponent = ({
 
 
             <Loader
-            loading={loading}
+                loading={loading}
             />
 
             {defects && defects.docs ?
@@ -325,12 +332,12 @@ const PaginateComponent = ({
                                         null
                                     }
 
-                                    {tableHeader.map((header) => (
-                                        <>
+                                    {tableHeader.map((header, index) => (
+                                        <Fragment key={`table-${header}-$`}>
                                             {showColumn[header] ?
                                                 <TableCell
-                                                    key={`table-${header}`}
-                                                    sx={{textAlign:'center'}}
+                                                    key={`table-${header}-$`}
+                                                    sx={{ textAlign: 'center' }}
 
                                                 >
                                                     <TableSortLabel
@@ -351,7 +358,7 @@ const PaginateComponent = ({
                                                 :
                                                 null
                                             }
-                                        </>
+                                        </Fragment>
                                     ))}
                                 </TableRow>
                             </TableHead>
@@ -370,7 +377,7 @@ const PaginateComponent = ({
                                                     setAnchorEl(e.currentTarget)
                                                 }}
                                             >
-                                                <MenuIcon color='secondary' sx={{'&:hover':{color:'#ce32e7'}}} /></TableCell>
+                                                <MenuIcon color='secondary' sx={{ '&:hover': { color: '#ce32e7' } }} /></TableCell>
                                             :
                                             null
                                         }
@@ -378,68 +385,96 @@ const PaginateComponent = ({
 
                                         {showColumn.defectid ?
                                             <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}>
-                                                <Typography 
-                                                variant='body'
-                                                onClick={()=>navigate(`/defect/view/${item.defectid}`)} 
-                                                sx={{color:'blue',cursor:'pointer'}}>{item.defectid}</Typography>
-                                                </TableCell>
+                                                <Typography
+                                                    variant='body'
+                                                    onClick={() => navigate(`/defect/view/${item.defectid}`)}
+                                                    sx={{ color: 'blue', cursor: 'pointer' }}>{item.defectid}</Typography>
+                                            </TableCell>
                                             :
                                             null
                                         }
 
                                         {showColumn.title ?
-                                            <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', textAlign: 'center',overflowWrap: 'anywhere', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
+                                            <TableCell key={`${item.title}-${index}`} sx={{ minWidth: '350px', textAlign: 'center', overflowWrap: 'anywhere', textOverflow: 'ellipsis' }}>{item.title}</TableCell>
                                             :
                                             null
                                         }
 
                                         {showColumn.project ?
-                                            <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px',textAlign: 'center' }}>{item.project}</TableCell>
+                                            <TableCell key={`${item.project}-${index}`} sx={{ minWidth: '150px', textAlign: 'center' }}>{item.project}</TableCell>
                                             :
                                             null
                                         }
 
+
                                         {showColumn.components ?
-                                            <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px',textAlign: 'center' }}>{item.components}</TableCell>
+                                            <TableCell key={`${item.components}-${index}`} sx={{ minWidth: '150px', textAlign: 'center' }}>{item.components}</TableCell>
                                             :
                                             null
                                         }
 
                                         {showColumn.severity ?
-                                            <TableCell key={`${item.severity}-${index}`} sx={{ width: '20px',textAlign: 'center' }}>
-                                                <Box sx={{flexBasis:'100%',display:'flex',justifyContent:'center'}}>
-                                                {SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}
+                                            <TableCell key={`${item.severity}-${index}`} sx={{ width: '20px', textAlign: 'center' }}>
+                                                <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+                                                    {SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}
                                                 </Box>
-                                                </TableCell>
+                                            </TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.status ?
-                                            <TableCell key={`${item.status}-${index}`} sx={{ width: '20px',textAlign: 'center' }}>
-                                                <Box sx={{flexBasis:'100%',display:'flex',justifyContent:'center'}}>
-                                                {StatusColorCode({ status: item.status, textWidth: '6rem' })}
+                                            <TableCell key={`${item.status}-${index}`} sx={{ width: '20px', textAlign: 'center' }}>
+                                                <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+                                                    {StatusColorCode({ status: item.status, textWidth: '6rem' })}
                                                 </Box>
                                             </TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.server ?
-                                            <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px',textAlign: 'center' }}>{item.server}</TableCell>
+                                            <TableCell key={`${item.server}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}>{item.server}</TableCell>
                                             :
                                             null
                                         }
+
+                                        {showColumn.assigneeDetails && item.assigneeDetails ?
+
+                                            <TableCell key={`${item.assigneeDetails.username}-${index}`} sx={{ minWidth: '150px', textAlign: 'center' }}>
+                                                {item.assigneeDetails.map((user) => (
+                                                    <Box>
+                                                        <Chip
+                                                            avatar={<Avatar alt={user.username} src={user.photoURL} />}
+                                                            label={user.username}
+                                                            variant="outlined"
+                                                            sx={{ width: '100%', justifyContent: 'flex-start', m: 0.2 }}
+                                                        />
+                                                    </Box>
+                                                ))}
+                                            </TableCell>
+
+                                            :
+                                            null
+                                        }
+
                                         {showColumn.reporter ?
-                                            <TableCell key={`${item.reporter}-${index}`} sx={{ minWidth: '50px',textAlign: 'center', overflowWrap: 'break-word' }}>{item.reporter}</TableCell>
+                                            <TableCell key={`${item.reporter.username}-${index}`} sx={{ minWidth: '50px', textAlign: 'center', overflowWrap: 'break-word' }}>
+                                                <Chip
+                                                    avatar={<Avatar alt={item.reporter.username} src={item.reporter.photoURL} />}
+                                                    label={item.reporter.username}
+                                                    variant="outlined"
+                                                    sx={{ width: '100%', justifyContent: 'flex-start', m: 0.2 }}
+                                                />
+                                                </TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.createdDate ?
-                                            <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px',textAlign: 'center' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
+                                            <TableCell key={`${item.createdDate}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}><Moment format="DD/MMM/YYYY">{item.createdDate}</Moment></TableCell>
                                             :
                                             null
                                         }
                                         {showColumn.lastUpdatedDate ?
-                                            <TableCell key={`${item.lastUpdatedDate}-${index}`} sx={{ minWidth: '50px',textAlign: 'center' }}><Moment format="DD/MMM/YYYY">{item.lastUpdatedDate}</Moment></TableCell>
+                                            <TableCell key={`${item.lastUpdatedDate}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}><Moment format="DD/MMM/YYYY">{item.lastUpdatedDate}</Moment></TableCell>
                                             :
                                             null
                                         }
