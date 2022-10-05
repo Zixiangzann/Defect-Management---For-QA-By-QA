@@ -39,7 +39,7 @@ let DEFAULT_DEFECT_STATE = {
     server:null,
     severity: null,
     status: null,
-    assignee: null,
+    assignee: [],
     search: '',
     },
     showColumn:{
@@ -81,11 +81,28 @@ export const defectsSlice = createSlice({
     },
     setFilterState: (state, action) => {
       state.filter.field = action.payload
-      state.filter.filtered = true;
+      
+      if (
+        state.filter.field.search !== '' 
+        || state.filter.field.project !== null 
+        || state.filter.field.server !== null  
+        || state.filter.field.components !== null 
+        || state.filter.field.severity !== null 
+        || state.filter.field.status !== null
+        || state.filter.field.assignee !== null) {
+        state.filter.filtered = true;
+      }
     },
     setSearch: (state, action) => {
       state.filter.field.search = action.payload
-      if (state.filter.field.search !== '' || state.filter.field.project !== null || state.filter.field.server !== null  || state.filter.field.components !== null || state.filter.field.severity !== null || state.filter.field.status !== null) {
+      if (
+        state.filter.field.search !== '' 
+        || state.filter.field.project !== null 
+        || state.filter.field.server !== null  
+        || state.filter.field.components !== null 
+        || state.filter.field.severity !== null 
+        || state.filter.field.status !== null
+        || state.filter.field.assignee !== null) {
         state.filter.filtered = true;
       } else {
         state.filter.filtered = false;

@@ -371,6 +371,7 @@ export const filterDefectList = async (req, user) => {
         const components = req.body.components || '';
         const status = req.body.status || '';
         const severity = req.body.severity || '';
+        const assignee = req.body.assignee || ''; 
         const server = req.body.server || '';
         const search = req.body.search || '(.*?)';
 
@@ -397,6 +398,7 @@ export const filterDefectList = async (req, user) => {
         const filterStatus = (status === '') ? { $regex: matchAll } : status
         const filterSeverity = (severity === '') ? { $regex: matchAll } : severity
         const filterServer = (server === '') ? { $regex: matchAll } : server
+        const filterAssignee = (!assignee.length) ?  { $all: [/(.*?)/i] }   :  { $all: assignee }
 
         let aggQuery = Defect.aggregate([
             [
@@ -407,7 +409,8 @@ export const filterDefectList = async (req, user) => {
                         status: filterStatus,
                         severity: filterSeverity,
                         server: filterServer,
-                        title: { $regex: search, $options: 'i' }
+                        title: { $regex: search, $options: 'i' },
+                        "assigneeDetails.username": filterAssignee
                     }
                 },
                 { $sort: { [sortby]: order } }

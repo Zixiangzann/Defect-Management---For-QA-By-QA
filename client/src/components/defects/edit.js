@@ -9,7 +9,7 @@ import { errorHelper, errorHelperSelect, Loader } from '../../utils/tools'
 import { validation, formValues } from './validationSchema'
 import ModalComponent from '../../utils/modal/modal';
 import WYSIWYG from '../../utils/form/wysiwyg';
-import { StatusColorCode,SeverityColorCode } from '../../utils/tools';
+import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
 
 //MUI
 import { Checkbox, FormControlLabel, Tooltip, Typography } from "@mui/material";
@@ -41,7 +41,9 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 import Avatar from '@mui/material/Avatar';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Chip from '@mui/material/Chip';
-
+import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
@@ -439,7 +441,7 @@ const EditDefect = () => {
                 formik.values.assigneeDetails = assignee
             }
 
-           
+
 
 
             dispatch(updateDefect({ values, defectId }))
@@ -452,14 +454,40 @@ const EditDefect = () => {
 
     return (
         <>
-            <Typography variant='h4' sx={{ marginTop: '2rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Edit Issue</Typography>
+
+            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', mt:5 }}>
+                <Button
+                    startIcon={<ArrowCircleLeftRoundedIcon
+                    />}
+                    onClick={() => navigate(`/defect`)}
+                    sx={{ mb: 3 }}
+                >
+                    Back
+                </Button>
+
+                <Box flexBasis={'100%'} />
+
+                <Button
+                    startIcon={<VisibilityIcon />}
+                    color="secondary"
+                    variant='outlined'
+                    sx={{ mb: 3 }}
+                    onClick={() => navigate(`/defect/view/${defectId}`)}>
+                    View Issue
+                </Button>
+            </Box>
 
 
-
+            <Box sx={{display:'flex',justifyContent:'flex-start',flexBasis:'100%'}}>
+                <Typography variant='h4' sx={{ marginTop: '0rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Edit Issue</Typography>
+                </Box>
+                
             <form className='defect_form' style={{ marginTop: '2rem' }} onSubmit={formik.handleSubmit}>
 
                 {/* revamp project select */}
                 <Box sx={{ display: 'flex', marginBottom: '2rem' }}>
+
+
 
                     <FormControl
                         fullWidth
@@ -541,15 +569,15 @@ const EditDefect = () => {
                                 {...formik.getFieldProps('status')}
                             >
 
-                                <MenuItem key="New" value="New">{StatusColorCode({status: "New", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Open" value="Open">{StatusColorCode({status: "Open", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Fixed" value="Fixed">{StatusColorCode({status: "Fixed", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Pending Retest" value="Pending Retest">{StatusColorCode({status: "Pending Retest", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Verified" value="Verified">{StatusColorCode({status: "Verified", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Closed" value="Closed">{StatusColorCode({status: "Closed", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Deferred" value="Deferred">{StatusColorCode({status: "Deferred", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Duplicated" value="Duplicated">{StatusColorCode({status: "Duplicated", textWidth:'10rem'})}</MenuItem>
-                                <MenuItem key="Not a bug" value="Not a bug">{StatusColorCode({status: "Not a bug", textWidth:'10rem'})}</MenuItem>
+                                <MenuItem key="New" value="New">{StatusColorCode({ status: "New", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Open" value="Open">{StatusColorCode({ status: "Open", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Fixed" value="Fixed">{StatusColorCode({ status: "Fixed", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Pending Retest" value="Pending Retest">{StatusColorCode({ status: "Pending Retest", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Verified" value="Verified">{StatusColorCode({ status: "Verified", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Closed" value="Closed">{StatusColorCode({ status: "Closed", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Deferred" value="Deferred">{StatusColorCode({ status: "Deferred", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Duplicated" value="Duplicated">{StatusColorCode({ status: "Duplicated", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Not a bug" value="Not a bug">{StatusColorCode({ status: "Not a bug", textWidth: '10rem' })}</MenuItem>
 
                             </Select>
 
@@ -796,10 +824,10 @@ const EditDefect = () => {
                                     {...formik.getFieldProps('severity')}
                                 >
 
-                                    <MenuItem key="Low" value="Low">{SeverityColorCode({severity: "Low",textWidth:'10rem'})}</MenuItem>
-                                    <MenuItem key="Medium" value="Medium">{SeverityColorCode({severity: "Medium",textWidth:'10rem'})}</MenuItem>
-                                    <MenuItem key="High" value="High">{SeverityColorCode({severity: "High",textWidth:'10rem'})}</MenuItem>
-                                    <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({severity: "Showstopper",textWidth:'10rem'})}</MenuItem>
+                                    <MenuItem key="Low" value="Low">{SeverityColorCode({ severity: "Low", textWidth: '10rem' })}</MenuItem>
+                                    <MenuItem key="Medium" value="Medium">{SeverityColorCode({ severity: "Medium", textWidth: '10rem' })}</MenuItem>
+                                    <MenuItem key="High" value="High">{SeverityColorCode({ severity: "High", textWidth: '10rem' })}</MenuItem>
+                                    <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({ severity: "Showstopper", textWidth: '10rem' })}</MenuItem>
                                 </Select>
 
                                 {errorHelperSelect(formik, 'severity')}

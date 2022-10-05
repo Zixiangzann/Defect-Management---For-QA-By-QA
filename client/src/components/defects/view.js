@@ -64,6 +64,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
+import EditIcon from '@mui/icons-material/Edit';
 
 const ViewDefect = () => {
 
@@ -142,10 +143,10 @@ const ViewDefect = () => {
     const handleWatchlist = () => {
 
         dispatch(defectWatch({ defectId }))
-        .unwrap()
-        .then(()=>{
-            dispatch(getDefectById(defectId))
-        })
+            .unwrap()
+            .then(() => {
+                dispatch(getDefectById(defectId))
+            })
     }
 
     const handleDownload = async (downloadURL) => {
@@ -315,15 +316,28 @@ const ViewDefect = () => {
                 <Box className='defect_container' mt={5} sx={{ display: 'flex', flexWrap: 'wrap' }}>
 
                     {/* <Typography className='defect-id' sx={{ ml: '2rem', fontSize: '1.2rem', color: 'darkblue' }}>Defect ID:</Typography> */}
-                    
-                    <Button
-                    startIcon={<ArrowCircleLeftRoundedIcon
-                    />}
-                    onClick={()=>navigate(`/defect`)}
-                    sx={{mb:3}}
-                    >
-                        Back
-                    </Button>
+
+                    <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'flex-end',flexWrap:'wrap' }}>
+                        <Button
+                            startIcon={<ArrowCircleLeftRoundedIcon
+                            />}
+                            onClick={() => navigate(`/defect`)}
+                            sx={{ mb: 3 }}
+                        >
+                            Back
+                        </Button>
+
+                        <Box flexBasis={'100%'}/>
+
+                        <Button
+                            startIcon={<EditIcon />}
+                            color="secondary"
+                            variant='outlined'
+                            sx={{ mb: 3 }}
+                            onClick={() => navigate(`/defect/edit/${defectId}`)}>
+                            Edit Issue
+                        </Button>
+                    </Box>
 
                     <Box flexBasis={'100%'}></Box>
 
@@ -349,6 +363,8 @@ const ViewDefect = () => {
                         }
                     </Box>
 
+
+
                     <Box className="createdOn" sx={{ display: 'flex', flexBasis: '100%', justifyContent: 'flex-end' }}>
 
                         {/* if it is not converted(showing iso date), use Created on */}
@@ -368,7 +384,7 @@ const ViewDefect = () => {
                     </Box>
 
 
-                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem',overflowWrap:'break-word',width:'100%' }}>{currentDefect.title}</Typography>
+                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem', overflowWrap: 'break-word', width: '100%' }}>{currentDefect.title}</Typography>
 
                     <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'}>
                         <Typography mr={'1rem'}>{SeverityColorCode({ severity: currentDefect.severity, textWidth: '9rem' })}</Typography>

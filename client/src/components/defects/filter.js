@@ -40,7 +40,7 @@ const DefectFilter = ({
 
     const defects = useSelector(state => state.defects);
     const [assignee, setAssignee] = useState([])
-    const [components, setComponents] = useState('')
+    const [components, setComponents] = useState(null)
     const dispatch = useDispatch();
 
     const ITEM_HEIGHT = 48;
@@ -90,9 +90,9 @@ const DefectFilter = ({
     }
 
     useEffect(() => {
+        
         setState({
             project: defects.filter.field.project,
-            // components: defects.filter.field.components,
             severity: defects.filter.field.severity,
             status: defects.filter.field.status,
             server: defects.filter.field.server,
@@ -106,6 +106,7 @@ const DefectFilter = ({
             setComponents(defects.filter.field.components)
         }
 
+
     }, [])
 
     useEffect(() => {
@@ -118,9 +119,10 @@ const DefectFilter = ({
             assignee: assignee,
             search: defects.filter.field.search
         }))
+
         dispatch(setSortBy(defects.sort.sortby))            
         dispatch(setOrder(defects.sort.order))
-    }, [state,components,assignee])
+    }, [state,assignee,components])
 
     useEffect(() => {
         if(defects.filter.filtered){
@@ -137,7 +139,7 @@ const DefectFilter = ({
                 search: defects.filter.field.search
             }))
         }
-    }, [state,components,assignee])
+    }, [state,assignee,components])
 
     useEffect(() => {
         // setState({})
@@ -182,6 +184,7 @@ const DefectFilter = ({
                                             // document.getElementById('search-by-title').value = ''
                                             dispatch(resetFilterState());
                                             setAssignee([])
+                                            setComponents('')
                                             dispatch(getAllDefectPaginate({
                                                 order: defects.sort.order,
                                                 sortby: defects.sort.sortby
