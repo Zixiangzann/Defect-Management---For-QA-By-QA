@@ -479,7 +479,7 @@ const EditDefect = () => {
 
 
             <Box sx={{display:'flex',justifyContent:'flex-start',flexBasis:'100%'}}>
-                <Typography variant='h4' sx={{ marginTop: '0rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Edit Issue</Typography>
+                <Typography variant='h4' sx={{ marginTop: '0rem', color:'#00008b', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Edit Issue</Typography>
                 </Box>
                 
             <form className='defect_form' style={{ marginTop: '2rem' }} onSubmit={formik.handleSubmit}>
@@ -528,7 +528,7 @@ const EditDefect = () => {
                                 setOpenModal(true);
                             }
                             }
-                            sx={{ mt: '1rem', ml: '1rem' }}>
+                            sx={{ mt: '1rem', ml: '1rem',width:'55px' }}>
                             <ModeEditIcon />
                         </IconButton>
                     </Tooltip>
@@ -838,7 +838,7 @@ const EditDefect = () => {
                         <Box>
                             <Button
                                 variant='text'
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/defect')}
                                 sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
                                 Cancel
                             </Button>

@@ -386,6 +386,7 @@ const PaginateComponent = ({
                                         {showColumn.defectid ?
                                             <TableCell key={`${item.defectid}-${index}`} sx={{ minWidth: '50px', textAlign: 'center' }}>
                                                 <Typography
+                                                    key={`${item.defectid}-${index}-typography`}
                                                     variant='body'
                                                     onClick={() => navigate(`/defect/view/${item.defectid}`)}
                                                     sx={{ color: 'blue', cursor: 'pointer' }}>{item.defectid}</Typography>
@@ -415,7 +416,9 @@ const PaginateComponent = ({
 
                                         {showColumn.severity ?
                                             <TableCell key={`${item.severity}-${index}`} sx={{ width: '20px', textAlign: 'center' }}>
-                                                <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+                                                <Box 
+                                                key={`${item.severity}-${index}-box`}
+                                                sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
                                                     {SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}
                                                 </Box>
                                             </TableCell>
@@ -424,7 +427,9 @@ const PaginateComponent = ({
                                         }
                                         {showColumn.status ?
                                             <TableCell key={`${item.status}-${index}`} sx={{ width: '20px', textAlign: 'center' }}>
-                                                <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+                                                <Box 
+                                                 key={`${item.status}-${index}-box`}
+                                                sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
                                                     {StatusColorCode({ status: item.status, textWidth: '6rem' })}
                                                 </Box>
                                             </TableCell>
@@ -440,8 +445,8 @@ const PaginateComponent = ({
                                         {showColumn.assigneeDetails && item.assigneeDetails ?
 
                                             <TableCell key={`${item.assigneeDetails.username}-${index}`} sx={{ minWidth: '150px', textAlign: 'center' }}>
-                                                {item.assigneeDetails.map((user) => (
-                                                    <Box>
+                                                {item.assigneeDetails.map((user,index) => (
+                                                    <Box key={`${user}-${index}`}>
                                                         <Chip
                                                             avatar={<Avatar alt={user.username} src={user.photoURL} />}
                                                             label={user.username}
@@ -450,6 +455,7 @@ const PaginateComponent = ({
                                                         />
                                                     </Box>
                                                 ))}
+                                                
                                             </TableCell>
 
                                             :
@@ -459,6 +465,7 @@ const PaginateComponent = ({
                                         {showColumn.reporter ?
                                             <TableCell key={`${item.reporter.username}-${index}`} sx={{ minWidth: '50px', textAlign: 'center', overflowWrap: 'break-word' }}>
                                                 <Chip
+                                                   key={`${item.reporter.username}-${index}-chip`}
                                                     avatar={<Avatar alt={item.reporter.username} src={item.reporter.photoURL} />}
                                                     label={item.reporter.username}
                                                     variant="outlined"

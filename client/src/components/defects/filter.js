@@ -230,7 +230,7 @@ const DefectFilter = ({
                                 </Select>
                             </FormControl>
 
-                            {defects.data.components && defects.data.components.length !== 0 ?
+                            {defects.data.components  && defects.filter.field.project  ?
                                 <FormControl
                                     sx={{ margin: '0.5rem', flexBasis: '100%' }}>
 
