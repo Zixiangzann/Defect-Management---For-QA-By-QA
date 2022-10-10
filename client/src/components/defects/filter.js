@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 
 //comp
-import { getAllDefectPaginate } from '../../store/actions/defects';
 import { resetDataState, setFilterState, resetFilterState, setSortBy, setOrder } from '../../store/reducers/defects';
 import { getAllAssignee, getAllComponents, getAllProjects, filterDefect } from '../../store/actions/defects';
 import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
@@ -41,6 +40,8 @@ const DefectFilter = ({
     const defects = useSelector(state => state.defects);
     const [assignee, setAssignee] = useState([])
     const [components, setComponents] = useState(null)
+    const [reporter, setReporter] = useState('')
+
     const dispatch = useDispatch();
 
     const ITEM_HEIGHT = 48;
@@ -55,18 +56,19 @@ const DefectFilter = ({
     };
 
     const [state, setState] = useState({
-        project: "",
-        severity: "",
-        status: "",
-        server: ""
+        project: null,
+        severity: null,
+        status: null,
+        server: null
     })
 
 
     const handleChange = (event) => {
 
-        if(event.target.name === "project") {
+        if (event.target.name === "project") {
             setAssignee([])
             setComponents('')
+            setReporter('')
         }
 
         const value = event.target.value;
@@ -85,12 +87,16 @@ const DefectFilter = ({
         );
     };
 
+    const handleReporter = (event) => {
+        setReporter(event.target.value)
+    }
+
     const handleComponents = (event) => {
         setComponents(event.target.value)
     }
 
     useEffect(() => {
-        
+
         setState({
             project: defects.filter.field.project,
             severity: defects.filter.field.severity,
@@ -98,12 +104,16 @@ const DefectFilter = ({
             server: defects.filter.field.server,
         })
 
-        if(defects.filter.field.assignee){
+        if (defects.filter.field.assignee) {
             setAssignee(defects.filter.field.assignee)
         }
 
-        if(defects.filter.field.components){
+        if (defects.filter.field.components) {
             setComponents(defects.filter.field.components)
+        }
+
+        if(defects.filter.field.reporter) {
+            setReporter(defects.filter.field.reporter)
         }
 
 
@@ -117,29 +127,13 @@ const DefectFilter = ({
             severity: state.severity,
             server: state.server,
             assignee: assignee,
+            reporter: reporter,
             search: defects.filter.field.search
         }))
 
-        dispatch(setSortBy(defects.sort.sortby))            
+        dispatch(setSortBy(defects.sort.sortby))
         dispatch(setOrder(defects.sort.order))
-    }, [state,assignee,components])
-
-    useEffect(() => {
-        if(defects.filter.filtered){
-        dispatch(filterDefect(
-            {
-                project: state.project,
-                components: components,
-                status: state.status,
-                severity: state.severity,
-                server: state.server,
-                assignee: assignee,
-                order: defects.sort.order,
-                sortby: defects.sort.sortby,
-                search: defects.filter.field.search
-            }))
-        }
-    }, [state,assignee,components])
+    }, [state, assignee, components, reporter])
 
     useEffect(() => {
         // setState({})
@@ -150,12 +144,12 @@ const DefectFilter = ({
 
 
     useEffect(() => {
-        if(defects.filter.field.project){
-        dispatch(getAllAssignee(defects.filter.field.project))
+        if (defects.filter.field.project) {
+            dispatch(getAllAssignee(defects.filter.field.project))
         }
     }, [state.project])
 
- 
+
 
 
     return (
@@ -185,11 +179,7 @@ const DefectFilter = ({
                                             dispatch(resetFilterState());
                                             setAssignee([])
                                             setComponents('')
-                                            dispatch(getAllDefectPaginate({
-                                                order: defects.sort.order,
-                                                sortby: defects.sort.sortby
-
-                                            }))
+                                            setReporter('')
                                         }}
                                     >
                                         <RestartAltIcon />
@@ -230,7 +220,7 @@ const DefectFilter = ({
                                 </Select>
                             </FormControl>
 
-                            {defects.data.components  && defects.filter.field.project  ?
+                            {defects.data.components && defects.filter.field.project ?
                                 <FormControl
                                     sx={{ margin: '0.5rem', flexBasis: '100%' }}>
 
@@ -318,27 +308,78 @@ const DefectFilter = ({
                                 </Select>
                             </FormControl>
 
-                            {defects.data.assignee  && defects.filter.field.project ?
+                            {defects.data.assignee && defects.filter.field.project ?
 
-                            <FormControl sx={{ margin: '0.5rem', flexBasis: '100%'  }}>
-                                <InputLabel id="assignee-checkbox-label">Assignee</InputLabel>
+                                <FormControl sx={{ margin: '0.5rem', flexBasis: '100%' }}>
+                                    <InputLabel id="assignee-checkbox-label">Assignee</InputLabel>
+                                    <Select
+                                        labelId="assignee-checkbox-label"
+                                        id="assigneeSelect"
+                                        multiple
+                                        value={assignee}
+                                        onChange={handleAssignee}
+                                        input={<OutlinedInput label="Assignee" />}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value) => (
+                                                    <Chip
+                                                        label={value}
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        sx={{ width: 'max-content', justifyContent: 'flex-start', m: 0.2 }}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        )}
+                                        MenuProps={MenuProps}
+                                    >
+
+
+                                        {defects.data.assignee ? defects.data.assignee.map((user) => (
+                                            <MenuItem key={user.username} value={user.username}>
+                                                <Checkbox checked={assignee.indexOf(user.username) > -1} />
+                                                <Avatar
+                                                    alt={user.username}
+                                                    src={user.photoURL}
+                                                    sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
+
+                                                <Box>
+                                                    <Typography
+                                                        sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
+                                                    >{user.email}</Typography>
+                                                    <Typography
+                                                        sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
+                                                    >@{user.username}</Typography>
+                                                </Box>
+                                            </MenuItem>
+                                        ))
+                                            :
+                                            null
+                                        }
+                                    </Select>
+                                </FormControl>
+                                :
+                                null
+                            }
+
+{defects.data.assignee && defects.filter.field.project ?
+
+                            <FormControl sx={{ margin: '0.5rem', flexBasis: '100%' }}>
+                                <InputLabel id="reporter-label">Reporter</InputLabel>
                                 <Select
-                                    labelId="assignee-checkbox-label"
-                                    id="assigneeSelect"
-                                    multiple
-                                    value={assignee}
-                                    onChange={handleAssignee}
-                                    input={<OutlinedInput label="Assignee" />}
-                                    renderValue={(selected) => (
+                                    labelId="reporter-label"
+                                    id="reporterSelect"
+                                    value={reporter}
+                                    onChange={handleReporter}
+                                    input={<OutlinedInput label="Reporter" />}
+                                    renderValue={() => (
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {selected.map((value) => (
-                                                <Chip
-                                                label={value}
+                                            <Chip
+                                                label={reporter}
                                                 variant="outlined"
                                                 color="primary"
                                                 sx={{ width: 'max-content', justifyContent: 'flex-start', m: 0.2 }}
                                             />
-                                            ))}
                                         </Box>
                                     )}
                                     MenuProps={MenuProps}
@@ -347,7 +388,6 @@ const DefectFilter = ({
 
                                     {defects.data.assignee ? defects.data.assignee.map((user) => (
                                         <MenuItem key={user.username} value={user.username}>
-                                            <Checkbox checked={assignee.indexOf(user.username) > -1} />
                                             <Avatar
                                                 alt={user.username}
                                                 src={user.photoURL}

@@ -8,7 +8,6 @@ import {
   filterDefect,
   getAllAssignee,
   getAllComponents,
-  getAllDefectPaginate,
   getAllProjects,
   getDefectById,
   updateAttachment,
@@ -32,6 +31,7 @@ let DEFAULT_DEFECT_STATE = {
     attachment: []
   },
   filter: {
+    filtering: false,
     filtered: false,
     field:{
     project: null,
@@ -40,6 +40,7 @@ let DEFAULT_DEFECT_STATE = {
     severity: null,
     status: null,
     assignee: [],
+    reporter: null,
     search: '',
     },
     showColumn:{
@@ -59,7 +60,7 @@ let DEFAULT_DEFECT_STATE = {
   },
   sort: {
     order: -1,
-    sortby: 'createdDate'
+    sortby: 'lastUpdatedDate'
   },
   current: {
     defect: null,
@@ -89,7 +90,8 @@ export const defectsSlice = createSlice({
         || state.filter.field.components !== null 
         || state.filter.field.severity !== null 
         || state.filter.field.status !== null
-        || state.filter.field.assignee !== null) {
+        || state.filter.field.assignee !== null
+        || state.filter.field.reporter !== null) {
         state.filter.filtered = true;
       }
     },
@@ -102,7 +104,8 @@ export const defectsSlice = createSlice({
         || state.filter.field.components !== null 
         || state.filter.field.severity !== null 
         || state.filter.field.status !== null
-        || state.filter.field.assignee !== null) {
+        || state.filter.field.assignee !== null
+        || state.filter.field.reporter !== null) {
         state.filter.filtered = true;
       } else {
         state.filter.filtered = false;
@@ -141,13 +144,11 @@ export const defectsSlice = createSlice({
         state.loading = false;
       })
       .addCase(createDefect.rejected, (state) => { state.loading = false })
-      .addCase(getAllDefectPaginate.pending, (state) => { state.loading = true })
-      .addCase(getAllDefectPaginate.fulfilled, (state, action) => {
-        state.loading = false;
-        state.defectLists = action.payload
+      .addCase(filterDefect.pending,(state, action) => {
+        state.filter.filtering = true
       })
-      .addCase(getAllDefectPaginate.rejected, (state) => { state.loading = false })
       .addCase(filterDefect.fulfilled, (state, action) => {
+        state.filter.filtering = false
         state.loading = false
         state.defectLists = action.payload
         if (state.filter.field.search !== '' 
@@ -156,11 +157,16 @@ export const defectsSlice = createSlice({
         || state.filter.field.severity !== null 
         || state.filter.field.status !== null
         || state.filter.field.assignee !== null
+        || state.filter.field.reporter !== null
         ) {
           state.filter.filtered = true;
         } else {
           state.filter.filtered = false;
         }
+      })
+      .addCase(filterDefect.rejected, (state, action) => {
+        state.filter.filtering = false
+        showToast('ERROR',"Failed to get defect list")
       })
       .addCase(getDefectById.pending, (state) => { state.loading = true })
       .addCase(getDefectById.fulfilled, (state, action) => {

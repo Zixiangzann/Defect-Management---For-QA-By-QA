@@ -631,6 +631,99 @@ const EditDefect = () => {
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
                             <Typography className='defectSubHeader' flexBasis={'100%'} mb={1}>Additonal Information: </Typography>
 
+                            <FormControl
+                                id="createDefectComponents"
+                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+
+                                <InputLabel className='defectDetailsSelectLabel'>Components</InputLabel>
+
+                                <Select
+                                    name='components'
+                                    label='components'
+                                    value={selectedComponents}
+                                    {...formik.getFieldProps('components')}
+                                >
+
+                                    {defect.components ? defect.components.map((item) => (
+                                        <MenuItem
+                                            key={item}
+                                            value={item}
+                                        >{item}</MenuItem>
+                                    )) : null
+                                    }
+                                </Select>
+
+                                {errorHelperSelect(formik, 'components')}
+                            </FormControl>
+
+
+
+                            <br></br>
+
+                            <FormControl
+                                id="createDefectServer"
+                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+
+                                <InputLabel className='defectDetailsSelectLabel'>Server</InputLabel>
+                                <Select
+                                    name='server'
+                                    label='Server'
+                                    {...formik.getFieldProps('server')}
+                                >
+
+                                    <MenuItem key="Local" value="Local">Local</MenuItem>
+                                    <MenuItem key="Development" value="Development">Development</MenuItem>
+                                    <MenuItem key="QA" value="QA">QA</MenuItem>
+                                    <MenuItem key="Production" value="Production">Production</MenuItem>
+                                </Select>
+
+                                {errorHelperSelect(formik, 'server')}
+                            </FormControl>
+
+
+                            <FormControl
+                                id="createDefectIssueType"
+                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+
+                                <InputLabel className='defectDetailsSelectLabel'>Issue Type</InputLabel>
+                                <Select
+                                    name='issuetype'
+                                    label='Issue Type'
+                                    {...formik.getFieldProps('issuetype')}
+                                >
+                                    <MenuItem key="Bug" value="Bug">Bug</MenuItem>
+                                    <MenuItem key="Change" value="Change">Change</MenuItem>
+                                    <MenuItem key="Incident" value="Incident">Incident</MenuItem>
+                                </Select>
+
+                                {errorHelperSelect(formik, 'server')}
+                            </FormControl>
+
+                            <br></br>
+                            <FormControl
+                                id="createDefectSeverity"
+                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+
+
+                                <InputLabel className='defectDetailsSelectLabel'>Severity</InputLabel>
+                                <Select
+                                    name='severity'
+                                    label='severity'
+                                    {...formik.getFieldProps('severity')}
+                                >
+
+
+                                    <MenuItem key="Low" value="Low">{SeverityColorCode({ severity: "Low", textWidth: '10rem',lineHeight:0.5 })}</MenuItem>
+                                    <MenuItem key="Medium" value="Medium">{SeverityColorCode({ severity: "Medium", textWidth: '10rem',lineHeight:0.5  })}</MenuItem>
+                                    <MenuItem key="High" value="High">{SeverityColorCode({ severity: "High", textWidth: '10rem',lineHeight:0.5  })}</MenuItem>
+                                    <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({ severity: "Showstopper", textWidth: '10rem',lineHeight:0.5  })}</MenuItem>
+                                
+                                </Select>
+
+                                {errorHelperSelect(formik, 'severity')}
+                            </FormControl>
+
+
                             {assignee ?
                                 <FormikProvider value={formik}>
                                     <FieldArray
@@ -743,97 +836,11 @@ const EditDefect = () => {
                                 null
                             }
 
-                            <FormControl
-                                id="createDefectComponents"
-                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
 
-                                <InputLabel className='defectDetailsSelectLabel'>Components</InputLabel>
-
-                                <Select
-                                    name='components'
-                                    label='components'
-                                    value={selectedComponents}
-                                    {...formik.getFieldProps('components')}
-                                >
-
-                                    {defect.components ? defect.components.map((item) => (
-                                        <MenuItem
-                                            key={item}
-                                            value={item}
-                                        >{item}</MenuItem>
-                                    )) : null
-                                    }
-                                </Select>
-
-                                {errorHelperSelect(formik, 'components')}
-                            </FormControl>
-
-
-
-                            <br></br>
-
-                            <FormControl
-                                id="createDefectServer"
-                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-
-                                <InputLabel className='defectDetailsSelectLabel'>Server</InputLabel>
-                                <Select
-                                    name='server'
-                                    label='Server'
-                                    {...formik.getFieldProps('server')}
-                                >
-
-                                    <MenuItem key="Local" value="Local">Local</MenuItem>
-                                    <MenuItem key="Development" value="Development">Development</MenuItem>
-                                    <MenuItem key="QA" value="QA">QA</MenuItem>
-                                    <MenuItem key="Production" value="Production">Production</MenuItem>
-                                </Select>
-
-                                {errorHelperSelect(formik, 'server')}
-                            </FormControl>
-
-
-                            <FormControl
-                                id="createDefectIssueType"
-                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-
-                                <InputLabel className='defectDetailsSelectLabel'>Issue Type</InputLabel>
-                                <Select
-                                    name='issuetype'
-                                    label='Issue Type'
-                                    {...formik.getFieldProps('issuetype')}
-                                >
-                                    <MenuItem key="Bug" value="Bug">Bug</MenuItem>
-                                    <MenuItem key="Change" value="Change">Change</MenuItem>
-                                    <MenuItem key="Incident" value="Incident">Incident</MenuItem>
-                                </Select>
-
-                                {errorHelperSelect(formik, 'server')}
-                            </FormControl>
-
-                            <br></br>
-                            <FormControl
-                                id="createDefectSeverity"
-                                sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-
-
-                                <InputLabel className='defectDetailsSelectLabel'>Severity</InputLabel>
-                                <Select
-                                    name='severity'
-                                    label='severity'
-                                    {...formik.getFieldProps('severity')}
-                                >
-
-                                    <MenuItem key="Low" value="Low">{SeverityColorCode({ severity: "Low", textWidth: '10rem' })}</MenuItem>
-                                    <MenuItem key="Medium" value="Medium">{SeverityColorCode({ severity: "Medium", textWidth: '10rem' })}</MenuItem>
-                                    <MenuItem key="High" value="High">{SeverityColorCode({ severity: "High", textWidth: '10rem' })}</MenuItem>
-                                    <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({ severity: "Showstopper", textWidth: '10rem' })}</MenuItem>
-                                </Select>
-
-                                {errorHelperSelect(formik, 'severity')}
-                            </FormControl>
                             <br></br>
                         </Box>
+
+                        
 
                         <Box>
                             <Button

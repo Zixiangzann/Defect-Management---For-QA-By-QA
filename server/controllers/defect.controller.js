@@ -80,14 +80,14 @@ const defectController = {
             next(error);
         }
     },
-    async defectListPaginate(req, res, next) {
-        try {
-            const defects = await defectService.paginateDefectList(req, req.user);
-            res.json(defects);
-        } catch (error) {
-            next(error);
-        }
-    },
+    // async defectListPaginate(req, res, next) {
+    //     try {
+    //         const defects = await defectService.paginateDefectList(req, req.user);
+    //         res.json(defects);
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // },
     //Get details for creating defects
     async getAllAssignee(req, res, next) {
         try {

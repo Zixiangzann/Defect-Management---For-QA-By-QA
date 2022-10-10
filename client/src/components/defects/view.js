@@ -384,9 +384,9 @@ const ViewDefect = () => {
                     </Box>
 
 
-                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem', overflowWrap: 'break-word', width: '100%' }}>{currentDefect.title}</Typography>
+                    <Typography variant='h4' className='defect-summary' sx={{ flexBasis: '100%', m: '1rem', overflowWrap: 'break-word', width: '100%',mt:'5rem'}}>{currentDefect.title}</Typography>
 
-                    <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'}>
+                    <Box flexBasis={'100%'} display={'flex'} justifyContent={'flex-end'} mt={7}>
                         <Typography mr={'1rem'}>{SeverityColorCode({ severity: currentDefect.severity, textWidth: '9rem' })}</Typography>
                         <Typography >{StatusColorCode({ status: currentDefect.status, textWidth: '9rem' })}</Typography>
 

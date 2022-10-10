@@ -176,12 +176,12 @@ const Report = () => {
 
             {!selectedProject ?
                 <Box>
-                    <Typography variant='h5' sx={{ marginTop: '2rem' }}>Select a project to generate report</Typography>
+                    <Typography variant='h5' sx={{ marginTop: '5rem' ,color:'#00008b'}}>Select a project to generate report</Typography>
 
 
                     <FormControl
                         fullWidth
-                        sx={{ marginTop: '1rem' }}>
+                        sx={{ marginTop: '2rem' }}>
 
 
                         <InputLabel>Project</InputLabel>
@@ -380,7 +380,7 @@ const Report = () => {
     
 
                     <Grid item xs={1} sm={1} md={8} id='report-title'>                    
-                        <Typography variant='h3' textAlign={'center'}>{project}</Typography>
+                        <Typography variant='h3' textAlign={'center'} sx={{color:'#00008b'}}>{project}</Typography>
                         <Typography variant='h5' mt={4} mb={4} textAlign={'center'}>Total Bug: {totalDefect}</Typography>
                     </Grid>
                    

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 //comp
-import { getAllDefectPaginate } from '../../store/actions/defects';
 import { resetDataState, resetFilterState } from '../../store/reducers/defects';
 import ColumnFilter from './columnFilter';
 

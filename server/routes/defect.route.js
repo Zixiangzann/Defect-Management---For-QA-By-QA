@@ -19,7 +19,7 @@ router.post('/watch/:defectId',auth('updateAny','defects'),defectController.defe
 
 //get all
 router.post('/more',auth('readAny','defects'),defectController.getMoreDefects);
-router.post('/paginate',auth('readAny','defects'),defectController.defectListPaginate)
+// router.post('/paginate',auth('readAny','defects'),defectController.defectListPaginate)
 
 //Get details for create
 router.post('/assignee',auth('readAny','defects'),defectController.getAllAssignee)

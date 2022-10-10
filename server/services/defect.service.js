@@ -236,54 +236,55 @@ export const getMoreDefects = async (req, user) => {
 
 //For paginate and search by title
 //Do a seperate search for id? 
-export const paginateDefectList = async (req) => {
+// //not using
+// export const paginateDefectList = async (req) => {
 
-    const sortby = req.body.sortby || "lastUpdatedDate";
-    const order = req.body.order || -1
-    const limit = req.body.limit || 15;
-    const skip = req.body.skip || 0;
-    const search = req.body.search || '(.*?)';
+//     const sortby = req.body.sortby || "lastUpdatedDate";
+//     const order = req.body.order || -1
+//     const limit = req.body.limit || 15;
+//     const skip = req.body.skip || 0;
+//     const search = req.body.search || '(.*?)';
 
-    //If it is a user account, user can only see project that the account is been assigned to
-    const userProject = Project.find({ "assignee": { $in: [req.user.email] } }).select("title -_id").distinct("title").exec()
+//     //If it is a user account, user can only see project that the account is been assigned to
+//     const userProject = Project.find({ "assignee": { $in: [req.user.email] } }).select("title -_id").distinct("title").exec()
 
-    const options = {
-        page: req.body.page,
-        limit,
-        sortby,
-        order,
-        search
-    }
+//     const options = {
+//         page: req.body.page,
+//         limit,
+//         sortby,
+//         order,
+//         search
+//     }
 
-    let aggQuery;
+//     let aggQuery;
 
-    try {
-        if (!req.user.permission[0].viewAllDefect) {
-            aggQuery = Defect.aggregate(
-                [{ $match: { project: { $in: await userProject }, title: { $regex: search, $options: 'i' } } },
-                { $sort: { [sortby]: order } }
-                ], { collation: { locale: "en", caseLevel: true } }
-            )
-        }
+//     try {
+//         if (!req.user.permission[0].viewAllDefect) {
+//             aggQuery = Defect.aggregate(
+//                 [{ $match: { project: { $in: await userProject }, title: { $regex: search, $options: 'i' } } },
+//                 { $sort: { [sortby]: order } }
+//                 ], { collation: { locale: "en", caseLevel: true } }
+//             )
+//         }
 
-        if (req.user.permission[0].viewAllDefect) {
-            aggQuery = Defect.aggregate(
-                [{ $match: { title: { $regex: search, $options: 'i' } } },
-                { $sort: { [sortby]: order } }
-                ]
-                , { collation: { locale: "en", caseLevel: true } }
-            )
-        }
+//         if (req.user.permission[0].viewAllDefect) {
+//             aggQuery = Defect.aggregate(
+//                 [{ $match: { title: { $regex: search, $options: 'i' } } },
+//                 { $sort: { [sortby]: order } }
+//                 ]
+//                 , { collation: { locale: "en", caseLevel: true } }
+//             )
+//         }
 
-        const defects = Defect.aggregatePaginate(aggQuery, options);
+//         const defects = Defect.aggregatePaginate(aggQuery, options);
 
-        return defects;
+//         return defects;
 
-    } catch (error) {
-        throw error
-    }
+//     } catch (error) {
+//         throw error
+//     }
 
-}
+// }
 
 //Get details for creating defects
 //Get assignee of the project.
@@ -372,8 +373,10 @@ export const filterDefectList = async (req, user) => {
         const status = req.body.status || '';
         const severity = req.body.severity || '';
         const assignee = req.body.assignee || ''; 
+        const reporter = req.body.reporter || '';
         const server = req.body.server || '';
         const search = req.body.search || '(.*?)';
+
 
         //if search by project but user is not assigned to the project and does not have viewAllDefect permission throw error
         if (project !== '' && !user.permission[0].viewAllDefect && !user.project.includes(project)) {
@@ -399,6 +402,7 @@ export const filterDefectList = async (req, user) => {
         const filterSeverity = (severity === '') ? { $regex: matchAll } : severity
         const filterServer = (server === '') ? { $regex: matchAll } : server
         const filterAssignee = (!assignee.length) ?  { $all: [/(.*?)/i] }   :  { $all: assignee }
+        const filterReporter = (reporter === '') ? { $regex: matchAll } : reporter
 
         let aggQuery = Defect.aggregate([
             [
@@ -409,6 +413,7 @@ export const filterDefectList = async (req, user) => {
                         status: filterStatus,
                         severity: filterSeverity,
                         server: filterServer,
+                        "reporter.username": filterReporter,
                         title: { $regex: search, $options: 'i' },
                         "assigneeDetails.username": filterAssignee
                     }

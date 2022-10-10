@@ -288,7 +288,8 @@ export const calcuDateDiff = (isodate) => {
 //TODO: plan in the future to be able to customize 
 export const StatusColorCode = ({
     status,
-    textWidth
+    textWidth,
+    lineHeight
 }) => {
     switch (status.toLowerCase()) {
         case "new":
@@ -302,7 +303,8 @@ export const StatusColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "open":
@@ -316,7 +318,8 @@ export const StatusColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "fixed":
@@ -330,7 +333,8 @@ export const StatusColorCode = ({
                         color: 'black',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "pending retest":
@@ -344,7 +348,8 @@ export const StatusColorCode = ({
                         color: 'black',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "verified":
@@ -358,7 +363,8 @@ export const StatusColorCode = ({
                         color: 'black',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "closed":
@@ -372,7 +378,8 @@ export const StatusColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "deferred":
@@ -386,7 +393,8 @@ export const StatusColorCode = ({
                         color: 'black',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "duplicated":
@@ -400,7 +408,8 @@ export const StatusColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
         case "not a bug":
@@ -414,7 +423,8 @@ export const StatusColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{status}</Typography>
             )
 
@@ -427,7 +437,8 @@ export const StatusColorCode = ({
                     color: 'black',
                     textTransform: 'uppercase',
                     width: `${textWidth}`,
-                    padding: '0.5rem'
+                    padding: '0.5rem',
+                    lineHeight: lineHeight || 1.5
                 }}>{status}</Typography>
             break;
     }
@@ -435,7 +446,8 @@ export const StatusColorCode = ({
 
 export const SeverityColorCode = ({
     severity,
-    textWidth
+    textWidth,
+    lineHeight,
 }) => {
     switch (severity.toLowerCase()) {
         case "showstopper":
@@ -448,7 +460,8 @@ export const SeverityColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{severity}</Typography>
             )
         case "high":
@@ -461,7 +474,8 @@ export const SeverityColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{severity}</Typography>
             )
         case "medium":
@@ -474,7 +488,8 @@ export const SeverityColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{severity}</Typography>
             )
         case "low":
@@ -487,7 +502,8 @@ export const SeverityColorCode = ({
                         color: 'white',
                         textTransform: 'uppercase',
                         width: `${textWidth}`,
-                        padding: '0.5rem'
+                        padding: '0.5rem',
+                        lineHeight: lineHeight || 1.5
                     }}>{severity}</Typography>
             )
         default:
@@ -499,7 +515,8 @@ export const SeverityColorCode = ({
                     color: 'black',
                     textTransform: 'uppercase',
                     width: `${textWidth}`,
-                    padding: '0.5rem'
+                    padding: '0.5rem',
+                    lineHeight: lineHeight || 1.5
                 }}>{severity}</Typography>
             break;
     }

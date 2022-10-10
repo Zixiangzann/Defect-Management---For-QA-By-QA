@@ -210,34 +210,35 @@ export const defectWatch = createAsyncThunk(
         }
     })
 
+//to remove, not using anymore
 
-export const getAllDefectPaginate = createAsyncThunk(
-    'defects/getAllDefectPaginate',
-    async ({
-        page = 1,
-        limit = 10,
-        project = "",
-        sortby = 'lastUpdatedDate',
-        order = -1,
-        search
-    }, { dispatch }) => {
-        try {
-            const request = await axios.post('/api/defect/paginate', {
-                page,
-                limit,
-                project,
-                sortby,
-                order,
-                search
-            }
-                , getAuthHeader())
-            return request.data;
-        } catch (error) {
-            dispatch(errorGlobal(<div>Error fetching defect list</div>));
-            throw error
-        }
-    }
-)
+// export const getAllDefectPaginate = createAsyncThunk(
+//     'defects/getAllDefectPaginate',
+//     async ({
+//         page = 1,
+//         limit = 10,
+//         project = "",
+//         sortby = 'lastUpdatedDate',
+//         order = -1,
+//         search
+//     }, { dispatch }) => {
+//         try {
+//             const request = await axios.post('/api/defect/paginate', {
+//                 page,
+//                 limit,
+//                 project,
+//                 sortby,
+//                 order,
+//                 search
+//             }
+//                 , getAuthHeader())
+//             return request.data;
+//         } catch (error) {
+//             dispatch(errorGlobal(<div>Error fetching defect list</div>));
+//             throw error
+//         }
+//     }
+// )
 
 export const updateDefect = createAsyncThunk(
     'defects/updateDefect',
@@ -298,6 +299,7 @@ export const filterDefect = createAsyncThunk(
         status,
         severity,
         assignee,
+        reporter,
         server,
         sortby = 'lastUpdatedDate',
         order = 1,
@@ -312,6 +314,7 @@ export const filterDefect = createAsyncThunk(
                 status,
                 severity,
                 assignee,
+                reporter,
                 server,
                 sortby,
                 order,

@@ -186,7 +186,9 @@ const CreateDefect = () => {
 
     return (
         <>
-            <Typography variant='h4' sx={{ marginTop: '2rem', backgroundColor: 'lightblue', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Create Issue</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', flexBasis: '100%' }}>
+                <Typography variant='h4' sx={{ marginTop: '2rem', color: '#00008b', borderRadius: '20px', width: 'fit-content', padding: '0.5rem' }}>Create Issue</Typography>
+            </Box>
 
             {defects.loading ?
                 <Loader
@@ -214,7 +216,7 @@ const CreateDefect = () => {
 
                         <Select
                             name='project'
-                            label='Select Project'
+                            label={formik.values.project ? "Selected Project" : "Select Project"}
                             disabled={enableSelectProject}
                             {...formik.getFieldProps('project')}
                         >
@@ -372,109 +374,6 @@ const CreateDefect = () => {
 
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 
-
-                        <FormikProvider value={formik}>
-                            <FieldArray
-                                name="assignee"
-                                render={arrayHelpers => (
-                                    <FormControl
-                                        id="createDefectAssignee"
-                                        sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
-
-                                        {formik.values.project ?
-                                            <InputLabel className='defectDetailsSelectLabel'>Assignee</InputLabel>
-                                            :
-                                            <InputLabel color='grey'>Assignee</InputLabel>
-                                        }
-
-
-
-
-                                        <Select
-                                            multiple
-                                            name='assignee'
-                                            label='Assignee'
-                                            value={assignee}
-                                            onChange={
-                                                (e) => {
-                                                    handleChange(e)
-                                                }
-                                            }
-                                            onClose={() => {
-                                                setAssigneeSelectTouched(true);
-                                                formik.setFieldValue('assignee', [...assignee])
-                                            }}
-                                            required
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip
-                                                            avatar={<Avatar alt={value.username} src={value.photoURL} />}
-                                                            key={value.username}
-                                                            label={value.username}
-                                                            color="primary"
-                                                            variant='outlined'
-                                                            sx={{ ml: 2 }} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                            disabled={formik.values.project ? false : true}
-                                        >
-                                            {defects.data.assignee ? defects.data.assignee.map((item) => (
-
-                                                <MenuItem
-                                                    key={item.email}
-                                                    value={item}
-                                                >
-                                                    <Checkbox
-                                                        checked={assignee.indexOf(item) > -1}
-                                                        icon={<AddCircleIcon sx={{ display: 'none' }} />}
-                                                        checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
-
-                                                    />
-
-                                                    <Avatar
-                                                        alt={item.email}
-                                                        src={item.photoURL}
-                                                        sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
-
-
-
-                                                    <Box>
-                                                        <Typography
-                                                            sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
-                                                        >{item.email}</Typography>
-                                                        <Typography
-                                                            sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
-                                                        >@{item.username}</Typography>
-                                                    </Box>
-
-                                                </MenuItem>
-
-                                            )
-                                            ) : null}
-
-                                        </Select>
-                                        {!formik.values.project ?
-                                            <FormHelperText color='brown'>
-                                                Please select a project first
-                                            </FormHelperText>
-                                            :
-                                            null
-                                        }
-                                        {!formik.values.assignee && submitClicked === true ?
-                                            <FormHelperText error={true}>
-                                                Please select a assignee
-                                            </FormHelperText>
-                                            :
-                                            null
-                                        }
-                                    </FormControl>
-                                )}
-                            />
-                        </FormikProvider>
-
-
                         <FormControl
                             id="createDefectComponents"
                             sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
@@ -569,14 +468,115 @@ const CreateDefect = () => {
                                 {...formik.getFieldProps('severity')}
                             >
 
-                                <MenuItem key="Low" value="Low">{SeverityColorCode({ severity: "Low", textWidth: '10rem' })}</MenuItem>
-                                <MenuItem key="Medium" value="Medium">{SeverityColorCode({ severity: "Medium", textWidth: '10rem' })}</MenuItem>
-                                <MenuItem key="High" value="High">{SeverityColorCode({ severity: "High", textWidth: '10rem' })}</MenuItem>
-                                <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({ severity: "Showstopper", textWidth: '10rem' })}</MenuItem>
+                                <MenuItem key="Low" value="Low">{SeverityColorCode({ severity: "Low", textWidth: '10rem', lineHeight: 0.5 })}</MenuItem>
+                                <MenuItem key="Medium" value="Medium">{SeverityColorCode({ severity: "Medium", textWidth: '10rem', lineHeight: 0.5 })}</MenuItem>
+                                <MenuItem key="High" value="High">{SeverityColorCode({ severity: "High", textWidth: '10rem', lineHeight: 0.5 })}</MenuItem>
+                                <MenuItem key="Showstopper" value="Showstopper">{SeverityColorCode({ severity: "Showstopper", textWidth: '10rem', lineHeight: 0.5 })}</MenuItem>
                             </Select>
 
                             {errorHelperSelect(formik, 'severity')}
                         </FormControl>
+
+                        <FormikProvider value={formik}>
+                            <FieldArray
+                                name="assignee"
+                                render={arrayHelpers => (
+                                    <FormControl
+                                        id="createDefectAssignee"
+                                        sx={{ mt: '1rem', mr: '1rem', flexBasis: '35%' }}>
+
+                                        {formik.values.project ?
+                                            <InputLabel className='defectDetailsSelectLabel'>Assignee</InputLabel>
+                                            :
+                                            <InputLabel color='grey'>Assignee</InputLabel>
+                                        }
+
+
+
+
+                                        <Select
+                                            multiple
+                                            name='assignee'
+                                            label="Assignee"
+                                            value={assignee}
+                                            onChange={
+                                                (e) => {
+                                                    handleChange(e)
+                                                }
+                                            }
+                                            onClose={() => {
+                                                setAssigneeSelectTouched(true);
+                                                formik.setFieldValue('assignee', [...assignee])
+                                            }}
+                                            required
+                                            renderValue={(selected) => (
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                    {selected.map((value) => (
+                                                        <Chip
+                                                            avatar={<Avatar alt={value.username} src={value.photoURL} />}
+                                                            key={value.username}
+                                                            label={value.username}
+                                                            color="primary"
+                                                            variant='outlined'
+                                                            sx={{ ml: 2 }} />
+                                                    ))}
+                                                </Box>
+                                            )}
+                                            disabled={formik.values.project ? false : true}
+                                        >
+                                            {defects.data.assignee ? defects.data.assignee.map((item) => (
+
+                                                <MenuItem
+                                                    key={item.email}
+                                                    value={item}
+                                                >
+                                                    <Checkbox
+                                                        checked={assignee.indexOf(item) > -1}
+                                                        icon={<AddCircleIcon sx={{ display: 'none' }} />}
+                                                        checkedIcon={<AddCircleIcon sx={{ color: 'green' }} />}
+
+                                                    />
+
+                                                    <Avatar
+                                                        alt={item.email}
+                                                        src={item.photoURL}
+                                                        sx={{ marginRight: '1rem', width: 65, height: 65 }}></Avatar>
+
+
+
+                                                    <Box>
+                                                        <Typography
+                                                            sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '600' }}
+                                                        >{item.email}</Typography>
+                                                        <Typography
+                                                            sx={{ maxWidth: '15rem', overflow: 'auto', fontWeight: '300' }}
+                                                        >@{item.username}</Typography>
+                                                    </Box>
+
+                                                </MenuItem>
+
+                                            )
+                                            ) : null}
+
+                                        </Select>
+                                        {!formik.values.project ?
+                                            <FormHelperText color='brown'>
+                                                Please select a project first
+                                            </FormHelperText>
+                                            :
+                                            null
+                                        }
+                                        {!formik.values.assignee && submitClicked === true ?
+                                            <FormHelperText error={true}>
+                                                Please select a assignee
+                                            </FormHelperText>
+                                            :
+                                            null
+                                        }
+                                    </FormControl>
+                                )}
+                            />
+                        </FormikProvider>
 
                     </Box>
                     <br></br>
@@ -584,7 +584,7 @@ const CreateDefect = () => {
                     <Box>
                         <Button
                             variant='text'
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/defect')}
                             sx={{ float: 'right', margin: '3rem 0.5rem 0 0' }}>
                             Cancel
                         </Button>

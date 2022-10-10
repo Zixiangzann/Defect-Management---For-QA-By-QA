@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 //comp
-import { getAllDefectPaginate, deleteDefect, filterDefect } from '../../store/actions/defects';
+import { deleteDefect, filterDefect } from '../../store/actions/defects';
 import { setOrder, setSearch, setSortBy, resetFilterState } from '../../store/reducers/defects';
 import ModalComponent from '../../utils/modal/modal';
 import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
@@ -230,10 +230,10 @@ const PaginateComponent = ({
         setToRemove(null)
     }
 
-    useEffect(() => {
-        dispatch(setSortBy(sortActive));
-        orderActive === 'asc' ? dispatch(setOrder(1)) : dispatch(setOrder(-1))
-    }, [sortActive, orderActive])
+    // useEffect(() => {
+    //     dispatch(setSortBy(sortActive));
+    //     orderActive === 'asc' ? dispatch(setOrder(1)) : dispatch(setOrder(-1))
+    // }, [sortActive, orderActive])
 
 
     useEffect(() => {
@@ -242,53 +242,41 @@ const PaginateComponent = ({
             setLoading(true)
         }
 
-        if (filter.filtered === false) {
-            dispatch(getAllDefectPaginate({
-                page: page + 1,
-                limit: rowsPerPage,
-                sortby: sort.sortby,
-                order: sort.order,
-                search: filter.field.search
-            }))
-                .unwrap()
-                .then(() => {
-                    if (firstLoad) {
-                        setLoading(false)
-                        setFirstLoad(false)
-                    }
-                })
-        } else {
-            dispatch(filterDefect({
-                page: page + 1,
-                limit: rowsPerPage,
-                project: filter.field.project,
-                components: filter.field.components,
-                server: filter.field.server,
-                severity: filter.field.severity,
-                status: filter.field.status,
-                sortby: sort.sortby,
-                order: sort.order,
-                search: filter.field.search
-            }))
-                .unwrap()
-                .then(() => {
-                    if (firstLoad) {
-                        setLoading(false)
-                        setFirstLoad(false)
-                    }
-                })
+        if(!filter.filtering && !loading){
+        dispatch(filterDefect({
+            page: page + 1,
+            limit: rowsPerPage,
+            project: filter.field.project,
+            components: filter.field.components,
+            assignee: filter.field.assignee,
+            reporter: filter.field.reporter,
+            server: filter.field.server,
+            severity: filter.field.severity,
+            status: filter.field.status,
+            sortby: sort.sortby,
+            order: sort.order,
+            search: filter.field.search
+        }))
+            .unwrap()
+            .then(() => {
+                if (firstLoad) {
+                    setLoading(false)
+                    setFirstLoad(false)
+                }
+            })
         }
-    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.field.search]);
+        
+    }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.field]);
+
+    // useEffect(() => {
+    //     //reset filter state on load
+    //     // dispatch(resetFilterState())
+    //     setSearchField(filter.field.search)
+    // }, [])
 
     useEffect(() => {
-        //reset filter state on load
-        // dispatch(resetFilterState())
-        setSearchField(filter.field.search)
-    }, [])
-
-    useEffect(() => {
-        if(searchField){
-        dispatch(setSearch(searchField));
+        if (searchField) {
+            dispatch(setSearch(searchField));
         }
     }, [searchField])
 
@@ -416,9 +404,9 @@ const PaginateComponent = ({
 
                                         {showColumn.severity ?
                                             <TableCell key={`${item.severity}-${index}`} sx={{ width: '20px', textAlign: 'center' }}>
-                                                <Box 
-                                                key={`${item.severity}-${index}-box`}
-                                                sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+                                                <Box
+                                                    key={`${item.severity}-${index}-box`}
+                                                    sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
                                                     {SeverityColorCode({ severity: item.severity, textWidth: '9rem' })}
                                                 </Box>
                                             </TableCell>
@@ -427,9 +415,9 @@ const PaginateComponent = ({
                                         }
                                         {showColumn.status ?
                                             <TableCell key={`${item.status}-${index}`} sx={{ width: '20px', textAlign: 'center' }}>
-                                                <Box 
-                                                 key={`${item.status}-${index}-box`}
-                                                sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+                                                <Box
+                                                    key={`${item.status}-${index}-box`}
+                                                    sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
                                                     {StatusColorCode({ status: item.status, textWidth: '6rem' })}
                                                 </Box>
                                             </TableCell>
@@ -445,7 +433,7 @@ const PaginateComponent = ({
                                         {showColumn.assigneeDetails && item.assigneeDetails ?
 
                                             <TableCell key={`${item.assigneeDetails.username}-${index}`} sx={{ minWidth: '150px', textAlign: 'center' }}>
-                                                {item.assigneeDetails.map((user,index) => (
+                                                {item.assigneeDetails.map((user, index) => (
                                                     <Box key={`${user}-${index}`}>
                                                         <Chip
                                                             avatar={<Avatar alt={user.username} src={user.photoURL} />}
@@ -455,7 +443,7 @@ const PaginateComponent = ({
                                                         />
                                                     </Box>
                                                 ))}
-                                                
+
                                             </TableCell>
 
                                             :
@@ -465,13 +453,13 @@ const PaginateComponent = ({
                                         {showColumn.reporter ?
                                             <TableCell key={`${item.reporter.username}-${index}`} sx={{ minWidth: '50px', textAlign: 'center', overflowWrap: 'break-word' }}>
                                                 <Chip
-                                                   key={`${item.reporter.username}-${index}-chip`}
+                                                    key={`${item.reporter.username}-${index}-chip`}
                                                     avatar={<Avatar alt={item.reporter.username} src={item.reporter.photoURL} />}
                                                     label={item.reporter.username}
                                                     variant="outlined"
                                                     sx={{ width: '100%', justifyContent: 'flex-start', m: 0.2 }}
                                                 />
-                                                </TableCell>
+                                            </TableCell>
                                             :
                                             null
                                         }
