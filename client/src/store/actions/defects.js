@@ -7,7 +7,6 @@ import { getAuthHeader, removeTokenCookie } from '../../utils/tools'
 import { storage } from '../../firebase';
 import { ref, getDownloadURL, uploadBytes, uploadBytesResumable, deleteObject, listAll } from "firebase/storage"
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { async } from '@firebase/util';
 
 //Get details for creating defects
 //Get all available assignee of a project
@@ -327,6 +326,7 @@ export const filterDefect = createAsyncThunk(
         }
     }
 )
+
 
 
 

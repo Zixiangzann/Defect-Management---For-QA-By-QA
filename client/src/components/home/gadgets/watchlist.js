@@ -1,59 +1,73 @@
 //lib
-import Moment from 'react-moment'
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from "react"
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import Moment from 'react-moment'
 
 //comp
-import { deleteDefect, filterDefect } from '../../store/actions/defects';
-import { setOrder, setSearch, setSortBy, resetFilterState } from '../../store/reducers/defects';
-import ModalComponent from '../../utils/modal/modal';
-import { StatusColorCode, SeverityColorCode } from '../../utils/tools';
-import { Loader } from '../../utils/tools';
+import { StatusColorCode, SeverityColorCode } from '../../../utils/tools';
+import { getWatchlistDefectList, updateFieldFilter } from "../../../store/actions/watchlist";
+import WatchlistColumnFilter from "./watchlistColumnFilter";
+import { deleteDefect } from "../../../store/actions/defects";
+import ModalComponent from "../../../utils/modal/modal";
+import { setOrder, setSearch, setSortBy } from "../../../store/reducers/watchlist";
 
-//MUI
-import Table from '@mui/material/Table'
-import TableCell from '@mui/material/TableCell'
+//mui
+import Box from "@mui/material/Box"
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Pagination from '@mui/material/Pagination';
-import TableBody from '@mui/material/TableBody';
-import Button from '@mui/material/Button';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper'
-import Tooltip from '@mui/material/Tooltip'
-import TableSortLabel from '@mui/material/TableSortLabel';
-import { visuallyHidden } from '@mui/utils';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import SettingsIcon from '@mui/icons-material/Settings';
+import IconButton from "@mui/material/IconButton";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ViewWeekRoundedIcon from '@mui/icons-material/ViewWeekRounded';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import { visuallyHidden } from '@mui/utils';
+import Chip from '@mui/material/Chip';
+import Avatar from '@mui/material/Avatar';
+import TablePagination from '@mui/material/TablePagination';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Avatar, Chip } from '@mui/material';
+import WatchlistDefectFilter from "./watchlistDefectFilter";
 
+const Watchlist = ({
 
-const PaginateComponent = ({
-    defects,
-    filter,
-    sort
 }) => {
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [settingAnchorEl, setSettingAnchorEl] = useState(null);
+    const [columnFilterAnchor, setColumnFilterAnchor] = useState()
+    const [defectFilterAnchor, setDefectFilterAnchor] = useState()
+    const settingMenuOpen = Boolean(settingAnchorEl);
+
     const users = useSelector(state => state.users)
-    const showColumn = useSelector(state => state.defects.filter.showColumn)
+    const defectList = useSelector(state => state.watchlist.defectList.data)
+    const showColumn = useSelector(state => state.watchlist.defectList.filter.showColumn)
+    const filter = useSelector(state => state.watchlist.defectList.filter)
+    const sort = useSelector(state => state.watchlist.defectList.filter.sort)
+
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [toRemove, setToRemove] = useState(null);
     const [searchField, setSearchField] = useState('');
-
     const [page, setPage] = useState(0);
-
     const [loading, setLoading] = useState(false)
     const [firstLoad, setFirstLoad] = useState(true)
+
 
     //Table
     const tableHeader = [
@@ -89,7 +103,6 @@ const PaginateComponent = ({
     }
 
     //Table sorting
-
     //For table header sorting state
     const [orderActive, setOrderActive] = useState('desc');
     const [sortActive, setSortActive] = useState('lastUpdatedDate');
@@ -98,16 +111,16 @@ const PaginateComponent = ({
     const handleOrder = () => {
         if (orderActive === 'desc') {
             setOrderActive('asc');
-            dispatch(setOrder(1))
+            dispatch(setOrder(1));
         } else if (orderActive === 'asc') {
             setOrderActive('desc');
-            dispatch(setOrder(-1))
+            dispatch(setOrder(-1));
         }
     }
 
     const handleSort = (header) => {
         setSortActive(header);
-        dispatch(setSortBy(header))
+        dispatch(setSortBy(header));
     }
 
     const handleSearch = (event) => {
@@ -115,12 +128,7 @@ const PaginateComponent = ({
         dispatch(setSearch(event.target.value))
     }
 
-    //Modal
-    const [openModal, setOpenModal] = useState(false);
-
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
+    //table pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -136,6 +144,50 @@ const PaginateComponent = ({
 
     const handleView = (id) => {
         navigate(`/defect/view/${id}`)
+    }
+
+
+
+    //Defect Menu
+    const [defectItem, setDefectItem] = useState({})
+    const [showMenu, setShowMenu] = useState(false)
+    const [defectMenuAnchorEl, setDefectMenuAnchorEl] = useState(null);
+
+    const DefectMenu = ({
+        defect
+    }) => {
+        return (
+            <>
+                <Menu
+                    id="defect-menu"
+                    open={showMenu}
+                    onClose={() => setShowMenu(false)}
+                    anchorEl={defectMenuAnchorEl}
+                >
+                    <MenuItem
+                        onClick={() => handleView(defect.defectid)}>
+                        <Tooltip title="View">
+                            <Button
+                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5, mr: 1 }}
+
+                            >
+                                <OpenInNewIcon />
+                            </Button>
+                        </Tooltip>
+                        View</MenuItem>
+
+                    <EditMenuComponent
+                        defect={defect}
+                    />
+
+                    <DeleteMenuComponent
+                        defect={defect}
+                    />
+
+                </Menu>
+            </>
+        )
+
     }
 
     const EditMenuComponent = ({ defect }) => {
@@ -186,59 +238,37 @@ const PaginateComponent = ({
         return null
     }
 
-    //Defect Menu
 
-    const [defectItem, setDefectItem] = useState({})
-    const [showMenu, setShowMenu] = useState(false)
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const DefectMenu = ({
-        defect
-    }) => {
-        return (
-            <>
-                <Menu
-                    id="defect-menu"
-                    open={showMenu}
-                    onClose={() => setShowMenu(false)}
-                    anchorEl={anchorEl}
-                >
-                    <MenuItem
-                        onClick={() => handleView(defect.defectid)}>
-                        <Tooltip title="View">
-                            <Button
-                                sx={{ minHeight: 0, minWidth: 0, padding: 0.5, mr: 1 }}
-
-                            >
-                                <OpenInNewIcon />
-                            </Button>
-                        </Tooltip>
-                        View</MenuItem>
-
-                    <EditMenuComponent
-                        defect={defect}
-                    />
-
-                    <DeleteMenuComponent
-                        defect={defect}
-                    />
-
-                </Menu>
-            </>
-        )
-
-    }
+    //modal
+    const [openModal, setOpenModal] = useState(false);
 
     const handleModalConfirm = (toRemove) => {
         dispatch(deleteDefect({ defectId: toRemove }))
         setToRemove(null)
     }
 
-    // useEffect(() => {
-    //     dispatch(setSortBy(sortActive));
-    //     orderActive === 'asc' ? dispatch(setOrder(1)) : dispatch(setOrder(-1))
-    // }, [sortActive, orderActive])
+    //watchlist
+    //show/hide settings
 
+    const handleColumnFilter = (event) => {
+        setColumnFilterAnchor(columnFilterAnchor ? null : event.currentTarget);
+    }
+
+    const handleDefectFilter = (event) => {
+        setDefectFilterAnchor(defectFilterAnchor ? null : event.currentTarget);
+    }
+
+    const handleSettingClick = (event) => {
+        setSettingAnchorEl(event.currentTarget)
+    }
+
+    const handleSettingClose = () => {
+        setSettingAnchorEl(null)
+    }
+
+    // useEffect(() => {
+    //     dispatch(getWatchlistDefectList({ watchlist: users.email }))
+    // }, [])
 
     useEffect(() => {
 
@@ -247,7 +277,7 @@ const PaginateComponent = ({
         }
 
         if(!filter.filtering && !loading){
-        dispatch(filterDefect({
+        dispatch(getWatchlistDefectList({
             page: page + 1,
             limit: rowsPerPage,
             project: filter.field.project,
@@ -259,7 +289,8 @@ const PaginateComponent = ({
             status: filter.field.status,
             sortby: sort.sortby,
             order: sort.order,
-            search: filter.field.search
+            search: filter.field.search,
+            watchlist: users.email
         }))
             .unwrap()
             .then(() => {
@@ -272,12 +303,7 @@ const PaginateComponent = ({
         
     }, [page, rowsPerPage, toRemove, sort.order, sort.sortby, filter.field]);
 
-    // useEffect(() => {
-    //     //reset filter state on load
-    //     // dispatch(resetFilterState())
-    //     setSearchField(filter.field.search)
-    // }, [])
-
+   
     useEffect(() => {
         if (searchField) {
             dispatch(setSearch(searchField));
@@ -285,16 +311,57 @@ const PaginateComponent = ({
     }, [searchField])
 
 
+ 
+
+
     return (
-        <>
 
 
-            <Loader
-                loading={loading}
-            />
 
-            {defects && defects.docs ?
-                <Paper sx={{ width: '100%', mb: 2, mt: 2 }}>
+        <Box sx={{ height: '100%' }}>
+
+
+
+            <Box className="widget-header" mt={1} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+
+                < Typography mb={1} sx={{ textAlign: 'left', flexBasis: '95%', alignSelf: 'flex-end', color: '#00008b', fontSize: '150%' }}> Watchlist </Typography >
+
+                <IconButton
+                    id="setting-button"
+                    onClick={handleSettingClick}
+                    sx={{ flexBasis: '5%' }}
+                >
+                    <SettingsIcon color="b"/>
+                </IconButton>
+                <Menu
+                    id="setting-menu"
+                    anchorEl={settingAnchorEl}
+                    open={settingMenuOpen}
+                    onClose={handleSettingClose}
+                >
+
+                    <MenuItem
+                    onClick={handleDefectFilter}>
+                        <ListItemIcon>
+                            <FilterListIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Filter</ListItemText>
+                    </MenuItem>
+
+                    <MenuItem
+                        onClick={handleColumnFilter}>
+                        <ListItemIcon>
+                            <ViewWeekRoundedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Column</ListItemText>
+                    </MenuItem>
+
+                </Menu>
+
+            </Box>
+
+            {defectList.docs ?
+                <Paper sx={{ width: '100%', mb: 2, mt: 2, height: "calc(100% - 100px)" }}>
                     <TextField
                         id="search-by-title"
                         label="Search by title"
@@ -306,7 +373,7 @@ const PaginateComponent = ({
                     />
                     <TableContainer
                         className='defectListTableContainer'
-                        sx={{ mt: 2, minWidth: '100%', maxHeight: 750 }}
+                        sx={{ mt: 2, minWidth: '100%', height: 'calc(100% - 150px)' }}
 
                     >
                         <Table
@@ -356,7 +423,7 @@ const PaginateComponent = ({
                             </TableHead>
                             <TableBody
                             >
-                                {defects.docs.map((item, index) => (
+                                {defectList.docs.map((item, index) => (
                                     <TableRow key={item._id}
                                     >
                                         {showColumn.menu ?
@@ -366,7 +433,7 @@ const PaginateComponent = ({
                                                 onClick={(e) => {
                                                     setDefectItem(item)
                                                     setShowMenu(true)
-                                                    setAnchorEl(e.currentTarget)
+                                                    setDefectMenuAnchorEl(e.currentTarget)
                                                 }}
                                             >
                                                 <MenuIcon color='secondary' sx={{ '&:hover': { color: '#ce32e7' } }} /></TableCell>
@@ -488,7 +555,7 @@ const PaginateComponent = ({
                         component="div"
                         rowsPerPage={rowsPerPage}
                         colSpan={3}
-                        count={defects.totalDocs}
+                        count={defectList.totalDocs}
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -496,8 +563,22 @@ const PaginateComponent = ({
 
                 </Paper>
                 :
-                null
+                <Typography>There is no defect in your watchlist</Typography>
             }
+
+            <WatchlistDefectFilter
+                defectFilterAnchor={defectFilterAnchor}
+                setDefectFilterAnchor={setDefectFilterAnchor}
+            >
+
+            </WatchlistDefectFilter>
+
+            <WatchlistColumnFilter
+                columnFilterAnchor={columnFilterAnchor}
+                setColumnFilterAnchor={setColumnFilterAnchor}
+
+            />
+
             <ModalComponent
                 open={openModal}
                 setOpenModal={setOpenModal}
@@ -516,9 +597,12 @@ const PaginateComponent = ({
             >
             </DefectMenu>
 
+        </Box >
 
-        </>
+
+
     )
+
 }
 
-export default PaginateComponent;
+export default Watchlist

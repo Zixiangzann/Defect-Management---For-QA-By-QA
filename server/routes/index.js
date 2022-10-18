@@ -8,6 +8,7 @@ import adminRoute from './admin.route.js';
 import projectRoute from './project.route.js';
 import commentRoute from './comment.route.js';
 import historyRoute from './history.route.js';
+import watchlistRoute from './watchlist.route.js' 
 
 const routesIndex = [
     {
@@ -37,8 +38,13 @@ const routesIndex = [
     {
         path:'/history',
         route:historyRoute
+    },
+    {
+        path:'/watchlist',
+        route:watchlistRoute
     }
 ] 
+
 
 routesIndex.forEach((route)=>{
     router.use(route.path,route.route)

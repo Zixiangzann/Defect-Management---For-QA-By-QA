@@ -17,6 +17,11 @@ let grantsObject = {
         projects:allRights,
         comments:allRights,
         history: allRights,
+        watchlist:{
+            'read:own':['*'],
+            'update:own':['*']
+
+        }
     },
     admin: {
         profile:allRights,
@@ -26,6 +31,11 @@ let grantsObject = {
         projects:allRights,
         comments:allRights,
         history: allRights,
+        watchlist:{
+            'read:own':['*'],
+            'update:own':['*']
+
+        }
     },
     user: {
         profile:{
@@ -52,6 +62,11 @@ let grantsObject = {
             'create:any':['*'],
             'read:any':['*']
         },
+        watchlist:{
+            'read:own':['*'],
+            'update:own':['*']
+
+        }
     }
 };
 

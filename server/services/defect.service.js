@@ -45,6 +45,8 @@ export const createDefect = async (body, user) => {
             "username": user.username
         }
 
+        const watching = [...body.assignee,user.email]
+
         try {
             const defect = new Defect({
                 defectid: defectid,
@@ -58,6 +60,7 @@ export const createDefect = async (body, user) => {
                 status: body.status,
                 assignee: body.assignee,
                 assigneeDetails: body.assigneeDetails,
+                watching: watching,
                 server: body.server
             })
 
@@ -159,6 +162,8 @@ export const updateDefectById = async (defectId, user, body) => {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to update defect');
         }
 
+        const watching = [...body.assignee,defect.reporter.email]
+
         const newDefectDetail = Defect.findOneAndUpdate({ defectid: defectId },
             {
                 "$set": {
@@ -171,6 +176,7 @@ export const updateDefectById = async (defectId, user, body) => {
                     status: body.status,
                     assignee: body.assignee,
                     assigneeDetails: body.assigneeDetails,
+                    watching: watching,
                     server: body.server,
                     lastUpdatedDate: Date.now()
                 }
@@ -372,7 +378,8 @@ export const filterDefectList = async (req, user) => {
         const components = req.body.components || '';
         const status = req.body.status || '';
         const severity = req.body.severity || '';
-        const assignee = req.body.assignee || ''; 
+        const assignee = req.body.assignee || '';
+        const watchlist = req.body.watchlist || ''; 
         const reporter = req.body.reporter || '';
         const server = req.body.server || '';
         const search = req.body.search || '(.*?)';
@@ -381,6 +388,10 @@ export const filterDefectList = async (req, user) => {
         //if search by project but user is not assigned to the project and does not have viewAllDefect permission throw error
         if (project !== '' && !user.permission[0].viewAllDefect && !user.project.includes(project)) {
             throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view project');
+        }
+
+        if(watchlist && watchlist !== user.email){
+            throw new ApiError(httpStatus.METHOD_NOT_ALLOWED, 'No permission to view other user watchlist');
         }
 
         const matchAll = new RegExp('(.*?)', 'gi')
@@ -397,11 +408,13 @@ export const filterDefectList = async (req, user) => {
             filterProject = project
         }
 
+
         const filterComponents = (components === '') ? { $regex: matchAll } : components
         const filterStatus = (status === '') ? { $regex: matchAll } : status
         const filterSeverity = (severity === '') ? { $regex: matchAll } : severity
         const filterServer = (server === '') ? { $regex: matchAll } : server
         const filterAssignee = (!assignee.length) ?  { $all: [/(.*?)/i] }   :  { $all: assignee }
+        const filterWatchlist = (watchlist === '') ?  { $in: [/(.*?)/i] }:  { $in: [ user.email ] }
         const filterReporter = (reporter === '') ? { $regex: matchAll } : reporter
 
         let aggQuery = Defect.aggregate([
@@ -415,7 +428,8 @@ export const filterDefectList = async (req, user) => {
                         server: filterServer,
                         "reporter.username": filterReporter,
                         title: { $regex: search, $options: 'i' },
-                        "assigneeDetails.username": filterAssignee
+                        "assigneeDetails.username": filterAssignee,
+                        watching: filterWatchlist
                     }
                 },
                 { $sort: { [sortby]: order } }

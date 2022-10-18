@@ -8,6 +8,7 @@ import adminSlice from './reducers/admin'
 import reportSlice from './reducers/report'
 import historySlice from './reducers/history'
 import projectsSlice from './reducers/projects'
+import watchlistSlice from './reducers/watchlist'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     site:siteSlice,
     history:historySlice,
     comments:commentsSlice,
+    watchlist:watchlistSlice
   },middleware:(getDefaultMiddleware)=>
     getDefaultMiddleware({
       serializableCheck:{
